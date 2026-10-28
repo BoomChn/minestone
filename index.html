@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minestone · หินและกำไลตามดวง (V6b prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Decide before first paint whether the WebGL bloom (bloom.js) takes over from the CSS one. -->
+  <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches && document.createElement("canvas").getContext("webgl")) document.documentElement.classList.add("gl-bloom");</script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="Minestone หน้าแรก">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+      <span>Minestone</span>
+    </a>
+    <nav class="nav-links" aria-label="หลัก">
+      <a href="#custom">กำไลตามดวง</a>
+      <a href="#">กำไลพร้อมส่ง</a>
+      <a href="#">คลังหิน</a>
+      <a href="#birthday">ดูดวง · ฤกษ์</a>
+    </nav>
+    <div class="nav-end">
+      <span class="muted">@minestone</span>
+      <a class="btn btn-dark btn-sm" href="#line">สั่งทาง LINE</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="kicker rise" style="--i:0">หินและกำไลตามดวง · ร้อยมือทีละเม็ด</p>
+      <h1 class="rise" style="--i:1">หินที่ใช่ เริ่มจาก<br>วันเกิดของคุณ</h1>
+      <p class="lede rise" style="--i:2">ครูดาวอ่านวันเกิดของคุณ แล้วเลือกหินให้ทีละเม็ด ร้อยด้วยมือ ส่งพร้อมการ์ดและข้อความเสียงบอกเหตุผลทุกเม็ด</p>
+      <div class="cta-row rise" style="--i:3">
+        <a class="btn btn-dark" href="#custom">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" fill="none" stroke="#fff" stroke-width="1.3"/><circle cx="9" cy="2.5" r="1.8" fill="#fff"/><circle cx="14.6" cy="12.2" r="1.8" fill="#fff"/><circle cx="3.4" cy="12.2" r="1.8" fill="#fff"/></svg>
+          ให้ครูดาวร้อยให้
+        </a>
+        <a class="btn btn-line" href="#">ดูกำไลพร้อมส่ง</a>
+      </div>
+      <ul class="facts rise" style="--i:4">
+        <li>ร้อยมือ 5–7 วันทำการ</li>
+        <li>สั่งและคุยทาง LINE</li>
+        <li>หินแท้ ไม่แท้คืนเงิน</li>
+      </ul>
+      <div class="hero-stage" id="hero-stage">
+        <img class="hero-art" src="assets/hero.png" alt="กองผลึกหินสีน้ำ" width="880" height="520">
+        <span class="glint" aria-hidden="true"><i></i></span>
+      </div>
+      <img class="float f-rose" src="assets/rose-cut.png" alt="" aria-hidden="true" draggable="false">
+      <img class="float f-jade" src="assets/jade-cut.png" alt="" aria-hidden="true" draggable="false">
+      <img class="float f-amethyst" src="assets/amethyst-cut.png" alt="" aria-hidden="true" draggable="false">
+    </section>
+
+    <section class="honest">
+      <h2 class="h-sm reveal">หินที่นี่บอกชนิดตามจริง ไม่สัญญาผลลัพธ์</h2>
+      <p class="body reveal">ทุกเม็ดติดป้ายว่าเป็นหินธรรมชาติ ผ่านการปรับปรุง หรือสังเคราะห์ และราคาก็ตั้งตามนั้น เราเล่าความหมายตามความเชื่อไทยและจีน ไม่บอกว่าใส่แล้วชีวิตจะเปลี่ยน</p>
+    </section>
+
+    <section class="steps">
+      <h2 class="h-lg reveal">ได้กำไลของคุณในสามขั้น</h2>
+      <p class="body narrow reveal">ไม่ต้องรู้เรื่องหินมาก่อน บอกวันเกิดกับเรื่องที่อยากได้แรงหนุน ที่เหลือครูดาวดูแลให้</p>
+      <ol class="step-grid">
+        <li class="card reveal">
+          <span class="icon sage"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="4.5" width="16" height="14" rx="2.5" fill="none" stroke="#2E6A5C" stroke-width="1.4"/><path d="M3 9h16M7.5 2.5v4M14.5 2.5v4" fill="none" stroke="#2E6A5C" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+          <span class="step-no">ขั้นที่ 1</span>
+          <h3>บอกวันเกิดทาง LINE</h3>
+          <p>วันเดือนปีเกิด ขนาดข้อมือ และเรื่องที่อยากได้แรงหนุน งาน ความรัก หรือการคุ้มครอง</p>
+        </li>
+        <li class="card reveal">
+          <span class="icon sand"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="#B9844F" stroke-width="1.4"/><circle cx="11" cy="4" r="2.2" fill="#B9844F"/><circle cx="17.1" cy="14.5" r="2.2" fill="#B9844F"/><circle cx="4.9" cy="14.5" r="2.2" fill="#B9844F"/></svg></span>
+          <span class="step-no">ขั้นที่ 2</span>
+          <h3>ครูดาวอ่านและเลือกทีละเม็ด</h3>
+          <p>เปิดไพ่ คำนวณเลข แล้วเลือกหินเม็ดหลักตามวันเกิด เม็ดเสริมตามเรื่องที่คุณขอ</p>
+        </li>
+        <li class="card reveal">
+          <span class="icon sage"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 9v4M8.5 6v10M12 8v6M15.5 5v12M19 9v4M2 10.5v1" fill="none" stroke="#2E6A5C" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+          <span class="step-no">ขั้นที่ 3</span>
+          <h3>รับกำไลพร้อมข้อความเสียง</h3>
+          <p>ร้อยมือ ส่งพร้อมการ์ด และเสียงของครูดาวทาง LINE เล่าว่าเม็ดไหนอยู่ในเส้นเพราะอะไร</p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="birthday" id="birthday">
+      <div class="sphere reveal" id="sphere">
+        <img src="assets/sphere.png" alt="ลูกหินอะความารีน" width="480" height="480">
+        <canvas aria-hidden="true"></canvas>
+      </div>
+      <div class="bd-copy">
+        <p class="label sand-text reveal">หินประจำวันเกิด</p>
+        <h2 class="h-md reveal">ลองดูว่าหินไหน<br>เข้ากับคุณ</h2>
+        <p class="body reveal">ใส่วันเกิดเพื่อดูวัน สี และเลขของคุณแบบคร่าว ๆ ส่วนกำไลจริง ครูดาวจะอ่านละเอียดอีกครั้งก่อนเลือก</p>
+        <label class="field-label reveal" for="dob">วันเกิดของคุณ</label>
+        <div class="field reveal">
+          <svg width="20" height="20" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="4.5" width="16" height="14" rx="2.5" fill="none" stroke="#6B7280" stroke-width="1.3"/><path d="M3 9h16M7.5 2.5v4M14.5 2.5v4" fill="none" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <span id="dob-text">14 มีนาคม 2538</span>
+          <input id="dob" type="date" value="1995-03-14" min="1920-01-01" max="2025-12-31">
+        </div>
+        <div class="readout reveal" aria-live="polite">
+          <div class="cell">
+            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4" fill="none" stroke="#6B7280" stroke-width="1.3"/><path d="M10 1.5v2.5M10 16v2.5M1.5 10H4M16 10h2.5M4 4l1.8 1.8M14.2 14.2L16 16M4 16l1.8-1.8M14.2 5.8L16 4" fill="none" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div><span class="cap">เกิดวัน</span><strong class="swap" id="out-day">อังคาร</strong></div>
+          </div>
+          <div class="cell">
+            <span class="swatch" id="out-swatch"></span>
+            <div><span class="cap">สีประจำวัน</span><strong class="swap" id="out-color">ชมพู</strong></div>
+          </div>
+          <div class="cell">
+            <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l2.4 5 5.4.6-4 3.7 1.1 5.3L10 13.9 5.1 16.6l1.1-5.3-4-3.7 5.4-.6z" fill="none" stroke="#6B7280" stroke-width="1.3" stroke-linejoin="round"/></svg>
+            <div><span class="cap">เลขชีวิต</span><strong class="swap" id="out-num">5</strong></div>
+          </div>
+        </div>
+        <div class="stones reveal">
+          <span class="pill swap" id="out-stones">การ์เน็ต · โรสควอตซ์ · มูนสโตน</span>
+          <span class="muted swap" id="out-note">หินของคนเกิดวันอังคาร ตามความเชื่อ</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="intent">
+      <h2 class="h-lg reveal">อยากได้แรงหนุนเรื่องไหน</h2>
+      <p class="body narrow reveal">เลือกเรื่องที่ใจอยู่ตอนนี้ ครูดาวจะเพิ่มเม็ดเสริมตามความเชื่อของเรื่องนั้นเข้าไปในเส้นของคุณ</p>
+      <div class="chips reveal" role="group" aria-label="เรื่องที่อยากได้แรงหนุน">
+        <button class="chip" data-key="love" aria-pressed="false"><i style="--c:#E0A2AD"></i>ความรัก</button>
+        <button class="chip" data-key="work" aria-pressed="false"><i style="--c:#C08A3E"></i>การงาน</button>
+        <button class="chip" data-key="money" aria-pressed="false"><i style="--c:#7FA283"></i>การเงิน</button>
+        <button class="chip" data-key="protect" aria-pressed="false"><i style="--c:#4A4A55"></i>การคุ้มครอง</button>
+        <button class="chip" data-key="calm" aria-pressed="false"><i style="--c:#A98BC4"></i>ความสงบใจ</button>
+      </div>
+      <p class="pick-note muted swap" id="pick-note" aria-live="polite">เลือกได้มากกว่าหนึ่งเรื่อง</p>
+      <div class="row-art reveal" id="row-art" role="img" aria-label="หินห้าก้อน ชมพู ทอง เขียว ดำ ม่วง">
+        <img class="row-base" src="assets/row.png" alt="">
+        <img src="assets/row.png" alt="" data-key="love">
+        <img src="assets/row.png" alt="" data-key="work">
+        <img src="assets/row.png" alt="" data-key="money">
+        <img src="assets/row.png" alt="" data-key="protect">
+        <img src="assets/row.png" alt="" data-key="calm">
+      </div>
+    </section>
+
+    <section class="custom" id="custom">
+      <div class="custom-copy">
+        <p class="label sage-text reveal">กำไลตามดวง</p>
+        <h2 class="h-md reveal">หนึ่งเส้นสำหรับคุณคนเดียว<br>ร้อยจากวันเกิดจริง</h2>
+        <p class="body reveal">กำไลพร้อมส่งก็มี แต่ถ้าอยากได้เส้นที่คนอ่านดวงเลือกให้ทีละเม็ด นี่คือสิ่งที่ร้านนี้ทำได้ดีที่สุด</p>
+      </div>
+      <div class="offer reveal">
+        <div>
+          <h3>กำไลตามดวง</h3>
+          <p class="muted">ราคาตามหินที่เลือก แจ้งทาง LINE ก่อนร้อย</p>
+        </div>
+        <ul class="checks">
+          <li>อ่านวันเกิดด้วยไพ่และเลข</li>
+          <li>เลือกหินทีละเม็ด ติดป้ายชนิดตามจริง</li>
+          <li>ร้อยมือตามขนาดข้อมือ</li>
+          <li>การ์ดและข้อความเสียงบอกเหตุผล</li>
+        </ul>
+        <a class="btn btn-dark btn-block" href="#line">เริ่มคุยกับครูดาวทาง LINE</a>
+        <p class="fine">ร้อยเสร็จใน 5–7 วันทำการ · เสียหายระหว่างส่ง เปลี่ยนให้ฟรี</p>
+      </div>
+    </section>
+
+    <section class="line" id="line">
+      <h2 class="h-lg reveal">ฝากวันเกิดไว้ครั้งเดียว</h2>
+      <p class="body narrow reveal">เป็นเพื่อนกับ LINE @minestone ฟรี ก่อนแต่ละเทศกาลราวสองสัปดาห์ จะมีข้อความตามดวงและหินที่เข้ากับช่วงนั้นส่งไปหา</p>
+      <a class="btn btn-dark reveal" href="#">เพิ่มเพื่อน LINE @minestone</a>
+      <p class="fine reveal">ข้อมูลวันเกิดเห็นแค่สองคนในร้าน ตาม PDPA</p>
+      <img class="float f-jade2" src="assets/jade-cut.png" alt="" aria-hidden="true" draggable="false">
+      <img class="float f-rose2" src="assets/rose-cut.png" alt="" aria-hidden="true" draggable="false">
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand brand-sm" href="#top">
+          <svg width="24" height="24" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+          <span>Minestone</span>
+        </a>
+        <p class="muted">Minestone · หินและกำไลตามดวง ร้อยมือทีละเม็ด</p>
+      </div>
+      <div class="foot-cols">
+        <div><span class="cap">ร้าน</span><a href="#custom">กำไลตามดวง</a><a href="#">กำไลพร้อมส่ง</a><a href="#">คลังหิน</a></div>
+        <div><span class="cap">อ่านเพิ่ม</span><a href="#">สารบัญบทความ</a><a href="#">ของไหว้เทศกาล</a><a href="#birthday">ดูดวง · ฤกษ์</a></div>
+        <div><span class="cap">ติดต่อ</span><a href="#line">LINE @minestone</a><a href="#">นโยบายหินแท้ &amp; คืนเงิน</a></div>
+      </div>
+    </div>
+    <p class="foot-legal">© 2569 Minestone · ความหมายของหินเล่าตามความเชื่อ ไม่รับประกันผล</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script src="sphere.js"></script>
+  <script src="bloom.js"></script>
+</body>
+</html>
