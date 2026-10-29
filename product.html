@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>โรสควอตซ์คั่นมูนสโตน · Minestone (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@300;500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="product.css">
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <header class="nav nav-static">
+    <a class="brand" href="index.html" aria-label="Minestone หน้าแรก">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+      <span>Minestone</span>
+    </a>
+    <nav class="nav-links" aria-label="หลัก">
+      <a href="index.html#custom">กำไลตามดวง</a>
+      <a href="product.html" aria-current="page">กำไลพร้อมส่ง</a>
+      <a href="#">คลังหิน</a>
+      <a href="index.html#birthday">ดูดวง · ฤกษ์</a>
+    </nav>
+    <div class="nav-end"><span class="muted">@minestone</span></div>
+  </header>
+
+  <div class="pbar" id="pbar">
+    <p class="pbar-name">โรสควอตซ์คั่นมูนสโตน</p>
+    <nav class="pbar-links" aria-label="บทในหน้านี้">
+      <a href="#overview">ภาพรวม</a>
+      <a href="#stones">เรื่องของหิน</a>
+      <a href="#close-up">ใกล้ ๆ</a>
+      <a href="#guarantee">ป้ายและการรับประกัน</a>
+      <a href="#size">ขนาด</a>
+    </nav>
+    <div class="pbar-end">
+      <span class="price">790 บาท</span>
+      <a class="btn btn-dark btn-sm" href="#line">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="#fff"/></svg>
+        สั่งทาง LINE
+      </a>
+    </div>
+  </div>
+
+  <main>
+    <section class="p-hero chapter" id="overview">
+      <h1 class="rise" style="--i:0">โรสควอตซ์คั่นมูนสโตน</h1>
+      <p class="p-tag rise" style="--i:1">ชมพูอ่อนกับขาวนวล สลับกันทีละเม็ด</p>
+      <p class="p-price rise" style="--i:2">790 บาท · พร้อมส่ง</p>
+      <img class="plate p-hero-plate" id="hero-plate" src="assets/p-hero.png" alt="กำไลโรสควอตซ์สลับมูนสโตน ภาพสีน้ำ" width="1376" height="768">
+    </section>
+
+    <section class="statement">
+      <h2 class="big reveal">สองหิน สองความเชื่อ<br><span class="dim">ร้อยอยู่ในจังหวะเดียวกัน</span></h2>
+      <p class="lede reveal">โรสควอตซ์เป็นหินที่คนไทยและคนจีนผูกไว้กับความรักมานาน ส่วนมูนสโตนเป็นหินของแสงจันทร์ เส้นนี้สลับสองหินทีละเม็ด ให้ทั้งสองเรื่องอยู่ด้วยกันบนข้อมือ</p>
+    </section>
+
+    <div class="chapter" id="stones">
+      <section class="stone">
+        <img class="plate stone-plate reveal" src="assets/p-rose.png" alt="เม็ดโรสควอตซ์ ภาพสีน้ำ" width="1024" height="1024" loading="lazy">
+        <div class="stone-text reveal">
+          <span class="pill">หินธรรมชาติ · ไม่ย้อม ไม่อบ</span>
+          <h3>โรสควอตซ์</h3>
+          <p class="body">ควอตซ์สีชมพูขุ่นนวล ส่วนใหญ่มาจากบราซิลและมาดากัสการ์ สีชมพูเกิดจากแร่ธาตุเล็ก ๆ ในเนื้อหิน จึงไม่ใสเหมือนแก้ว และแต่ละเม็ดชมพูไม่เท่ากัน</p>
+          <dl class="belief">
+            <div><dt>ความเชื่อไทย</dt><dd>หินแห่งความรัก ทั้งรักคนอื่นและใจดีกับตัวเอง</dd></div>
+            <div><dt>ความเชื่อจีน</dt><dd>เรียกว่า 粉晶 ผูกกับ “ดอกท้อ” หรือโชคเรื่องคู่ครอง</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="stone flip">
+        <div class="stone-text reveal">
+          <span class="pill">หินธรรมชาติ · ไม่ย้อม ไม่อบ</span>
+          <h3>มูนสโตน</h3>
+          <p class="body">เฟลด์สปาร์สีขาวนวลจากศรีลังกาและอินเดีย เอียงข้อมือแล้วจะเห็นแสงฟ้าจาง ๆ ลอยอยู่ใต้ผิว แสงนี้มาจากชั้นแร่บาง ๆ ซ้อนกันในเนื้อหิน ไม่ใช่การเคลือบ</p>
+          <dl class="belief">
+            <div><dt>ความเชื่อไทย</dt><dd>หินของพระจันทร์ เกี่ยวกับความอ่อนโยนและใจที่นิ่ง</dd></div>
+            <div><dt>ความเชื่อจีน</dt><dd>เรียกว่า 月光石 เชื่อกันว่าช่วยให้ความสัมพันธ์ราบรื่น</dd></div>
+          </dl>
+        </div>
+        <img class="plate stone-plate reveal" src="assets/p-moon.png" alt="เม็ดมูนสโตน ภาพสีน้ำ" width="1024" height="1024" loading="lazy">
+      </section>
+    </div>
+
+    <section class="numbers chapter" id="close-up">
+      <h2 class="big reveal">เล็กพอจะใส่ทุกวัน</h2>
+      <div class="num-row">
+        <div class="num reveal"><b>8<small> มม.</small></b><p>เม็ดกลมขัดเงา<br>ขนาดเท่าเมล็ดถั่วลันเตา</p></div>
+        <div class="num reveal"><b>20<small> เม็ด</small></b><p>ชมพูสิบ ขาวสิบ<br>สลับกันทีละเม็ดรอบวง</p></div>
+        <div class="num reveal"><b>0.8<small> มม.</small></b><p>เชือกยืดใสสองเส้น<br>ใส่ถอดได้โดยไม่ต้องมีตะขอ</p></div>
+      </div>
+      <p class="note">ตัวเลขเป็นตัวอย่างสำหรับข้อมือ 16 ซม. รอยืนยันกับของจริงจากซัพพลายเออร์</p>
+    </section>
+
+    <section class="statement chapter" id="guarantee" style="padding-top:200px">
+      <h2 class="big reveal">ป้ายบอกว่าธรรมชาติ แต่ไม่แท้<br><span class="dim">คืนเงินเต็มจำนวน</span></h2>
+      <p class="lede reveal">ทั้งสองหินในเส้นนี้ติดป้ายว่าธรรมชาติ ถ้านำไปตรวจแล้วพบว่าย้อม อบ หรือเป็นหินสังเคราะห์ ส่งผลตรวจมาในแชต เราคืนเงินให้ทั้งหมด</p>
+      <div class="facts3">
+        <div class="reveal"><h3>การ์ดเล่าเรื่องหิน</h3><p>ทุกเส้นส่งพร้อมการ์ดเล่าที่มาและความเชื่อของหินแต่ละเม็ด</p></div>
+        <div class="reveal"><h3>เสียหายระหว่างส่ง เปลี่ยนให้ฟรี</h3><p>ถ่ายคลิปตอนแกะกล่องไว้ แล้วส่งมาให้ดูในแชต</p></div>
+        <div class="reveal"><h3>คุยกับคนจริงใน LINE</h3><p>สั่ง ถามขนาด หรือถามเรื่องหิน มีคนในร้านตอบเอง</p></div>
+      </div>
+    </section>
+
+    <section class="size chapter" id="size">
+      <div class="size-in">
+        <div class="size-text reveal">
+          <h2>วัดข้อมือ แล้วบวก 1 ซม.</h2>
+          <p class="body">ใช้สายวัดหรือเชือกพันรอบข้อมือตรงที่จะใส่ ได้เท่าไรบวกเพิ่ม 1 ซม. ถ้าไม่แน่ใจ ส่งรูปข้อมือคู่กับไม้บรรทัดมาในแชต เราช่วยดูให้</p>
+        </div>
+        <div class="size-pick reveal">
+          <fieldset>
+            <legend>ขนาดกำไล</legend>
+            <div class="sizes" id="sizes">
+              <button type="button" aria-pressed="false">14 ซม.</button>
+              <button type="button" aria-pressed="false">15 ซม.</button>
+              <button type="button" aria-pressed="true">16 ซม.</button>
+              <button type="button" aria-pressed="false">17 ซม.</button>
+              <button type="button" aria-pressed="false">18 ซม.</button>
+            </div>
+          </fieldset>
+          <p class="hint">ข้อมือ 15 ซม. ใส่เส้น 16 ซม. พอดีหลวมนิด ๆ ขนาดอื่นนอกจากนี้ ทักมาสั่งร้อยใหม่ได้</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="close" id="line">
+      <img class="plate close-plate reveal" src="assets/p-close.png" alt="" width="1024" height="1024" loading="lazy">
+      <h2 class="reveal">โรสควอตซ์คั่นมูนสโตน</h2>
+      <p class="sub reveal">790 บาท · ขนาด <span id="size-out">16 ซม.</span> · พร้อมส่ง</p>
+      <div class="cta-row reveal">
+        <a class="btn btn-dark" href="#">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="#fff"/></svg>
+          สั่งทาง LINE
+        </a>
+        <a class="btn btn-line" href="index.html#custom">ให้ครูดาวเลือกจากวันเกิดแทน</a>
+      </div>
+      <p class="note">กดแล้วจะเปิดแชต LINE พร้อมชื่อกำไลและขนาดที่เลือก</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand brand-sm" href="index.html">
+          <svg width="24" height="24" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+          <span>Minestone</span>
+        </a>
+        <p class="muted">Minestone · หินและกำไลตามดวง ร้อยมือทีละเม็ด</p>
+      </div>
+      <div class="foot-cols">
+        <div><span class="cap">ร้าน</span><a href="index.html#custom">กำไลตามดวง</a><a href="product.html">กำไลพร้อมส่ง</a><a href="#">คลังหิน</a></div>
+        <div><span class="cap">อ่านเพิ่ม</span><a href="#">สารบัญบทความ</a><a href="#">ของไหว้เทศกาล</a><a href="index.html#birthday">ดูดวง · ฤกษ์</a></div>
+        <div><span class="cap">ติดต่อ</span><a href="#line">LINE @minestone</a><a href="#">นโยบายหินแท้ &amp; คืนเงิน</a></div>
+      </div>
+    </div>
+    <p class="foot-legal">© 2569 Minestone · ความหมายของหินเล่าตามความเชื่อ ไม่รับประกันผล</p>
+  </footer>
+
+  <script src="product.js"></script>
+</body>
+</html>
