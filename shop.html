@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>กำไลพร้อมส่ง · Minestone (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="shop.css">
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html" aria-label="Minestone หน้าแรก">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+      <span>Minestone</span>
+    </a>
+    <nav class="nav-links" aria-label="หลัก">
+      <a href="index.html#custom">กำไลตามดวง</a>
+      <a href="shop.html" aria-current="page">กำไลพร้อมส่ง</a>
+      <a href="#">คลังหิน</a>
+      <a href="index.html#birthday">ดูดวง · ฤกษ์</a>
+    </nav>
+    <div class="nav-end">
+      <span class="muted">@minestone</span>
+      <a class="btn btn-dark btn-sm" href="#">สั่งทาง LINE</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="shop-head">
+      <h1>ใจอยู่ที่เรื่องไหน หินจะบอกเอง</h1>
+      <p class="body">กำไลพร้อมส่งทุกเส้นบอกชนิดหินตามจริง เลือกเรื่องที่อยากได้แรงหนุน หินที่เชื่อกันว่าเกี่ยวกับเรื่องนั้นจะสว่างขึ้น แล้วกำไลด้านล่างจะเหลือเฉพาะเส้นที่มีหินเม็ดนั้น</p>
+      <div class="intents" id="intents" role="group" aria-label="เรื่องที่อยากได้แรงหนุน">
+        <button type="button" data-intent="all" aria-pressed="false">ทั้งหมด</button>
+        <button type="button" data-intent="love" aria-pressed="true"><i class="dot" style="background:#E0A2AD"></i>ความรัก</button>
+        <button type="button" data-intent="work" aria-pressed="false"><i class="dot" style="background:#C08A3E"></i>การงาน</button>
+        <button type="button" data-intent="money" aria-pressed="false"><i class="dot" style="background:#7FA283"></i>การเงิน</button>
+        <button type="button" data-intent="protect" aria-pressed="false"><i class="dot" style="background:#4A4A55"></i>การคุ้มครอง</button>
+        <button type="button" data-intent="calm" aria-pressed="false"><i class="dot" style="background:#A98BC4"></i>ความสงบใจ</button>
+      </div>
+    </section>
+
+    <section class="tray-wrap">
+      <div class="tray" id="tray" role="img" aria-label="ถาดหินสีน้ำห้าเม็ด โรสควอตซ์ ซิทริน กรีนอะเวนเจอรีน ออนิกซ์ดำ อเมทิสต์">
+        <i class="base"></i><i class="lit"></i>
+      </div>
+      <ul class="captions" id="captions">
+        <li data-stone="rose" style="left:18.2%" class="on"><b>โรสควอตซ์</b><small>หินธรรมชาติ</small></li>
+        <li data-stone="citrine" style="left:35.5%"><b>ซิทริน</b><small>ผ่านความร้อน</small></li>
+        <li data-stone="aventurine" style="left:50.9%"><b>กรีนอะเวนเจอรีน</b><small>หินธรรมชาติ</small></li>
+        <li data-stone="onyx" style="left:66.8%"><b>ออนิกซ์ดำ</b><small>ย้อมสี</small></li>
+        <li data-stone="amethyst" style="left:82.7%"><b>อเมทิสต์</b><small>หินธรรมชาติ</small></li>
+      </ul>
+      <p class="belief-line" id="belief" aria-live="polite">ตามความเชื่อ โรสควอตซ์เกี่ยวกับความรัก ความอ่อนโยน และการเปิดใจให้ตัวเอง <a href="product.html#stones">อ่านเรื่องของหินเม็ดนี้</a></p>
+    </section>
+
+    <section class="results">
+      <div class="bar">
+        <div class="bar-title"><h2 id="res-title">กำไลที่มีโรสควอตซ์</h2><span id="res-count">5 เส้น</span></div>
+        <div class="bar-tools">
+          <label class="switch"><input type="checkbox" id="natural"><span class="track"><span class="knob"></span></span>เฉพาะหินธรรมชาติ</label>
+          <label class="sort"><span>เรียงตาม</span>
+            <select id="sort">
+              <option value="rec">แนะนำ</option>
+              <option value="asc">ราคาต่ำไปสูง</option>
+              <option value="desc">ราคาสูงไปต่ำ</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid" id="grid">
+        <a class="card-p" href="#" data-stones="rose" data-price="590" data-natural="1" data-order="1">
+          <div class="ph"><img src="assets/s-rose.png" alt="กำไลโรสควอตซ์ล้วน ภาพสีน้ำ" width="1024" height="1024"></div>
+          <div class="meta">
+            <h3>โรสควอตซ์ล้วน เม็ด 8 มม.</h3>
+            <div class="tags"><span class="tag">โรสควอตซ์ · ธรรมชาติ</span></div>
+            <p class="desc">เส้นเรียบที่สุดในชุด สำหรับคนที่อยากเริ่มจากหินเม็ดเดียว</p>
+            <div class="price-row"><b>590 บาท</b><span>พร้อมส่ง</span></div>
+          </div>
+        </a>
+        <a class="card-p" href="product.html" data-stones="rose moonstone" data-price="790" data-natural="1" data-order="2">
+          <div class="ph"><img src="assets/p-close.png" alt="กำไลโรสควอตซ์คั่นมูนสโตน ภาพสีน้ำ" width="1024" height="1024"></div>
+          <div class="meta">
+            <h3>โรสควอตซ์คั่นมูนสโตน</h3>
+            <div class="tags"><span class="tag">โรสควอตซ์ · ธรรมชาติ</span><span class="tag">มูนสโตน · ธรรมชาติ</span></div>
+            <p class="desc">มูนสโตนเชื่อกันว่าเกี่ยวกับความอ่อนโยนในความสัมพันธ์</p>
+            <div class="price-row"><b>790 บาท</b><span>พร้อมส่ง</span></div>
+          </div>
+        </a>
+        <a class="card-p" href="#" data-stones="rose garnet" data-price="690" data-natural="1" data-order="3">
+          <div class="ph"><img src="assets/s-garnet.png" alt="กำไลโรสควอตซ์กับการ์เน็ต ภาพสีน้ำ" width="1024" height="1024"></div>
+          <div class="meta">
+            <h3>โรสควอตซ์กับการ์เน็ต</h3>
+            <div class="tags"><span class="tag">โรสควอตซ์ · ธรรมชาติ</span><span class="tag">การ์เน็ต · ธรรมชาติ</span></div>
+            <p class="desc">การ์เน็ตเม็ดเล็กแทรกเป็นจังหวะ ตามความเชื่อเกี่ยวกับความรักที่มั่นคง</p>
+            <div class="price-row"><b>690 บาท</b><span>พร้อมส่ง</span></div>
+          </div>
+        </a>
+        <a class="custom-card" href="index.html#custom" data-order="4">
+          <div class="top">
+            <span class="ic"><svg width="22" height="22" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="#2E6A5C" stroke-width="1.6"/><circle cx="15" cy="4.5" r="3" fill="#2E6A5C"/><circle cx="24.1" cy="20.2" r="3" fill="#2E6A5C"/><circle cx="5.9" cy="20.2" r="3" fill="#2E6A5C"/></svg></span>
+            <h3>ไม่อยากเลือกเอง ให้ครูดาวอ่านวันเกิดแล้วเลือกให้ทีละเม็ด</h3>
+            <p>ร้อยมือเส้นเดียวสำหรับคุณ มีการ์ดและข้อความเสียงบอกว่าทำไมถึงเป็นเม็ดนี้</p>
+          </div>
+          <span class="go">ดูกำไลตามดวง <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7h8M7.5 3.5 11 7l-3.5 3.5" fill="none" stroke="#2E6A5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+        <a class="card-p" href="#" data-stones="rose" data-price="690" data-natural="1" data-order="5">
+          <div class="ph"><img src="assets/s-facet.png" alt="กำไลโรสควอตซ์เจียเหลี่ยม ภาพสีน้ำ" width="1024" height="1024" loading="lazy"></div>
+          <div class="meta">
+            <h3>โรสควอตซ์เจียเหลี่ยม 6 มม.</h3>
+            <div class="tags"><span class="tag">โรสควอตซ์ · ธรรมชาติ</span></div>
+            <p class="desc">เม็ดเล็กเจียเหลี่ยม ใส่ซ้อนกับนาฬิกาหรือกำไลเส้นอื่นได้</p>
+            <div class="price-row"><b>690 บาท</b><span>พร้อมส่ง</span></div>
+          </div>
+        </a>
+        <a class="card-p" href="#" data-stones="rose amethyst" data-price="750" data-natural="1" data-order="6">
+          <div class="ph"><img src="assets/s-amethyst.png" alt="กำไลโรสควอตซ์กับอเมทิสต์ ภาพสีน้ำ" width="1024" height="1024" loading="lazy"></div>
+          <div class="meta">
+            <h3>โรสควอตซ์กับอเมทิสต์สามเม็ด</h3>
+            <div class="tags"><span class="tag">โรสควอตซ์ · ธรรมชาติ</span><span class="tag">อเมทิสต์ · ธรรมชาติ</span></div>
+            <p class="desc">ความรักกับความสงบใจในเส้นเดียว อยู่ในคอลเลกชันเดือนเกิดกุมภาพันธ์ด้วย</p>
+            <div class="price-row"><b>750 บาท</b><span>พร้อมส่ง</span></div>
+          </div>
+        </a>
+        <div class="empty" id="empty" hidden>
+          <h3 id="empty-title">ยังไม่มีกำไลพร้อมส่งที่มีหินเม็ดนี้</h3>
+          <p>ให้ครูดาวร้อยเส้นใหม่ให้ได้ หรือกด "ทั้งหมด" เพื่อดูทุกเส้นที่มีตอนนี้</p>
+        </div>
+      </div>
+      <p class="grid-note">ราคาในหน้านี้เป็นตัวอย่าง รอยืนยันต้นทุนจากซัพพลายเออร์ · ขนาดข้อมือมาตรฐาน 15–17 ซม. ปรับได้ในหน้าสินค้า · ตอนนี้กดดูรายละเอียดได้เฉพาะเส้นโรสควอตซ์คั่นมูนสโตน</p>
+    </section>
+
+    <section class="key">
+      <div class="key-in">
+        <div class="key-text">
+          <h2 class="h-sm" style="text-align:left">ป้ายใต้กำไลบอกว่าหินเป็นแบบไหน</h2>
+          <p class="body">หินที่ผ่านการปรับปรุงไม่ได้แย่ แค่ควรรู้ก่อนซื้อ และราคาก็ต่างกันตามจริง</p>
+        </div>
+        <ul class="key-list">
+          <li><div class="k"><span class="tag">ธรรมชาติ</span></div><div><h3>ขุดมาแล้วขัดและเจาะเท่านั้น</h3><p>ถ้าพิสูจน์ได้ว่าไม่แท้ คืนเงินเต็มจำนวน</p></div></li>
+          <li><div class="k"><span class="tag">ย้อมสี · ผ่านความร้อน</span></div><div><h3>หินแท้ที่ถูกปรับสีหรือความใส</h3><p>เช่น ซิทรินในตลาดส่วนใหญ่คืออเมทิสต์ที่ผ่านความร้อน เราบอกตรง ๆ ในป้าย</p></div></li>
+          <li><div class="k"><span class="tag">สังเคราะห์</span></div><div><h3>ผลิตขึ้นในห้องแล็บ</h3><p>สีสม่ำเสมอและราคาย่อมกว่า ไม่เคยขายปนกับหินธรรมชาติ</p></div></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand brand-sm" href="index.html">
+          <svg width="24" height="24" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+          <span>Minestone</span>
+        </a>
+        <p class="muted">Minestone · หินและกำไลตามดวง ร้อยมือทีละเม็ด</p>
+      </div>
+      <div class="foot-cols">
+        <div><span class="cap">ร้าน</span><a href="index.html#custom">กำไลตามดวง</a><a href="shop.html">กำไลพร้อมส่ง</a><a href="#">คลังหิน</a></div>
+        <div><span class="cap">อ่านเพิ่ม</span><a href="#">สารบัญบทความ</a><a href="#">ของไหว้เทศกาล</a><a href="index.html#birthday">ดูดวง · ฤกษ์</a></div>
+        <div><span class="cap">ติดต่อ</span><a href="#">LINE @minestone</a><a href="#">นโยบายหินแท้ &amp; คืนเงิน</a></div>
+      </div>
+    </div>
+    <p class="foot-legal">© 2569 Minestone · ความหมายของหินเล่าตามความเชื่อ ไม่รับประกันผล</p>
+  </footer>
+
+  <script src="shop.js"></script>
+</body>
+</html>
