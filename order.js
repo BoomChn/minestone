@@ -132,18 +132,23 @@ function geometry() {
 }
 const polar = (cx, cy, r, t) => [cx + r * Math.sin(t), cy - r * Math.cos(t)];
 
-// Wrist view: the same beads on an ellipse around a side-on wrist. The arm stays put; the bead
-// scale follows the chosen wrist size, so 6 / 8 / 10 mm and a bigger wrist read true.
-const ARM = { w: 1264, h: 848, wx: 0.528, wy: 0.503, thick: 0.098 };
+// Wrist view: the same beads on a tilted ellipse around a photographed side-on wrist. The hand
+// stays put; the bead scale follows the chosen wrist size, so 6 / 8 / 10 mm and a bigger wrist read true.
+// Landmarks are in the photo's own pixels (assets/w-hand.jpg, 1248 × 832).
+const HAND = { w: 1248, x: 552, top: 229, bot: 392, tip: 1185, tilt: (-12 * Math.PI) / 180 };
+const photo = (id) => `url(assets/wb-${id}.jpg)`;
 function wristGeometry() {
-  const w = stage.clientWidth, h = stage.clientHeight, small = narrow.matches;
-  const S = small ? 1163 * (w / 390) : 1368 * (w / 760);
-  const wx = small ? w * 0.295 : w * 0.3816, wy = h / 2, T = ARM.thick * S;
-  const cm = T / (4.2 * (state.wrist / 16));
+  const w = stage.clientWidth, small = narrow.matches;
+  // The phone stage is a fixed 330px tall, so wider phones must not grow the hand into the controls.
+  const s = small ? Math.min(0.46 * (w / 390), 0.46) : 0.75 * (w / 760);
+  // Phones keep the fingertips just inside the right edge; desktop leaves room left of the forearm.
+  const imgX = small ? w - 2 - HAND.tip * s : -140 * (w / 760), imgY = small ? -10 : -50;
+  const top = HAND.top * s + imgY, bot = HAND.bot * s + imgY, T = bot - top;
+  const cm = T / (5.1 * (state.wrist / 16));
   const d = (state.size / 10) * cm;
   const b = ((state.wrist + 1) / (2 * Math.PI)) * cm;
-  return { S, wx, wy, T, d, a: 0.32 * b, b, cx: wx - 0.075 * T, cy: wy - T / 2 - d / 2 + 2 + b,
-    imgX: wx - ARM.wx * S, imgY: wy - ARM.wy * S * (ARM.h / ARM.w) };
+  // The loop rests on top of the wrist and hangs a little below it, as a loose bracelet does.
+  return { S: HAND.w * s, imgX, imgY, top, bot, d, a: 0.3 * b, b, cx: HAND.x * s + imgX, cy: top - d / 2 + 2 + b };
 }
 
 function drawRing(changedIdx) {
@@ -151,6 +156,7 @@ function drawRing(changedIdx) {
   const d = Math.min(((2 * Math.PI * g.R) / n) * 1.06, g.small ? 46 : 70);
   stage.style.setProperty("--bead", `${d.toFixed(1)}px`);
   stage.style.setProperty("--held", img(state.held));
+  stage.style.setProperty("--held-photo", photo(state.held));
 
   threadEl.setAttribute("class", `thread ${state.thread === "black" ? "dark" : state.thread === "red" ? "red" : ""}`);
   threadEl.innerHTML = `<circle cx="${g.cx}" cy="${g.cy}" r="${g.R}"/>`;
@@ -158,7 +164,7 @@ function drawRing(changedIdx) {
   const wrist = state.view === "wrist", wg = wrist ? wristGeometry() : null;
   stage.classList.toggle("wrist", wrist);
   if (wrist) {
-    armEl.style.backgroundSize = `${wg.S}px auto`;
+    armEl.style.backgroundSize = `${wg.S.toFixed(1)}px auto`;
     armEl.style.backgroundPosition = `${wg.imgX}px ${wg.imgY}px`;
   }
 
@@ -176,20 +182,25 @@ function drawRing(changedIdx) {
     b.classList.remove("leaving");
     let x, y, hid = false;
     if (wrist) {
-      const t = (i / n) * 2 * Math.PI + state.rot + 0.08, c = Math.cos(t);
-      x = wg.cx + wg.a * c; y = wg.cy + wg.b * Math.sin(t);
+      const t = (i / n) * 2 * Math.PI + state.rot, c = Math.cos(t);
+      const u = wg.a * c, v = wg.b * Math.sin(t);
+      x = wg.cx + u * Math.cos(HAND.tilt) - v * Math.sin(HAND.tilt);
+      y = wg.cy + u * Math.sin(HAND.tilt) + v * Math.cos(HAND.tilt);
       // The far half sits behind the arm; only beads clearing its silhouette show.
-      hid = c < 0 && Math.abs(y - wg.wy) < wg.T / 2 + 2;
-      b.style.setProperty("--bead", `${(wg.d * (c < 0 ? 0.85 : 0.92 + 0.08 * c)).toFixed(1)}px`);
+      hid = c < 0 && y > wg.top + 3 && y < wg.bot - 3;
+      b.style.setProperty("--bead", `${(wg.d * (1 + 0.07 * c)).toFixed(1)}px`);
       b.style.zIndex = Math.round((c + 1) * 50);
+      b.classList.toggle("far", c < 0);
     } else {
       [x, y] = polar(g.cx, g.cy, g.R, (i / n) * 2 * Math.PI);
       b.style.removeProperty("--bead"); b.style.zIndex = "";
+      b.classList.remove("far");
     }
     b.classList.toggle("hid", hid);
     b.tabIndex = hid ? -1 : 0;
     const s = stoneAt(i);
     b.style.setProperty("--img", img(s));
+    b.style.setProperty("--photo", photo(s));
     b.classList.toggle("same", s === state.held);
     b.setAttribute("aria-label", `เม็ดที่ ${i + 1} ${STONES[s].name}${state.beads[i] ? "" : " (หินหลัก)"}`);
     requestAnimationFrame(() => { b.style.transform = `translate(${x}px, ${y}px)`; });

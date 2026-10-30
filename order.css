@@ -334,13 +334,19 @@
 .views button[aria-checked="true"] { background: var(--ink); color: #fff; font-weight: 500; }
 .views button:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
 
-/* Wrist view: the ring's own beads re-thread around an illustrated wrist */
+/* Wrist view: the ring's own beads re-thread around a photographed wrist, drawn as photographed beads */
 .arm, .wrist-read, .wrist-foot { position: absolute; opacity: 0; visibility: hidden; transition: opacity 360ms ease, visibility 0s 360ms; }
-.arm { inset: 0; background: #fff url(assets/w-arm.jpg) no-repeat; filter: brightness(1.07) contrast(1.06) saturate(1.05); }
+/* The lift takes the photo's near-white backdrop to the page's pure white so no box edge shows. */
+.arm { inset: 0; background: #fff url(assets/w-hand.jpg) no-repeat; filter: brightness(1.04) contrast(1.04); }
 .stage.wrist .arm, .stage.wrist .wrist-read, .stage.wrist .wrist-foot { opacity: 1; visibility: visible; transition: opacity 420ms ease 80ms; }
 .arcs, .thread, .arc-labels, .ring-read { transition: opacity 300ms ease; }
 .stage.wrist .arcs, .stage.wrist .thread, .stage.wrist .arc-labels, .stage.wrist .ring-read { opacity: 0; }
-.stage.wrist .bead { box-shadow: 0 2px 3px rgba(90, 60, 35, 0.22); }
+.stage.wrist .bead {
+  background: #fff var(--photo) center / 100% no-repeat; filter: none;
+  box-shadow: 1px 3px 4px rgba(74, 44, 24, 0.32), 0 1px 1px rgba(74, 44, 24, 0.24);
+}
+.stage.wrist .bead.far { filter: brightness(0.88); box-shadow: none; }
+.stage.wrist .bead::after { background: var(--held-photo) center / 100% no-repeat; }
 .bead.hid { opacity: 0; pointer-events: none; }
 .wrist-read { left: 0; top: 0; display: flex; flex-direction: column; gap: 2px; pointer-events: none; }
 .wrist-read b { font-family: var(--head); font-weight: 600; font-size: 28px; line-height: 40px; font-variant-numeric: tabular-nums; }
