@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ร้อยกำไลเอง · Minestone (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="order.css">
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html" aria-label="Minestone หน้าแรก">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+      <span>Minestone</span>
+    </a>
+    <nav class="nav-links" aria-label="หลัก">
+      <a href="index.html#custom">กำไลตามดวง</a>
+      <a href="order.html" aria-current="page">ร้อยกำไลเอง</a>
+      <a href="shop.html">กำไลพร้อมส่ง</a>
+      <a href="#">คลังหิน</a>
+      <a href="index.html#birthday">ดูดวง · ฤกษ์</a>
+    </nav>
+    <div class="nav-end">
+      <span class="muted">@minestone</span>
+    </div>
+  </header>
+
+  <main class="order">
+    <section class="build" aria-labelledby="order-title">
+      <div class="intro">
+        <h1 id="order-title">ร้อยกำไลของคุณเอง</h1>
+        <p class="body">เลือกขนาดข้อมือ หิน ขนาดเม็ด และเส้นด้าย กำไลตรงนี้จะร้อยใหม่ให้ดูทุกครั้งที่เลือก แล้วส่งแบบไปคุยต่อกับเราใน LINE</p>
+      </div>
+
+      <div class="stage" id="stage">
+        <svg class="arcs" id="arcs" aria-hidden="true"></svg>
+        <svg class="thread" id="thread" aria-hidden="true"></svg>
+        <div class="beads" id="beads" role="group" aria-label="เม็ดหินบนวง แตะเพื่อเปลี่ยนเป็นหินที่ถืออยู่"></div>
+        <div class="arc-labels" id="arc-labels" aria-hidden="true"></div>
+        <div class="ring-read" aria-live="polite">
+          <b id="r-count">21 เม็ด</b>
+          <span id="r-length">ยาว 17 ซม. สำหรับข้อมือ 16 ซม.</span>
+        </div>
+      </div>
+
+      <div class="palette-wrap">
+        <div class="palette">
+          <div class="picks" id="picks" role="radiogroup" aria-label="หินที่ถืออยู่"></div>
+          <span class="pal-rule" aria-hidden="true"></span>
+          <button type="button" class="pal-act" id="undo" disabled>
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 4 2.5 7l3 3M3 7h6.5a3.5 3.5 0 0 1 0 7H8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>ย้อนกลับ</span>
+          </button>
+          <button type="button" class="pal-act pal-clear" id="clear">ล้างเหลือหินหลัก</button>
+        </div>
+        <p class="hint" id="hint">กำลังถือ <b>มูนสโตน</b> · แตะเม็ดบนวงเพื่อใส่ แตะซ้ำเพื่อคืนเป็นหินหลัก</p>
+        <button type="button" class="pal-clear-m" id="clear-m">ล้างเหลือหินหลัก</button>
+        <p class="adjust" id="adjust" hidden></p>
+      </div>
+
+      <div class="meaning">
+        <ul class="legend" id="legend" aria-hidden="true"></ul>
+        <h2 id="m-sum">เส้นนี้เน้นเรื่องความรัก มีความสงบใจเป็นส่วนเสริม</h2>
+        <p class="m-note">ตามความเชื่อไทยและจีน นับจากจำนวนเม็ดในเส้น ไม่ใช่การรับประกันผล</p>
+        <ul class="m-list" id="m-list"></ul>
+        <div class="m-foot">
+          <span>ไม่แน่ใจว่าหินไหนเหมาะกับคุณ</span>
+          <a href="index.html#custom">ให้เราเลือกจากวันเกิด
+            <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7h9M8 3.5 11.5 7 8 10.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <aside class="options" aria-label="ตัวเลือกกำไล">
+      <fieldset class="opt">
+        <div class="opt-head">
+          <legend>ขนาดข้อมือ</legend>
+          <button type="button" class="link" id="open-guide">วัดข้อมือยังไง</button>
+        </div>
+        <div class="sizes" id="wrists"></div>
+        <p class="opt-note">วัดรอบข้อมือตรงที่จะใส่ เราร้อยให้ยาวกว่านั้น 1 ซม. พอดีหลวมนิด ๆ</p>
+      </fieldset>
+
+      <fieldset class="opt">
+        <div class="opt-head">
+          <legend>หินหลัก</legend>
+          <span class="opt-aside">เต็มทั้งวงก่อน แล้วแตะเปลี่ยนทีละเม็ดบนวง</span>
+        </div>
+        <div class="stones" id="stones"></div>
+      </fieldset>
+
+      <fieldset class="opt">
+        <div class="opt-head">
+          <legend>ขนาดเม็ด</legend>
+          <span class="opt-aside" id="size-aside">จำนวนเม็ดคิดจากข้อมือ 16 ซม.</span>
+        </div>
+        <div class="bsizes" id="bsizes"></div>
+      </fieldset>
+
+      <fieldset class="opt">
+        <div class="opt-head"><legend>เส้นด้าย</legend></div>
+        <div class="threads" id="threads"></div>
+      </fieldset>
+
+      <div class="summary" id="summary">
+        <ul class="lines" id="lines"></ul>
+        <div class="total"><span>รวม</span><b id="total">645 บาท</b></div>
+        <button type="button" class="btn btn-dark btn-block send" data-send>
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.5c-3.9 0-7 2.5-7 5.6 0 2.8 2.5 5.1 5.8 5.5.2 0 .5.2.6.4l.1.9c0 .3.3.4.5.3 2.2-1.2 7-3.9 7-7.1 0-3.1-3.1-5.6-7-5.6Z" fill="currentColor"/></svg>
+          ส่งแบบนี้ไปสั่งทาง LINE
+        </button>
+        <p class="sum-note">แชตจะเปิดพร้อมรายการนี้ เราเช็กว่ามีหินครบก่อนค่อยโอนเงิน<br>ราคาในหน้านี้เป็นตัวอย่าง</p>
+        <div class="preview" id="preview" hidden>
+          <p>ต้นแบบนี้ยังไม่ได้ต่อ LINE จริง ข้อความที่จะส่งคือ</p>
+          <pre id="preview-text"></pre>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="buybar" id="buybar">
+    <div><b id="bb-total">645 บาท</b><span id="bb-meta">21 เม็ด · ข้อมือ 16 ซม.</span></div>
+    <button type="button" class="btn btn-dark" data-send>
+      <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.5c-3.9 0-7 2.5-7 5.6 0 2.8 2.5 5.1 5.8 5.5.2 0 .5.2.6.4l.1.9c0 .3.3.4.5.3 2.2-1.2 7-3.9 7-7.1 0-3.1-3.1-5.6-7-5.6Z" fill="currentColor"/></svg>
+      ส่งไปสั่งทาง LINE
+    </button>
+  </div>
+
+  <dialog class="guide" id="guide" aria-labelledby="guide-title">
+    <div class="g-panel">
+      <span class="grabber" aria-hidden="true"></span>
+      <header class="g-head">
+        <h2 id="guide-title" tabindex="-1" autofocus>วัดข้อมือยังไง</h2>
+        <button type="button" class="g-close" id="close-guide" aria-label="ปิด">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="m4 4 10 10M14 4 4 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+      <div class="g-body">
+        <div class="g-sec">
+          <p class="g-label" id="method-label">มีอะไรอยู่ใกล้มือ</p>
+          <div class="methods" id="methods" role="radiogroup" aria-labelledby="method-label">
+            <button type="button" role="radio" aria-checked="true" data-method="string"><span class="lg">เชือกหรือแถบกระดาษ</span><span class="sm">เชือกหรือกระดาษ</span></button>
+            <button type="button" role="radio" aria-checked="false" data-method="tape">สายวัดตัว</button>
+            <button type="button" role="radio" aria-checked="false" data-method="bracelet">กำไลที่ใส่พอดี</button>
+          </div>
+        </div>
+        <ol class="g-steps" id="g-steps"></ol>
+        <div class="g-sec g-measure">
+          <label class="g-label" for="m-value" id="m-label">วัดได้กี่เซนติเมตร</label>
+          <div class="measure-row">
+            <div class="stepper">
+              <button type="button" id="m-minus" aria-label="ลดครึ่งเซนติเมตร"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+              <div class="sv"><input id="m-value" type="text" inputmode="decimal" value="15.5" autocomplete="off"><span>ซม.</span></div>
+              <button type="button" id="m-plus" aria-label="เพิ่มครึ่งเซนติเมตร"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+            </div>
+            <span class="m-hint">ปรับทีละครึ่งเซนติเมตร</span>
+          </div>
+        </div>
+        <div class="g-result" id="g-result" aria-live="polite">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m6.5 10.2 2.3 2.3 4.7-4.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div><b id="g-res-title">เลือกขนาดข้อมือ 16 ซม.</b><p id="g-res-text"></p></div>
+        </div>
+      </div>
+      <footer class="g-foot">
+        <span>ยังไม่แน่ใจ <a href="#">ถามเราใน LINE</a></span>
+        <button type="button" class="btn btn-dark" id="use-size">ใช้ขนาด 16 ซม.</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <footer class="foot">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand brand-sm" href="index.html">
+          <svg width="24" height="24" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+          <span>Minestone</span>
+        </a>
+        <p class="muted">Minestone · หินและกำไลตามดวง ร้อยมือทีละเม็ด</p>
+      </div>
+      <div class="foot-cols">
+        <div><span class="cap">ร้าน</span><a href="index.html#custom">กำไลตามดวง</a><a href="order.html">ร้อยกำไลเอง</a><a href="shop.html">กำไลพร้อมส่ง</a><a href="#">คลังหิน</a></div>
+        <div><span class="cap">อ่านเพิ่ม</span><a href="#">สารบัญบทความ</a><a href="#">ของไหว้เทศกาล</a><a href="index.html#birthday">ดูดวง · ฤกษ์</a></div>
+        <div><span class="cap">ติดต่อ</span><a href="#">LINE @minestone</a><a href="#">นโยบายหินแท้ &amp; คืนเงิน</a></div>
+      </div>
+    </div>
+    <p class="foot-legal">© 2569 Minestone · ความหมายของหินเล่าตามความเชื่อ ไม่รับประกันผล</p>
+  </footer>
+
+  <script src="order.js"></script>
+</body>
+</html>
