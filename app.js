@@ -1,13 +1,13 @@
 // Birthday readout: weekday, Thai day colour, life-path number, and belief-based stones.
 // Stone lists are prototype placeholders until the shop confirms its own canon.
 const DAYS = [
-  { name: "อาทิตย์", color: "แดง", hex: "#D9534F", stones: "ทับทิม · การ์เน็ต · ซันสโตน" },
-  { name: "จันทร์", color: "เหลือง", hex: "#E9C46A", stones: "มูนสโตน · ซิทริน · ไข่มุก" },
-  { name: "อังคาร", color: "ชมพู", hex: "#E8A1B8", stones: "การ์เน็ต · โรสควอตซ์ · มูนสโตน" },
-  { name: "พุธ", color: "เขียว", hex: "#7FA283", stones: "หยก · มรกต · อะเวนจูรีน" },
-  { name: "พฤหัสบดี", color: "ส้ม", hex: "#E39B5B", stones: "ซิทริน · ไทเกอร์อาย · คาร์เนเลียน" },
-  { name: "ศุกร์", color: "ฟ้า", hex: "#8DB8D8", stones: "อะความารีน · ลาพิส ลาซูลี · บลูเลซ" },
-  { name: "เสาร์", color: "ม่วง", hex: "#A98BC4", stones: "อเมทิสต์ · ออนิกซ์ · การ์เน็ต" },
+  { name: "อาทิตย์", color: "แดง", hex: "#D9534F", stones: "ทับทิม การ์เน็ต และซันสโตน" },
+  { name: "จันทร์", color: "เหลือง", hex: "#E9C46A", stones: "มูนสโตน ซิทริน และไข่มุก" },
+  { name: "อังคาร", color: "ชมพู", hex: "#E8A1B8", stones: "การ์เน็ต โรสควอตซ์ และมูนสโตน" },
+  { name: "พุธ", color: "เขียว", hex: "#7FA283", stones: "หยก มรกต และอะเวนจูรีน" },
+  { name: "พฤหัสบดี", color: "ส้ม", hex: "#E39B5B", stones: "ซิทริน ไทเกอร์อาย และคาร์เนเลียน" },
+  { name: "ศุกร์", color: "ฟ้า", hex: "#8DB8D8", stones: "อะความารีน ลาพิส ลาซูลี และบลูเลซ" },
+  { name: "เสาร์", color: "ม่วง", hex: "#A98BC4", stones: "อเมทิสต์ ออนิกซ์ และการ์เน็ต" },
 ];
 const MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
@@ -71,7 +71,7 @@ chips.forEach((chip) =>
     rowStones.forEach((img) => img.classList.toggle("on", picked.includes(img.dataset.key)));
     swapText(
       $("pick-note"),
-      picked.length ? `เม็ดเสริมตามความเชื่อ: ${picked.map((k) => SUPPORT[k]).join(" · ")}` : "เลือกได้มากกว่าหนึ่งเรื่อง"
+      picked.length ? `เม็ดเสริมตามความเชื่อ: ${picked.map((k) => SUPPORT[k]).join(" ")}` : "เลือกได้มากกว่าหนึ่งเรื่อง"
     );
   })
 );

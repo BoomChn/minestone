@@ -13,8 +13,8 @@
 .intro .body { max-width: 560px; }
 
 /* Ring stage */
-.stage { position: relative; width: 760px; max-width: 100%; height: 500px; margin: 32px auto 0; --bead: 54px; }
-.stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.stage { position: relative; width: 760px; max-width: 100%; height: 500px; margin: 0 auto; --bead: 54px; }
+.stage > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .arcs path { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke 240ms ease; }
 .thread circle { fill: none; stroke: #CFCAC0; stroke-width: 1.2; }
 .thread.dark circle { stroke: #2B2B2F; }
@@ -318,4 +318,64 @@
   .bead.pop { animation: none; }
   .guide, .guide::backdrop { transition: none; }
   .sizes button:active, .stones button:active, .bsizes button:active, .threads button:active, .pick:active { transform: none; }
+}
+
+/* View switch: ring or wrist */
+.views {
+  position: relative; z-index: 3; display: flex; gap: 2px; width: fit-content;
+  margin: 32px calc((100% - min(760px, 100%)) / 2) -42px auto;
+  padding: 4px; border: 1px solid var(--rule); border-radius: 999px; background: #fff;
+}
+.views button {
+  display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px 0 12px; border: 0; border-radius: 999px; background: none;
+  font: inherit; font-size: 14px; line-height: 20px; color: var(--muted); cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+.views button[aria-checked="true"] { background: var(--ink); color: #fff; font-weight: 500; }
+.views button:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
+
+/* Wrist view: the ring's own beads re-thread around an illustrated wrist */
+.arm, .wrist-read, .wrist-foot { position: absolute; opacity: 0; visibility: hidden; transition: opacity 360ms ease, visibility 0s 360ms; }
+.arm { inset: 0; background: #fff url(assets/w-arm.jpg) no-repeat; filter: brightness(1.07) contrast(1.06) saturate(1.05); }
+.stage.wrist .arm, .stage.wrist .wrist-read, .stage.wrist .wrist-foot { opacity: 1; visibility: visible; transition: opacity 420ms ease 80ms; }
+.arcs, .thread, .arc-labels, .ring-read { transition: opacity 300ms ease; }
+.stage.wrist .arcs, .stage.wrist .thread, .stage.wrist .arc-labels, .stage.wrist .ring-read { opacity: 0; }
+.stage.wrist .bead { box-shadow: 0 2px 3px rgba(90, 60, 35, 0.22); }
+.bead.hid { opacity: 0; pointer-events: none; }
+.wrist-read { left: 0; top: 0; display: flex; flex-direction: column; gap: 2px; pointer-events: none; }
+.wrist-read b { font-family: var(--head); font-weight: 600; font-size: 28px; line-height: 40px; font-variant-numeric: tabular-nums; }
+.wrist-read span { color: var(--muted); font-size: 15px; line-height: 22px; }
+.wrist-foot { left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.fit { display: flex; align-items: center; gap: 12px; }
+.fit svg { flex-shrink: 0; }
+.fit div { display: flex; flex-direction: column; }
+.fit b { font-size: 15px; font-weight: 600; line-height: 22px; }
+.fit div > span { color: var(--muted); font-size: 14px; line-height: 20px; }
+.rotate { display: flex; align-items: center; gap: 4px; padding: 4px; border: 1px solid var(--rule); border-radius: 999px; background: #fff; }
+.rotate span { padding: 0 4px; font-size: 14px; line-height: 20px; }
+.rotate button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 160ms var(--ease-out); }
+.rotate button:active { transform: scale(0.92); }
+.rotate button:focus-visible { outline: 2px solid var(--sage); outline-offset: 1px; }
+.g-steps b em { font-style: normal; color: var(--sand-ink); margin-right: 2px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .views button[aria-checked="false"]:hover { color: var(--ink); background: #F7F6F3; }
+  .rotate button:hover { background: #F7F6F3; }
+}
+@media (max-width: 960px) {
+  .views { margin: 14px auto 0; padding: 3px; }
+  .views button { height: 34px; padding: 0 14px 0 11px; gap: 6px; }
+  .stage { width: calc(100% + 40px); max-width: none; margin-inline: -20px; margin-top: 8px; }
+  .wrist-read { left: 20px; top: 6px; }
+  .wrist-read b { font-size: 22px; line-height: 32px; }
+  .wrist-read span { font-size: 13px; line-height: 18px; }
+  .wrist-foot { left: 20px; right: 20px; bottom: 4px; }
+  .fit svg, .fit .lg, .rotate span { display: none; }
+  .fit b { font-size: 14px; line-height: 20px; }
+  .fit div > span { font-size: 13px; line-height: 18px; }
+  .rotate { gap: 6px; padding: 0; border: 0; background: none; }
+  .rotate button { width: 44px; height: 44px; border: 1px solid var(--rule); background: #fff; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arm, .wrist-read, .wrist-foot, .stage.wrist .arm, .stage.wrist .wrist-read, .stage.wrist .wrist-foot { transition: none; }
 }

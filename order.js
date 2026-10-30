@@ -28,7 +28,7 @@ const baht = (n) => `${n.toLocaleString("th-TH")} บาท`;
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const narrow = matchMedia("(max-width: 960px)");
 
-const state = { wrist: 16, size: 8, main: "rose", thread: "clear", held: "moon", beads: [] };
+const state = { wrist: 16, size: 8, main: "rose", thread: "clear", held: "moon", beads: [], view: "ring", rot: 0 };
 const history = [];
 const count = () => Math.floor(((state.wrist + 1) * 10) / state.size);
 const stoneAt = (i) => state.beads[i] || state.main;
@@ -38,6 +38,7 @@ state.beads = Array.from({ length: count() }, (_, i) => (i % 3 === 1 ? "moon" : 
 
 const $ = (id) => document.getElementById(id);
 const stage = $("stage"), beadsEl = $("beads"), arcsEl = $("arcs"), threadEl = $("thread"), labelsEl = $("arc-labels");
+const armEl = $("arm");
 
 /* ---------- Options ---------- */
 function radio(container, items, current, onPick) {
@@ -131,6 +132,20 @@ function geometry() {
 }
 const polar = (cx, cy, r, t) => [cx + r * Math.sin(t), cy - r * Math.cos(t)];
 
+// Wrist view: the same beads on an ellipse around a side-on wrist. The arm stays put; the bead
+// scale follows the chosen wrist size, so 6 / 8 / 10 mm and a bigger wrist read true.
+const ARM = { w: 1264, h: 848, wx: 0.528, wy: 0.503, thick: 0.098 };
+function wristGeometry() {
+  const w = stage.clientWidth, h = stage.clientHeight, small = narrow.matches;
+  const S = small ? 1163 * (w / 390) : 1368 * (w / 760);
+  const wx = small ? w * 0.295 : w * 0.3816, wy = h / 2, T = ARM.thick * S;
+  const cm = T / (4.2 * (state.wrist / 16));
+  const d = (state.size / 10) * cm;
+  const b = ((state.wrist + 1) / (2 * Math.PI)) * cm;
+  return { S, wx, wy, T, d, a: 0.32 * b, b, cx: wx - 0.075 * T, cy: wy - T / 2 - d / 2 + 2 + b,
+    imgX: wx - ARM.wx * S, imgY: wy - ARM.wy * S * (ARM.h / ARM.w) };
+}
+
 function drawRing(changedIdx) {
   const g = geometry(), n = state.beads.length;
   const d = Math.min(((2 * Math.PI * g.R) / n) * 1.06, g.small ? 46 : 70);
@@ -139,6 +154,13 @@ function drawRing(changedIdx) {
 
   threadEl.setAttribute("class", `thread ${state.thread === "black" ? "dark" : state.thread === "red" ? "red" : ""}`);
   threadEl.innerHTML = `<circle cx="${g.cx}" cy="${g.cy}" r="${g.R}"/>`;
+
+  const wrist = state.view === "wrist", wg = wrist ? wristGeometry() : null;
+  stage.classList.toggle("wrist", wrist);
+  if (wrist) {
+    armEl.style.backgroundSize = `${wg.S}px auto`;
+    armEl.style.backgroundPosition = `${wg.imgX}px ${wg.imgY}px`;
+  }
 
   const els = [...beadsEl.children];
   for (let i = 0; i < Math.max(n, els.length); i++) {
@@ -152,7 +174,20 @@ function drawRing(changedIdx) {
       beadsEl.append(b);
     }
     b.classList.remove("leaving");
-    const [x, y] = polar(g.cx, g.cy, g.R, (i / n) * 2 * Math.PI);
+    let x, y, hid = false;
+    if (wrist) {
+      const t = (i / n) * 2 * Math.PI + state.rot + 0.08, c = Math.cos(t);
+      x = wg.cx + wg.a * c; y = wg.cy + wg.b * Math.sin(t);
+      // The far half sits behind the arm; only beads clearing its silhouette show.
+      hid = c < 0 && Math.abs(y - wg.wy) < wg.T / 2 + 2;
+      b.style.setProperty("--bead", `${(wg.d * (c < 0 ? 0.85 : 0.92 + 0.08 * c)).toFixed(1)}px`);
+      b.style.zIndex = Math.round((c + 1) * 50);
+    } else {
+      [x, y] = polar(g.cx, g.cy, g.R, (i / n) * 2 * Math.PI);
+      b.style.removeProperty("--bead"); b.style.zIndex = "";
+    }
+    b.classList.toggle("hid", hid);
+    b.tabIndex = hid ? -1 : 0;
     const s = stoneAt(i);
     b.style.setProperty("--img", img(s));
     b.classList.toggle("same", s === state.held);
@@ -241,6 +276,16 @@ beadsEl.addEventListener("click", (e) => {
   beadsEl.children[i]?.focus();
 });
 
+/* ---------- View: on the ring or on a wrist ---------- */
+$("views").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+  state.view = b.dataset.view;
+  $("views").querySelectorAll("button").forEach((x) => { x.setAttribute("aria-checked", x === b); x.tabIndex = x === b ? 0 : -1; });
+  render();
+}));
+const turn = (dir) => { state.rot += dir * ((2 * Math.PI) / state.beads.length) * 3; drawRing(); };
+$("rot-l").addEventListener("click", () => turn(-1));
+$("rot-r").addEventListener("click", () => turn(1));
+
 $("undo").addEventListener("click", () => { if (!history.length) return; state.beads = history.pop(); render(); });
 const clear = () => { if (!state.beads.some(Boolean)) return; snapshot(); state.beads = state.beads.map(() => null); $("adjust").hidden = true; render(); };
 $("clear").addEventListener("click", clear);
@@ -252,15 +297,17 @@ function render(changedIdx) {
   drawRing(changedIdx);
   $("r-count").textContent = `${n} เม็ด`;
   $("r-length").textContent = `ยาว ${state.wrist + 1} ซม. สำหรับข้อมือ ${state.wrist} ซม.`;
+  $("w-count").textContent = $("r-count").textContent;
+  $("w-length").textContent = $("r-length").textContent;
   $("size-aside").textContent = `จำนวนเม็ดคิดจากข้อมือ ${state.wrist} ซม.`;
-  $("hint").innerHTML = `กำลังถือ <b>${STONES[state.held].name}</b> · ${narrow.matches ? "แตะหรือลากนิ้วบนวงเพื่อใส่" : "แตะเม็ดบนวงเพื่อใส่ แตะซ้ำเพื่อคืนเป็นหินหลัก"}`;
+  $("hint").innerHTML = `ถือ<b>${STONES[state.held].name}</b>อยู่ ${state.view === "wrist" ? (narrow.matches ? "แตะเม็ดบนข้อมือเพื่อใส่ได้" : "แตะเม็ดบนข้อมือเพื่อใส่ได้เหมือนบนวง") : narrow.matches ? "แตะหรือลากนิ้วบนวงเพื่อใส่" : "แตะเม็ดบนวงเพื่อใส่ แตะซ้ำเพื่อคืนเป็นหินหลัก"}`;
   $("undo").disabled = !history.length;
   $("clear").disabled = $("clear-m").disabled = !state.beads.some(Boolean);
   sizeButtons();
 
   const { by } = tally();
   const order = Object.keys(by).sort((a, b) => (a === state.main ? -1 : b === state.main ? 1 : by[b] - by[a]));
-  $("m-list").innerHTML = order.map((id) => `<li><span class="im" style="--img:${img(id)}"></span><div><b>${STONES[id].name} <small>· ${STONES[id].type} · ${by[id]} เม็ด</small></b><p>${STONES[id].belief}</p></div></li>`).join("");
+  $("m-list").innerHTML = order.map((id) => `<li><span class="im" style="--img:${img(id)}"></span><div><b>${STONES[id].name} <small>หิน${STONES[id].type} ${by[id]} เม็ด</small></b><p>${STONES[id].belief}</p></div></li>`).join("");
 
   const t = THREADS[state.thread];
   let total = LABOUR + t.extra;
@@ -269,11 +316,11 @@ function render(changedIdx) {
     total += p;
     return [`${STONES[id].name} ${state.size} มม. × ${by[id]} เม็ด`, p];
   });
-  lines.push([`ร้อยมือ · ${t.name.replace(" ปรับขนาดได้", "")}`, LABOUR + t.extra]);
+  lines.push([`ค่าร้อยมือและ${t.name.replace(" ปรับขนาดได้", "")}`, LABOUR + t.extra]);
   $("lines").innerHTML = lines.map(([l, p]) => `<li><span>${l}</span><span>${baht(p)}</span></li>`).join("");
   $("total").textContent = baht(total);
   $("bb-total").textContent = baht(total);
-  $("bb-meta").textContent = `${n} เม็ด · ข้อมือ ${state.wrist} ซม.`;
+  $("bb-meta").textContent = `${n} เม็ด สำหรับข้อมือ ${state.wrist} ซม.`;
   state.total = total; state.lines = lines;
   $("preview").hidden = true;
 }
@@ -284,7 +331,7 @@ document.querySelectorAll("[data-send]").forEach((b) => b.addEventListener("clic
   const pattern = state.beads.map((_, i) => STONES[stoneAt(i)].name).join(", ");
   const text = [
     "สวัสดีค่ะ อยากสั่งกำไลแบบนี้",
-    `ข้อมือ ${state.wrist} ซม. (กำไลยาว ${state.wrist + 1} ซม.) · เม็ด ${state.size} มม. · ${n} เม็ด`,
+    `ข้อมือ ${state.wrist} ซม. (กำไลยาว ${state.wrist + 1} ซม.) เม็ด ${state.size} มม. จำนวน ${n} เม็ด`,
     `หินหลัก: ${STONES[state.main].name}`,
     `เส้นด้าย: ${THREADS[state.thread].name}`,
     ...state.lines.map(([l, p]) => `- ${l} ${baht(p)}`),
@@ -299,19 +346,19 @@ document.querySelectorAll("[data-send]").forEach((b) => b.addEventListener("clic
 /* ---------- Wrist guide ---------- */
 const STEPS = {
   string: [
-    { t: "1 · พันรอบข้อมือ", tm: "1 · พันข้อมือ", d: "ใต้ปุ่มกระดูก แนบแต่ไม่รัด", dm: "ใต้ปุ่มกระดูก ไม่รัด", art: "w-wrap", size: "auto 150%", pos: "34% 50%" },
-    { t: "2 · ทำเครื่องหมาย", tm: "2 · ทำรอย", d: "ตรงที่ปลายมาชนกัน", dm: "ตรงที่ปลายชนกัน", art: "w-mark", size: "auto 125%", pos: "50% 50%" },
-    { t: "3 · วัดกับไม้บรรทัด", tm: "3 · วัดความยาว", d: "จากปลายเชือกถึงรอย", dm: "ปลายเชือกถึงรอย", art: "w-ruler", size: "auto 200%", pos: "70% 50%" },
+    { t: "1 พันรอบข้อมือ", tm: "1 พันข้อมือ", d: "ใต้ปุ่มกระดูก แนบแต่ไม่รัด", dm: "ใต้ปุ่มกระดูก ไม่รัด", art: "w-wrap", size: "auto 150%", pos: "34% 50%" },
+    { t: "2 ทำเครื่องหมาย", tm: "2 ทำรอย", d: "ตรงที่ปลายมาชนกัน", dm: "ตรงที่ปลายชนกัน", art: "w-mark", size: "auto 125%", pos: "50% 50%" },
+    { t: "3 วัดกับไม้บรรทัด", tm: "3 วัดความยาว", d: "จากปลายเชือกถึงรอย", dm: "ปลายเชือกถึงรอย", art: "w-ruler", size: "auto 200%", pos: "70% 50%" },
   ],
   tape: [
-    { t: "1 · พันรอบข้อมือ", tm: "1 · พันข้อมือ", d: "ใต้ปุ่มกระดูก แนบแต่ไม่รัด", dm: "ใต้ปุ่มกระดูก ไม่รัด" },
-    { t: "2 · อ่านตัวเลข", tm: "2 · อ่านเลข", d: "ตรงที่ปลายสายมาชนกัน", dm: "ตรงที่ปลายชนกัน" },
-    { t: "3 · ใส่ตัวเลขด้านล่าง", tm: "3 · ใส่ตัวเลข", d: "ครึ่งเซนติเมตรก็ได้", dm: "ครึ่งเซนก็ได้" },
+    { t: "1 พันรอบข้อมือ", tm: "1 พันข้อมือ", d: "ใต้ปุ่มกระดูก แนบแต่ไม่รัด", dm: "ใต้ปุ่มกระดูก ไม่รัด" },
+    { t: "2 อ่านตัวเลข", tm: "2 อ่านเลข", d: "ตรงที่ปลายสายมาชนกัน", dm: "ตรงที่ปลายชนกัน" },
+    { t: "3 ใส่ตัวเลขด้านล่าง", tm: "3 ใส่ตัวเลข", d: "ครึ่งเซนติเมตรก็ได้", dm: "ครึ่งเซนก็ได้" },
   ],
   bracelet: [
-    { t: "1 · วางกำไลราบ", tm: "1 · วางกำไล", d: "บนโต๊ะ ไม่ต้องยืดเชือก", dm: "วางราบ ไม่ยืด" },
-    { t: "2 · วัดรอบวง", tm: "2 · วัดรอบวง", d: "ใช้เชือกวัดตามแนวกลางเม็ด", dm: "ตามแนวกลางเม็ด" },
-    { t: "3 · ใส่ความยาวกำไล", tm: "3 · ใส่ความยาว", d: "เราหักออก 1 ซม. ให้เอง", dm: "เราหัก 1 ซม. ให้" },
+    { t: "1 วางกำไลราบ", tm: "1 วางกำไล", d: "บนโต๊ะ ไม่ต้องยืดเชือก", dm: "วางราบ ไม่ยืด" },
+    { t: "2 วัดรอบวง", tm: "2 วัดรอบวง", d: "ใช้เชือกวัดตามแนวกลางเม็ด", dm: "ตามแนวกลางเม็ด" },
+    { t: "3 ใส่ความยาวกำไล", tm: "3 ใส่ความยาว", d: "เราหักออก 1 ซม. ให้เอง", dm: "เราหัก 1 ซม. ให้" },
   ],
 };
 const guide = $("guide"), mInput = $("m-value");
@@ -321,7 +368,7 @@ function drawSteps() {
   const s = STEPS[method], m = narrow.matches;
   const ol = $("g-steps");
   ol.classList.toggle("no-art", !s[0].art);
-  ol.innerHTML = s.map((x) => `<li>${x.art ? `<span class="art" role="img" aria-label="${x.t}" style="--img:url(assets/${x.art}.jpg);--size:${x.size};--pos:${x.pos}"></span>` : ""}<b>${m ? x.tm : x.t}</b><p>${m ? x.dm : x.d}</p></li>`).join("");
+  ol.innerHTML = s.map((x) => `<li>${x.art ? `<span class="art" role="img" aria-label="${x.t}" style="--img:url(assets/${x.art}.jpg);--size:${x.size};--pos:${x.pos}"></span>` : ""}<b>${(m ? x.tm : x.t).replace(/^(\d) /, "<em>$1</em> ")}</b><p>${m ? x.dm : x.d}</p></li>`).join("");
   $("m-label").textContent = method === "bracelet" ? "กำไลยาวกี่เซนติเมตร" : "วัดได้กี่เซนติเมตร";
 }
 function result() {
@@ -375,3 +422,5 @@ let rt;
 addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => render(), 120); });
 // order.html#wrist opens the guide straight away (linked from elsewhere on the site).
 if (location.hash === "#wrist") $("open-guide").click();
+// order.html#on-wrist opens straight into the wrist view.
+if (location.hash === "#on-wrist") document.querySelector('[data-view="wrist"]').click();
