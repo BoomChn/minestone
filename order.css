@@ -337,7 +337,12 @@
 /* Wrist view: the ring's own beads re-thread around a photographed wrist, drawn as photographed beads */
 .arm, .wrist-read, .wrist-foot { position: absolute; opacity: 0; visibility: hidden; transition: opacity 360ms ease, visibility 0s 360ms; }
 /* The lift takes the photo's near-white backdrop to the page's pure white so no box edge shows. */
-.arm { inset: 0; background: #fff url(assets/w-hand.jpg) no-repeat; filter: brightness(1.04) contrast(1.04); }
+.arm {
+  inset: 0; background: #fff url(assets/w-hand.jpg) no-repeat; filter: brightness(1.04) contrast(1.04);
+  /* The forearm is cropped at the stage's left edge; fade it into the page instead of a hard cut. */
+  --fade: linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.35) 60px, #000 170px);
+  -webkit-mask-image: var(--fade); mask-image: var(--fade);
+}
 .stage.wrist .arm, .stage.wrist .wrist-read, .stage.wrist .wrist-foot { opacity: 1; visibility: visible; transition: opacity 420ms ease 80ms; }
 .arcs, .thread, .arc-labels, .ring-read { transition: opacity 300ms ease; }
 .stage.wrist .arcs, .stage.wrist .thread, .stage.wrist .arc-labels, .stage.wrist .ring-read { opacity: 0; }
@@ -372,6 +377,8 @@
   .views { margin: 14px auto 0; padding: 3px; }
   .views button { height: 34px; padding: 0 14px 0 11px; gap: 6px; }
   .stage { width: calc(100% + 40px); max-width: none; margin-inline: -20px; margin-top: 8px; }
+  /* Shorter on phones: only ~80px of forearm shows before the bracelet. */
+  .arm { --fade: linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.4) 24px, #000 64px); }
   .wrist-read { left: 20px; top: 6px; }
   .wrist-read b { font-size: 22px; line-height: 32px; }
   .wrist-read span { font-size: 13px; line-height: 18px; }
