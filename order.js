@@ -288,9 +288,14 @@ beadsEl.addEventListener("click", (e) => {
 });
 
 /* ---------- View: on the ring or on a wrist ---------- */
+function markView(v) {
+  $("views").querySelectorAll("button").forEach((x) => { const on = x.dataset.view === v; x.setAttribute("aria-checked", on); x.tabIndex = on ? 0 : -1; });
+}
 $("views").querySelectorAll("button").forEach((b) => b.addEventListener("click", () => {
+  // The camera is its own full-screen step; the page underneath keeps the ring or wrist view.
+  if (b.dataset.view === "camera") { markView("camera"); openCamera(); return; }
   state.view = b.dataset.view;
-  $("views").querySelectorAll("button").forEach((x) => { x.setAttribute("aria-checked", x === b); x.tabIndex = x === b ? 0 : -1; });
+  markView(state.view);
   render();
 }));
 const turn = (dir) => { state.rot += dir * ((2 * Math.PI) / state.beads.length) * 3; drawRing(); };
@@ -427,7 +432,111 @@ $("close-guide").addEventListener("click", () => guide.close());
 guide.addEventListener("click", (e) => { if (e.target === guide) guide.close(); });
 $("use-size").addEventListener("click", () => { setCount({ wrist: pick }); guide.close(); });
 
+/* ---------- The design in a link, so a QR on desktop opens the same bracelet on a phone ---------- */
+const CODE = { rose: "r", amethyst: "a", citrine: "c", aventurine: "v", moon: "m", onyx: "o" };
+const UNCODE = Object.fromEntries(Object.entries(CODE).map(([k, v]) => [v, k]));
+const encode = () => [state.wrist, state.size, CODE[state.main], state.thread[0], state.beads.map((b) => (b ? CODE[b] : "-")).join("")].join("_");
+function decode(s) {
+  const [w, mm, main, th, beads] = (s || "").split("_");
+  const wrist = Number(w), size = Number(mm), thread = { c: "clear", b: "black", r: "red" }[th];
+  if (!WRISTS.includes(wrist) || !SIZES[size] || !UNCODE[main] || !thread || !beads) return false;
+  const n = Math.floor(((wrist + 1) * 10) / size);
+  if (beads.length !== n || /[^-ravcmo]/.test(beads)) return false;
+  Object.assign(state, { wrist, size, main: UNCODE[main], thread, beads: [...beads].map((c) => UNCODE[c] || null) });
+  mark($("wrists"), wrist); mark($("bsizes"), size); mark($("stones"), state.main); mark($("threads"), thread);
+  return true;
+}
+const designUrl = () => `${location.origin}${location.pathname}?d=${encode()}#camera`;
+
+/* ---------- Try on through the camera ---------- */
+// Phones get a short "before we ask for the camera" sheet; desktops get a QR to carry on on a phone.
+const coarse = matchMedia("(pointer: coarse)");
+const arEl = $("ar"), arAsk = $("ar-ask"), arDenied = $("ar-denied"), arDesk = $("ar-desk");
+let arModule = null, facing = "environment";
+const loadAR = () => (arModule ||= import("./ar.js"));
+
+[arAsk, arDenied, arDesk].forEach((d) => {
+  d.addEventListener("click", (e) => { if (e.target === d) d.close(); });
+  d.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => d.close()));
+  d.addEventListener("close", () => { if (arEl.hidden) markView(state.view); });
+  d.querySelectorAll("[data-guide]").forEach((b) => b.addEventListener("click", () => { d.close(); $("open-guide").click(); }));
+});
+
+function openCamera() {
+  if (!coarse.matches) { openDesk(); return; }
+  loadAR().catch(() => {}); // start fetching while the sheet is read
+  arAsk.showModal();
+}
+
+async function startCamera(face) {
+  facing = face;
+  markView("camera");
+  try {
+    const m = await loadAR();
+    await m.start({
+      facing,
+      design: () => ({ beads: state.beads.map((_, i) => stoneAt(i)), size: state.size, wrist: state.wrist, by: tally().by, main: state.main }),
+      names: Object.fromEntries(Object.entries(STONES).map(([k, s]) => [k, s.name])),
+      onClose: () => markView(state.view),
+      onEdit: () => $("stage").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" }),
+      onLine: () => document.querySelector(narrow.matches ? ".buybar [data-send]" : ".summary [data-send]").click(),
+    });
+  } catch (err) {
+    showDenied(err);
+  }
+}
+
+function showDenied(err) {
+  const name = err?.name || "";
+  const why = $("ar-denied-why");
+  $("ar-how").hidden = name !== "NotAllowedError" && name !== "SecurityError";
+  if (name === "NotAllowedError" || name === "SecurityError") why.textContent = "เบราว์เซอร์ยังไม่ได้รับอนุญาตให้ใช้กล้อง เปิดสิทธิ์ตามนี้ แล้วกลับมากดลองอีกครั้ง";
+  else if (name === "NotFoundError" || name === "OverconstrainedError") why.textContent = "ไม่เจอกล้องในเครื่องนี้ ลองเปิดหน้านี้บนมือถือแทน";
+  else if (name === "Unsupported") why.textContent = "เบราว์เซอร์นี้เปิดกล้องจากหน้าเว็บไม่ได้ ถ้าเปิดอยู่ในแอป LINE หรือ Instagram ลองกดเปิดใน Safari หรือ Chrome";
+  else why.textContent = "เปิดกล้องไม่สำเร็จ ลองอีกครั้ง หรือปิดแอปอื่นที่ใช้กล้องอยู่ก่อน";
+  arDenied.showModal();
+}
+
+$("ar-go").addEventListener("click", () => { arAsk.close(); startCamera("environment"); });
+$("ar-retry").addEventListener("click", () => { arDenied.close(); startCamera(facing); });
+$("ar-to-wrist").addEventListener("click", () => { arDenied.close(); document.querySelector('[data-view="wrist"]').click(); });
+$("ar-webcam").addEventListener("click", () => { arDesk.close(); startCamera("user"); });
+
+let qrLib = null;
+const loadQR = () => (qrLib ||= new Promise((ok, fail) => {
+  const s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js";
+  s.onload = () => ok(window.qrcode); s.onerror = fail;
+  document.head.append(s);
+}));
+async function openDesk() {
+  const url = designUrl();
+  const { by } = tally();
+  const order = Object.keys(by).sort((a, b) => (a === state.main ? -1 : b === state.main ? 1 : by[b] - by[a]));
+  $("ar-carry").innerHTML = order.map((id) => `<li><i style="--img:${img(id)}"></i>${STONES[id].name} ${by[id]} เม็ด</li>`).join("");
+  $("ar-carry-meta").textContent = `${state.size} มม. ${THREADS[state.thread].name.replace(" ปรับขนาดได้", "")} ข้อมือ ${state.wrist} ซม.`;
+  $("ar-copy").textContent = "คัดลอกลิงก์";
+  arDesk.showModal();
+  const box = $("ar-qr");
+  box.innerHTML = "";
+  try {
+    const q = (await loadQR())(0, "M");
+    q.addData(url); q.make();
+    const n = q.getModuleCount();
+    let d = "";
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (q.isDark(y, x)) d += `M${x} ${y}h1v1h-1z`;
+    box.innerHTML = `<svg viewBox="-2 -2 ${n + 4} ${n + 4}" shape-rendering="crispEdges"><rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#fff"/><path d="${d}" fill="#111827"/></svg>`;
+  } catch {
+    box.innerHTML = `<p>โหลด QR ไม่สำเร็จ กดคัดลอกลิงก์แล้วส่งเข้ามือถือแทนได้</p>`;
+  }
+}
+$("ar-copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(designUrl()); $("ar-copy").textContent = "คัดลอกแล้ว"; }
+  catch { prompt("คัดลอกลิงก์นี้", designUrl()); }
+});
+
 /* ---------- Boot ---------- */
+decode(new URLSearchParams(location.search).get("d"));
 render();
 let rt;
 addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => render(), 120); });
@@ -435,3 +544,5 @@ addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => rende
 if (location.hash === "#wrist") $("open-guide").click();
 // order.html#on-wrist opens straight into the wrist view.
 if (location.hash === "#on-wrist") document.querySelector('[data-view="wrist"]').click();
+// order.html?d=…#camera is the QR from a desktop: the same design, straight to the camera sheet.
+if (location.hash === "#camera") document.querySelector('[data-view="camera"]').click();

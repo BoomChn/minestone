@@ -392,3 +392,108 @@
 @media (prefers-reduced-motion: reduce) {
   .arm, .wrist-read, .wrist-foot, .stage.wrist .arm, .stage.wrist .wrist-read, .stage.wrist .wrist-foot { transition: none; }
 }
+
+/* Try on through the camera: the sheet before asking, the desktop QR, then a full-screen camera */
+.ar-lead { font-size: 17px; line-height: 28px; }
+.ar-facts { display: flex; flex-direction: column; gap: 14px; }
+.ar-facts li { display: flex; gap: 12px; align-items: flex-start; }
+.ar-facts svg { flex-shrink: 0; width: 24px; margin-top: 2px; color: var(--sage); }
+.ar-facts b { display: block; font-size: 15px; font-weight: 600; line-height: 22px; }
+.ar-facts span { color: var(--muted); font-size: 14px; line-height: 20px; }
+.ar-link { padding: 0; border: 0; background: none; font: inherit; color: var(--sage); font-weight: 500; text-decoration: underline 1px; text-underline-offset: 3px; cursor: pointer; }
+.ar-link:focus-visible, .ar-text-btn:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; border-radius: 4px; }
+.ar-text-btn { flex-shrink: 0; height: 44px; padding: 0 4px; border: 0; background: none; font: inherit; font-size: 15px; font-weight: 500; color: var(--ink); cursor: pointer; }
+/* The hand photo (white backdrop) multiplied onto a warm grey reads as a camera frame, not a cut-out. */
+.ar-peek {
+  position: relative; flex-shrink: 0; height: 150px; border-radius: 14px; overflow: hidden;
+  background: #E9E5DF url(assets/w-hand.jpg) -150px -50px / 560px auto no-repeat; background-blend-mode: multiply;
+}
+.ar-peek i { position: absolute; left: 80px; top: 41px; width: 36px; height: 96px; border: 2px dashed rgba(255, 255, 255, 0.95); border-radius: 50%; }
+.ar-peek::after {
+  content: ""; position: absolute; inset: 14px; --c: #fff;
+  background:
+    linear-gradient(var(--c), var(--c)) left top / 20px 2.4px, linear-gradient(var(--c), var(--c)) left top / 2.4px 20px,
+    linear-gradient(var(--c), var(--c)) right top / 20px 2.4px, linear-gradient(var(--c), var(--c)) right top / 2.4px 20px,
+    linear-gradient(var(--c), var(--c)) left bottom / 20px 2.4px, linear-gradient(var(--c), var(--c)) left bottom / 2.4px 20px,
+    linear-gradient(var(--c), var(--c)) right bottom / 20px 2.4px, linear-gradient(var(--c), var(--c)) right bottom / 2.4px 20px;
+  background-repeat: no-repeat;
+}
+.ar-how { border: 1px solid var(--rule); border-radius: 14px; }
+.ar-how[hidden] { display: none; }
+.ar-how > div { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; }
+.ar-how > div + div { border-top: 1px solid var(--rule); }
+.ar-how b { font-size: 15px; font-weight: 600; line-height: 22px; }
+.ar-how span { color: var(--muted); font-size: 14px; line-height: 21px; }
+.ar-how em { font-style: normal; color: var(--ink); font-weight: 500; }
+.ar-note { color: var(--muted); font-size: 14px; line-height: 21px; }
+.ar-qr { display: flex; flex-wrap: wrap; align-items: center; gap: 28px; padding: 20px; border: 1px solid var(--rule); border-radius: 14px; }
+.ar-qr-code { width: 200px; height: 200px; flex-shrink: 0; }
+.ar-qr-code svg { display: block; width: 100%; height: 100%; }
+.ar-qr-code p { padding-top: 70px; color: var(--muted); font-size: 14px; line-height: 20px; }
+.ar-carry { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.ar-carry b { font-size: 15px; font-weight: 600; line-height: 22px; }
+.ar-carry ul { display: flex; flex-direction: column; gap: 10px; }
+.ar-carry li { display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 20px; }
+.ar-carry li i { width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%; background: var(--img) center / 150% no-repeat; mix-blend-mode: multiply; }
+.ar-carry > span { color: var(--muted); font-size: 14px; line-height: 20px; }
+
+html.ar-on, html.ar-on body { overflow: hidden; }
+.ar { position: fixed; inset: 0; z-index: 100; overflow: hidden; background: #1B1916; color: #fff; touch-action: none; user-select: none; -webkit-user-select: none; }
+.ar[hidden] { display: none; }
+.ar:focus { outline: none; }
+.ar video, .ar canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ar video { object-fit: cover; }
+.ar.mirror video { transform: scaleX(-1); }
+.ar-top {
+  position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  padding: calc(14px + env(safe-area-inset-top)) 16px 48px; background: linear-gradient(rgba(17, 24, 39, 0.3), rgba(17, 24, 39, 0));
+}
+.ar-round { width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: rgba(17, 24, 39, 0.55); color: #fff; cursor: pointer; }
+.ar-round:focus-visible, .ar-ctl:focus-visible span, .ar-shutter:focus-visible span { outline: 2px solid var(--sage); outline-offset: 2px; }
+.ar-pill { display: flex; align-items: center; gap: 10px; min-width: 0; height: 44px; padding: 0 16px 0 10px; border-radius: 999px; background: rgba(17, 24, 39, 0.55); font-size: 14px; font-weight: 500; line-height: 20px; }
+.ar-pill .dots { display: flex; flex-shrink: 0; }
+.ar-pill .dots i { width: 22px; height: 22px; border-radius: 50%; background: center / 100% no-repeat; box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.55); }
+.ar-pill .dots i + i { margin-left: -6px; }
+.ar-pill > span:last-child { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ar-status {
+  position: absolute; left: 50%; top: calc(72px + env(safe-area-inset-top)); translate: -50% 0; max-width: calc(100% - 32px);
+  display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 6px 14px 6px 12px; border-radius: 16px;
+  background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(17, 24, 39, 0.12); font-size: 13px; font-weight: 500; line-height: 18px;
+}
+.ar-status i { width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: var(--sand); }
+.ar-status.ok i { background: var(--sage); }
+.ar-status.err { cursor: pointer; }
+.ar-status.err i { background: #B23A3A; }
+.ar-aim { position: absolute; left: 0; right: 0; top: 24%; display: flex; flex-direction: column; align-items: center; gap: 16px; pointer-events: none; transition: opacity 240ms ease; }
+.ar-aim.off { opacity: 0; }
+.ar-aim p { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 16px; border-radius: 14px; background: rgba(17, 24, 39, 0.55); text-align: center; }
+.ar-aim b { font-size: 15px; font-weight: 600; line-height: 22px; }
+.ar-aim span { font-size: 13px; line-height: 18px; opacity: 0.88; }
+.ar-bottom {
+  position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 16px 20px calc(20px + env(safe-area-inset-bottom)); border-radius: 18px 18px 0 0; background: #fff; color: var(--ink);
+}
+.ar-honest { color: var(--muted); font-size: 13px; line-height: 18px; text-align: center; }
+.ar-controls { display: flex; align-items: flex-start; justify-content: space-between; width: 100%; max-width: 360px; }
+.ar-ctl, .ar-shutter { width: 96px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; line-height: 18px; color: var(--ink); cursor: pointer; }
+.ar-ctl { padding-top: 10px; }
+.ar-ctl span { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--rule); border-radius: 50%; transition: transform 160ms var(--ease-out); }
+.ar-shutter { font-weight: 500; }
+.ar-shutter span { width: 68px; height: 68px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--ink); border-radius: 50%; }
+.ar-shutter i { width: 54px; height: 54px; border-radius: 50%; background: var(--ink); transition: transform 160ms var(--ease-out); }
+.ar-shutter:active:not(:disabled) i, .ar-ctl:active span { transform: scale(0.92); }
+.ar-shutter:disabled { opacity: 0.3; cursor: default; }
+.ar.flash::after { content: ""; position: absolute; inset: 0; background: #fff; pointer-events: none; animation: ar-flash 280ms ease-out forwards; }
+@keyframes ar-flash { from { opacity: 0.8; } to { opacity: 0; } }
+@media (hover: hover) and (pointer: fine) {
+  .ar-ctl:hover span { background: #F7F6F3; }
+  .ar-round:hover { background: rgba(17, 24, 39, 0.7); }
+}
+@media (max-width: 960px) {
+  .ar-lead { font-size: 16px; line-height: 26px; }
+  .ar-qr { gap: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ar.flash::after { animation: none; }
+  .ar-aim { transition: none; }
+}

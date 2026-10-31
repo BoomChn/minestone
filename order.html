@@ -45,6 +45,10 @@
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 6h6.2M1.5 10.5h6.2M7.7 6c1.6-1.6 4-2 5.6-1 1.3.8 1.4 2.4.2 3l-1.2.6 1.4.5c1 .4 1 1.8-.1 2.2-1.6.6-3.6.4-5.9-.8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="7.7" cy="8.25" rx="1.3" ry="3.2" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
           บนข้อมือ
         </button>
+        <button type="button" role="radio" aria-checked="false" data-view="camera" tabindex="-1">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 5.2c0-.7.5-1.2 1.2-1.2h1.7l1-1.4h4.2l1 1.4h1.7c.7 0 1.2.5 1.2 1.2v6.6c0 .7-.5 1.2-1.2 1.2H3.2c-.7 0-1.2-.5-1.2-1.2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="8" cy="8.4" r="2.4" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          ผ่านกล้อง
+        </button>
       </div>
 
       <div class="stage" id="stage">
@@ -199,6 +203,120 @@
       </footer>
     </div>
   </dialog>
+
+  <!-- Try on through the camera: ask first, then a full-screen camera; a QR on desktop -->
+  <dialog class="guide ar-sheet" id="ar-ask" aria-labelledby="ar-ask-title">
+    <div class="g-panel">
+      <span class="grabber" aria-hidden="true"></span>
+      <header class="g-head">
+        <h2 id="ar-ask-title" tabindex="-1" autofocus>ลองใส่ผ่านกล้อง</h2>
+        <button type="button" class="g-close" data-close aria-label="ปิด">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="m4 4 10 10M14 4 4 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+      <div class="g-body">
+        <div class="ar-peek" aria-hidden="true"><i></i></div>
+        <p class="ar-lead">ยื่นข้อมือให้กล้องเห็น เราจะสวมกำไลแบบที่เลือกไว้ให้ดูทันที ขยับมือได้ กำไลจะขยับตาม</p>
+        <ul class="ar-facts">
+          <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3.5" y="8" width="11" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6 8V5.8a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><div><b>ภาพจากกล้องอยู่ในเครื่องคุณ</b><span>ไม่บันทึก และไม่ส่งมาให้เรา</span></div></li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="1.8" y="5.5" width="14.4" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5 5.5v2.6M8 5.5v1.6M11 5.5v2.6M14 5.5v1.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div><b>ไว้ดูหน้าตาตอนใส่จริง</b><span>ขนาดข้อมือดูได้ที่ <button type="button" class="ar-link" data-guide>วัดข้อมือยังไง</button></span></div></li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="3.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 1.8v1.6M9 14.6v1.6M1.8 9h1.6M14.6 9h1.6M3.9 3.9l1.1 1.1M13 13l1.1 1.1M3.9 14.1 5 13M13 5l1.1-1.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div><b>อยู่ในที่สว่าง</b><span>กล้องเห็นข้อมือชัด กำไลจะนิ่งกว่า</span></div></li>
+        </ul>
+      </div>
+      <footer class="g-foot">
+        <button type="button" class="ar-text-btn" data-close>ไว้ก่อน</button>
+        <button type="button" class="btn btn-dark" id="ar-go">เปิดกล้อง</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog class="guide ar-sheet" id="ar-denied" aria-labelledby="ar-denied-title">
+    <div class="g-panel">
+      <span class="grabber" aria-hidden="true"></span>
+      <header class="g-head">
+        <h2 id="ar-denied-title" tabindex="-1" autofocus>เปิดกล้องไม่ได้</h2>
+        <button type="button" class="g-close" data-close aria-label="ปิด">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="m4 4 10 10M14 4 4 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+      <div class="g-body">
+        <p class="ar-lead" id="ar-denied-why">เบราว์เซอร์ยังไม่ได้รับอนุญาตให้ใช้กล้อง เปิดสิทธิ์ตามนี้ แล้วกลับมากดลองอีกครั้ง</p>
+        <div class="ar-how" id="ar-how">
+          <div><b>iPhone (Safari)</b><span>แตะ <em>aA</em> ข้างที่อยู่เว็บ แล้วเลือก <em>การตั้งค่าเว็บไซต์</em> จากนั้นตั้ง <em>กล้อง</em> เป็น อนุญาต</span></div>
+          <div><b>Android (Chrome)</b><span>แตะไอคอนข้างที่อยู่เว็บ แล้วเลือก <em>สิทธิ์</em> จากนั้นเปิด <em>กล้อง</em></span></div>
+        </div>
+        <p class="ar-note">ไม่อยากเปิดกล้องก็ได้ ภาพบนข้อมือแสดงแบบเดียวกันกับที่คุณเลือกไว้</p>
+      </div>
+      <footer class="g-foot">
+        <button type="button" class="ar-text-btn" id="ar-retry">ลองอีกครั้ง</button>
+        <button type="button" class="btn btn-dark" id="ar-to-wrist">ดูบนข้อมือแทน</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog class="guide ar-sheet" id="ar-desk" aria-labelledby="ar-desk-title">
+    <div class="g-panel">
+      <span class="grabber" aria-hidden="true"></span>
+      <header class="g-head">
+        <h2 id="ar-desk-title" tabindex="-1" autofocus>ลองใส่ผ่านกล้อง</h2>
+        <button type="button" class="g-close" data-close aria-label="ปิด">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="m4 4 10 10M14 4 4 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+      <div class="g-body">
+        <p class="ar-lead">กล้องใช้ได้ดีที่สุดบนมือถือ สแกนเพื่อเปิดหน้านี้บนมือถือ แบบที่เลือกไว้จะตามไปด้วย ไม่ต้องเลือกใหม่</p>
+        <div class="ar-qr">
+          <div class="ar-qr-code" id="ar-qr" role="img" aria-label="QR code เปิดหน้านี้บนมือถือ"></div>
+          <div class="ar-carry">
+            <b>แบบที่จะเปิดบนมือถือ</b>
+            <ul id="ar-carry"></ul>
+            <span id="ar-carry-meta"></span>
+          </div>
+        </div>
+        <ul class="ar-facts">
+          <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3.5" y="8" width="11" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M6 8V5.8a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><div><b>ภาพจากกล้องอยู่ในเครื่องคุณ</b><span>ไม่บันทึก และไม่ส่งมาให้เรา</span></div></li>
+          <li><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="1.8" y="5.5" width="14.4" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5 5.5v2.6M8 5.5v1.6M11 5.5v2.6M14 5.5v1.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div><b>ไว้ดูหน้าตาตอนใส่จริง</b><span>ขนาดข้อมือดูได้ที่ <button type="button" class="ar-link" data-guide>วัดข้อมือยังไง</button></span></div></li>
+        </ul>
+      </div>
+      <footer class="g-foot">
+        <span>หรือ <button type="button" class="ar-link" id="ar-webcam">ใช้เว็บแคมของเครื่องนี้</button></span>
+        <button type="button" class="btn btn-dark" id="ar-copy">คัดลอกลิงก์</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <div class="ar" id="ar" role="dialog" aria-modal="true" aria-label="ลองใส่กำไลผ่านกล้อง" tabindex="-1" hidden>
+    <video id="ar-video" playsinline muted autoplay></video>
+    <canvas id="ar-canvas" aria-hidden="true"></canvas>
+    <div class="ar-aim" id="ar-aim" aria-hidden="true">
+      <svg width="120" height="240" viewBox="0 0 120 240"><ellipse cx="60" cy="120" rx="44" ry="108" fill="none" stroke="#fff" stroke-width="2.4" stroke-dasharray="8 8" stroke-linecap="round"/></svg>
+      <p><b>วางข้อมือให้ตรงกรอบ</b><span>หันหลังมือเข้าหากล้อง ห่างราวหนึ่งศอก</span></p>
+    </div>
+    <div class="ar-top">
+      <button type="button" class="ar-round" id="ar-close" aria-label="ปิดกล้อง">
+        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <div class="ar-pill" id="ar-design"></div>
+      <button type="button" class="ar-round" id="ar-flip" aria-label="สลับกล้องหน้าและหลัง">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.2c0-.9.7-1.6 1.6-1.6h2l1.2-1.8h4.4l1.2 1.8h2c.9 0 1.6.7 1.6 1.6v7.2c0 .9-.7 1.6-1.6 1.6H4.6c-.9 0-1.6-.7-1.6-1.6z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7.4 10.6a2.7 2.7 0 0 1 4.7-1.6M12.6 10.2a2.7 2.7 0 0 1-4.7 1.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M12.4 7.6v1.6h-1.6M7.6 13.2v-1.6h1.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <p class="ar-status" id="ar-status" aria-live="polite"><i></i><span>กำลังเปิดกล้อง</span></p>
+    <div class="ar-bottom">
+      <p class="ar-honest">ไว้ดูหน้าตาตอนใส่จริง ลากนิ้วซ้ายขวาเพื่อหมุนกำไล</p>
+      <div class="ar-controls">
+        <button type="button" class="ar-ctl" id="ar-edit">
+          <span><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="2.4" r="1.7" fill="currentColor"/><circle cx="13" cy="10.6" r="1.7" fill="currentColor"/><circle cx="3" cy="10.6" r="1.7" fill="currentColor"/></svg></span>
+          แก้แบบ
+        </button>
+        <button type="button" class="ar-shutter" id="ar-shot" disabled><span><i></i></span>ถ่ายเก็บไว้</button>
+        <button type="button" class="ar-ctl" id="ar-line">
+          <span><svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.5c-3.9 0-7 2.5-7 5.6 0 2.8 2.5 5.1 5.8 5.5.2 0 .5.2.6.4l.1.9c0 .3.3.4.5.3 2.2-1.2 7-3.9 7-7.1 0-3.1-3.1-5.6-7-5.6Z" fill="currentColor"/></svg></span>
+          สั่งทาง LINE
+        </button>
+      </div>
+    </div>
+  </div>
 
   <footer class="foot">
     <div class="foot-top">
