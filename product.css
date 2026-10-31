@@ -52,6 +52,15 @@
 .p-tag { padding-top: 10px; font-size: 22px; line-height: 36px; }
 .p-price { padding-top: 14px; color: var(--muted); font-size: 17px; line-height: 26px; }
 .p-hero-plate { width: 1120px; max-width: 100%; aspect-ratio: 16 / 9; transform-origin: 50% 0; will-change: transform; }
+/* The bead layer's soft haze still has some opacity at the image border, which shows as a faint
+   straight cut. Fade every side to nothing inside the clear margin around the beads
+   (beads stay 5% from the sides, 24% from the top, 16% from the bottom). */
+.p-hero-plate {
+  --fade-x: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+  --fade-y: linear-gradient(to bottom, transparent, #000 14%, #000 88%, transparent);
+  -webkit-mask-image: var(--fade-x), var(--fade-y); -webkit-mask-composite: source-in;
+  mask-image: var(--fade-x), var(--fade-y); mask-composite: intersect;
+}
 
 /* Big statements */
 .statement { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 160px 24px 0; text-align: center; }
