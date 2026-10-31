@@ -32,6 +32,14 @@
 .p-hero-plate .wash { filter: saturate(1.7) brightness(0.86) contrast(1.18); }
 .close-plate .wash { opacity: 0.75; }
 
+/* Drag-to-spin beads (bead-spin.js). The canvas takes the photo's place once WebGL is up. */
+.plate canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+.plate.spinning canvas { cursor: grabbing; }
+.plate.spin-live > img:not(.wash) { visibility: hidden; }
+.spin-hint { position: absolute; left: 0; right: 0; bottom: 2%; color: var(--muted); font-size: 13px; line-height: 18px; text-align: center; opacity: 0; pointer-events: none; transition: opacity 300ms ease; }
+.spin-live .spin-hint { opacity: 1; }
+.spin-live.spun .spin-hint { opacity: 0; }
+
 /* Ch1 hero */
 .p-hero { display: flex; flex-direction: column; align-items: center; padding: 110px 24px 0; text-align: center; }
 .p-hero h1 { font-size: 72px; line-height: 100px; letter-spacing: -0.015em; }
