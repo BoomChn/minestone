@@ -64,3 +64,49 @@ if (!reduce && plate) {
   addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(settle); } }, { passive: true });
   settle();
 }
+
+// Stone aura. With a mouse it blooms while the pointer is over the stone and leans a little
+// toward it on a spring, so the colour seems to answer the hand. On touch it blooms once, when
+// the stone scrolls into view, and stays.
+const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
+document.querySelectorAll(".stone").forEach((stone) => {
+  const plate = stone.querySelector(".plate");
+  const drift = stone.querySelector(".aura-drift");
+  if (!plate || !drift) return;
+
+  if (!finePointer) {
+    const seen = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      seen.disconnect();
+      setTimeout(() => stone.classList.add("aura-on"), 300);
+    }, { threshold: 0.6 });
+    seen.observe(plate);
+    return;
+  }
+
+  plate.addEventListener("pointerenter", () => stone.classList.add("aura-on"));
+  plate.addEventListener("pointerleave", () => stone.classList.remove("aura-on"));
+  if (reduce) return;
+
+  // Lean up to 4% of the plate toward the pointer. A soft spring, so it trails rather than sticks.
+  const LEAN = 0.04, K = 90, DAMP = 14;
+  let target = [0, 0], pos = [0, 0], vel = [0, 0], last = 0, raf = 0;
+  const step = (now) => {
+    const dt = Math.min((now - last) / 1000, 0.032);
+    last = now;
+    for (let i = 0; i < 2; i++) {
+      vel[i] += (K * (target[i] - pos[i]) - DAMP * vel[i]) * dt;
+      pos[i] += vel[i] * dt;
+    }
+    drift.style.transform = `translate(${pos[0].toFixed(2)}%, ${pos[1].toFixed(2)}%)`;
+    const moving = Math.abs(target[0] - pos[0]) + Math.abs(target[1] - pos[1]) + Math.abs(vel[0]) + Math.abs(vel[1]) > 0.01;
+    raf = moving ? requestAnimationFrame(step) : 0;
+  };
+  const wake = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(step); } };
+  plate.addEventListener("pointermove", (e) => {
+    const r = plate.getBoundingClientRect();
+    target = [((e.clientX - r.left) / r.width - 0.5) * 2 * LEAN * 100, ((e.clientY - r.top) / r.height - 0.5) * 2 * LEAN * 100];
+    wake();
+  });
+  plate.addEventListener("pointerleave", () => { target = [0, 0]; wake(); });
+});

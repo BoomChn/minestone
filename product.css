@@ -32,6 +32,19 @@
 .p-hero-plate .wash { filter: saturate(1.7) brightness(0.86) contrast(1.18); }
 .close-plate .wash { opacity: 0.75; }
 
+/* Stone aura: the stone's colour bleeds out of the wash like pigment on wet paper.
+   Blooms slowly (700ms), lifts faster (300ms). .aura-drift leans toward the cursor in product.js. */
+.aura { position: absolute; left: var(--x); top: var(--y); width: 100%; height: 100%; mix-blend-mode: multiply; pointer-events: none; transform-origin: 50% 62%;
+  opacity: 0; transform: scale(0.9); transition: opacity 300ms ease-out, transform 300ms ease-out; }
+.aura-drift, .aura svg { display: block; width: 100%; height: 100%; }
+.aura-on .aura { opacity: 1; transform: scale(1); transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out); }
+.aura-on .aura-drift { will-change: transform; }
+
+/* The Thai belief line takes the same colour, as if the stone marked it. */
+.belief .hl { background: linear-gradient(color-mix(in srgb, var(--aura) 32%, transparent), color-mix(in srgb, var(--aura) 32%, transparent)) no-repeat 0 88% / 0% 42%;
+  transition: background-size 300ms ease-out; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.aura-on .belief .hl { background-size: 100% 42%; transition: background-size 600ms var(--ease-out) 150ms; color: var(--ink); }
+
 /* Ch1 hero */
 .p-hero { display: flex; flex-direction: column; align-items: center; padding: 110px 24px 0; text-align: center; }
 .p-hero h1 { font-size: 72px; line-height: 100px; letter-spacing: -0.015em; }
@@ -150,4 +163,5 @@
 @media (prefers-reduced-motion: reduce) {
   .pbar { transition: none; }
   .p-hero-plate { transform: none !important; }
+  .aura, .aura-on .aura { transform: none; }
 }
