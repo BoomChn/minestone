@@ -30,7 +30,6 @@
 .plate img { position: absolute; left: var(--x, 0); top: var(--y, 0); width: var(--w, 100%); height: var(--w, 100%); object-fit: contain; }
 .plate .wash { filter: saturate(1.4) brightness(0.92) contrast(1.1); }
 .p-hero-plate .wash { filter: saturate(1.7) brightness(0.86) contrast(1.18); }
-.close-plate .wash { opacity: 0.75; }
 
 /* Stone aura: the stone's colour seeps out from its edge like pigment into wet paper.
    It starts scaled down to the stone's own size, hidden behind it, then spreads outward fast and
