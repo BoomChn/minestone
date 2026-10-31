@@ -1,20 +1,21 @@
 // Drag-to-spin beads. There is only one photo of each bead, so a shader fakes the turn:
 // every pixel on the ball is lifted onto a unit sphere, rotated back, and read from the photo
-// again. The back of the ball reuses the front (orthographic, so the seam at the rim lines up).
-// Only the fine grain turns. The soft light (bright top, darker base) and the sharp glint stay
-// where the lamp put them, otherwise the bead reads as a sticker sliding over a ball.
+// again. Everything in the photo turns together, glint and pattern alike; nothing from the
+// still photo is laid over the top.
+// The photo is read as a map of the whole stone: the angle from the front decides how far out
+// to read, up to REACH of the radius. The thin outer band of the photo is never used, because
+// it is squeezed and glassy and would roll across the face as a white streak.
 const BEAD_FRAG = `
 precision highp float;
 uniform sampler2D u_tex;
 uniform mat3 u_rot;     // material -> view
 uniform vec3 u_ball;    // centre x, centre y, radius, in texture units
 varying vec2 v_uv;
-const float LIGHT_LOD = 6.0;  // mip level holding the lamp's soft light, not the stone's pattern
+const float REACH = 0.8;
+const float SEAM = 0.28;   // depth band where front and back crossfade
+const float HALF_PI = 1.5707963;
 
 vec3 unpm(vec4 c) { return c.a > 0.001 ? c.rgb / c.a : vec3(0.0); }
-float luma(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
-// A glint is a small spot much brighter than what is around it.
-float glint(vec3 c, vec3 around) { return smoothstep(0.07, 0.2, luma(c) - luma(around)) * smoothstep(0.7, 0.88, luma(c)); }
 
 void main() {
   vec4 orig = texture2D(u_tex, v_uv);
@@ -24,24 +25,17 @@ void main() {
 
   vec3 p = vec3(d.x, -d.y, sqrt(1.0 - r2));
   vec3 q = p * u_rot;                      // transpose = inverse rotation
-  vec2 uv = u_ball.xy + vec2(q.x, -q.y) * u_ball.z * 0.985;
-
-  vec3 s = unpm(texture2D(u_tex, uv));
-  vec3 sLight = unpm(texture2D(u_tex, uv, LIGHT_LOD));
-  s = mix(s, sLight, glint(s, sLight));    // the glint must not travel with the stone
-
-  vec3 o = unpm(orig);
-  vec3 oLight = unpm(texture2D(u_tex, v_uv, LIGHT_LOD));
-  vec3 grain = clamp(s / max(sLight, vec3(0.04)), 0.0, 2.5);
-  // Grain read from near the photo's rim is squeezed thin; turned to face us it smears into
-  // streaks. Where that stretch is large, fall back to a softer, quieter grain.
-  float stretch = smoothstep(1.6, 4.5, p.z / max(abs(q.z), 0.02));
-  vec3 soft = clamp(unpm(texture2D(u_tex, uv, 3.0)) / max(sLight, vec3(0.04)), 0.0, 2.5);
-  grain = mix(grain, mix(soft, vec3(1.0), 0.4), stretch);
-  vec3 c = clamp(grain * oLight, 0.0, 1.0);
-
-  c = mix(c, o, glint(o, oLight));
-  c = mix(c, o, smoothstep(0.9, 0.99, sqrt(r2)));   // keep the photographed rim and edge
+  float len = length(q.xy);
+  vec2 dir = len > 1e-5 ? q.xy / len : vec2(0.0);
+  // Front: angle from the front pole. Back: the same photo seen from behind (x flips), so the
+  // back is a different face, not a mirror. The two fade into each other around the edge.
+  float angF = acos(clamp(q.z, -1.0, 1.0));
+  float angB = acos(clamp(-q.z, -1.0, 1.0));
+  vec2 uvF = u_ball.xy + vec2(dir.x, -dir.y) * (angF / HALF_PI) * REACH * u_ball.z;
+  vec2 uvB = u_ball.xy + vec2(-dir.x, -dir.y) * (angB / HALF_PI) * REACH * u_ball.z;
+  vec3 c = mix(unpm(texture2D(u_tex, uvB)), unpm(texture2D(u_tex, uvF)), smoothstep(-SEAM, SEAM, q.z));
+  // The edge band we skip carried the photo's falloff; give the edge back a plain soft shade.
+  c *= mix(0.84, 1.0, smoothstep(0.0, 0.5, p.z));
   gl_FragColor = vec4(c * orig.a, orig.a);
 }`;
 
