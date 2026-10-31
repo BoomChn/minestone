@@ -24,8 +24,13 @@
 
 .chapter { scroll-margin-top: 70px; }
 
-/* Plates: AI watercolour placeholders. The filter lifts the cream ground to white. */
-.plate { filter: brightness(1.07) contrast(1.06) saturate(1.05); object-fit: cover; }
+/* Plates: AI placeholders stacked as in Paper, a watercolour wash under the beads.
+   Each layer is placed with --x, --y (offset) and --w (size), as a share of the plate. */
+.plate { position: relative; }
+.plate img { position: absolute; left: var(--x, 0); top: var(--y, 0); width: var(--w, 100%); height: var(--w, 100%); object-fit: contain; }
+.plate .wash { filter: saturate(1.4) brightness(0.92) contrast(1.1); }
+.p-hero-plate .wash { filter: saturate(1.7) brightness(0.86) contrast(1.18); }
+.close-plate .wash { opacity: 0.75; }
 
 /* Ch1 hero */
 .p-hero { display: flex; flex-direction: column; align-items: center; padding: 110px 24px 0; text-align: center; }
