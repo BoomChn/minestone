@@ -235,3 +235,12 @@
   .dip { filter: none; translate: none; }
   .time:active, .day.open:active, .topic:active { transform: none; }
 }
+
+/* Typed birth date and time: the format is the placeholder, the answer reads back underneath */
+.typed { position: relative; }
+.typed svg { position: absolute; left: 18px; top: 50%; translate: 0 -50%; pointer-events: none; }
+.typed .input { padding-left: 50px; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.f-note { min-height: 20px; color: var(--muted); font-size: 13px; line-height: 20px; transition: color 160ms ease; }
+.f-note.ok { color: var(--ink); }
+.f-note.err { color: #B4473F; }
+.input.bad, .input.bad:hover { border-color: #B4473F; }

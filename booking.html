@@ -77,20 +77,20 @@
         <legend class="step-head"><span class="step-title">วันเกิดของคุณ</span><span class="step-aside">เราเริ่มดูจากตรงนี้ก่อนถึงวันนัด</span></legend>
         <div class="fields">
           <div class="f-col f-date">
-            <label class="f-label" for="dob">วัน เดือน ปีเกิด</label>
-            <div class="field">
+            <label class="f-label" for="dob">วัน เดือน ปีเกิด <span class="opt">ปี พ.ศ.</span></label>
+            <div class="typed">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
-              <span id="dob-text" class="placeholder">เลือกวันเกิด</span>
-              <input id="dob" type="date" min="1920-01-01" max="2020-12-31" required>
+              <input class="input" id="dob" type="text" inputmode="numeric" autocomplete="bday" maxlength="10" placeholder="วว/ดด/ปปปป" aria-describedby="dob-note" required>
             </div>
+            <p class="f-note" id="dob-note">เช่น 14/03/2538</p>
           </div>
           <div class="f-col f-time">
             <label class="f-label" for="tob">เวลาเกิด <span class="opt">ถ้าจำได้</span></label>
-            <div class="field">
+            <div class="typed">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
-              <span id="tob-text" class="placeholder">ไม่ทราบก็ได้</span>
-              <input id="tob" type="time">
+              <input class="input" id="tob" type="text" inputmode="numeric" maxlength="5" placeholder="ชช:นน" aria-describedby="tob-note">
             </div>
+            <p class="f-note" id="tob-note">แบบ 24 ชั่วโมง เช่น 08:30 หรือ 21:15</p>
           </div>
         </div>
         <div class="readout bk-readout" aria-live="polite">

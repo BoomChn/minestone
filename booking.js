@@ -135,31 +135,89 @@ function swap(el, text, order) {
   el.classList.add("dip");
   setTimeout(() => { el.textContent = text; el.classList.remove("dip"); }, 110 + order * 50);
 }
-function birth() {
-  const v = $("dob").value;
-  if (!v) return null;
-  const [y, m, d] = v.split("-").map(Number);
-  return { y, m, d, day: DAYS[new Date(y, m - 1, d).getDay()], life: lifeNumber(v) };
+// Typed fields: digits only, the separators are inserted for you. Deleting never fights back.
+function mask(input, groups, sep) {
+  input.addEventListener("input", (e) => {
+    if (e.inputType && e.inputType.startsWith("delete")) return;
+    const digits = input.value.replace(/\D/g, "").slice(0, groups.reduce((a, g) => a + g, 0));
+    let out = "", i = 0;
+    groups.forEach((g, k) => {
+      const part = digits.slice(i, i + g);
+      i += g;
+      if (!part) return;
+      out += part;
+      if (part.length === g && k < groups.length - 1) out += sep;
+    });
+    input.value = out;
+  });
 }
-$("dob").addEventListener("change", () => {
-  const b = birth();
-  const t = $("dob-text");
-  if (!b) { t.textContent = "เลือกวันเกิด"; t.classList.add("placeholder"); render(); return; }
-  t.textContent = `${b.d} ${MONTHS[b.m - 1]} ${b.y + 543}`;
-  t.classList.remove("placeholder");
-  $("out-swatch").style.background = b.day.hex;
-  swap($("out-day"), b.day.name, 0);
-  swap($("out-color"), b.day.color, 1);
-  swap($("out-num"), String(b.life), 2);
-  $("dob").closest(".field").classList.remove("need");
+mask($("dob"), [2, 2, 4], "/");
+mask($("tob"), [2, 2], ":");
+
+function note(id, text, kind) {
+  const el = $(id);
+  el.textContent = text;
+  el.classList.toggle("ok", kind === "ok");
+  el.classList.toggle("err", kind === "err");
+  $(id.replace("-note", "")).classList.toggle("bad", kind === "err");
+}
+
+// Accepts dd/mm/yyyy in พ.ศ. (the label asks for it) and also ค.ศ., told apart by size.
+let born = null;
+function parseBirth(v) {
+  const m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return { error: null };
+  let [, d, mo, y] = m.map(Number);
+  const be = y > 2300;
+  if (be) y -= 543;
+  const date = new Date(y, mo - 1, d);
+  if (mo < 1 || mo > 12 || date.getDate() !== d || date.getMonth() !== mo - 1) return { error: "วันที่นี้ไม่มีในปฏิทิน ลองเช็กวันกับเดือนอีกครั้ง" };
+  if (date > today) return { error: "วันเกิดยังมาไม่ถึง ลองเช็กปีอีกครั้ง" };
+  if (y < 1920) return { error: "ปีนี้เก่าไปหน่อย ปีเกิดใส่เป็น พ.ศ. เช่น 2538" };
+  const isoDate = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  return { y, m: mo, d, be, day: DAYS[date.getDay()], life: lifeNumber(isoDate) };
+}
+function showBirth(b) {
+  if (b) {
+    $("out-swatch").style.background = b.day.hex;
+    swap($("out-day"), b.day.name, 0);
+    swap($("out-color"), b.day.color, 1);
+    swap($("out-num"), String(b.life), 2);
+  } else {
+    $("out-swatch").style.background = "";
+    ["out-day", "out-color", "out-num"].forEach((id, i) => swap($(id), "–", i));
+  }
+}
+function checkBirth(final) {
+  const v = $("dob").value.trim();
+  const r = parseBirth(v);
+  born = r.day ? r : null;
+  if (born) {
+    note("dob-note", `${born.d} ${MONTHS[born.m - 1]} ${born.y + 543} วัน${born.day.name}${born.be ? "" : ` (อ่านจาก ค.ศ. ${born.y})`}`, "ok");
+    $("dob").classList.remove("need");
+  } else if (r.error) note("dob-note", r.error, "err");
+  else if (final && v) note("dob-note", "ใส่ให้ครบตามแบบ วว/ดด/ปปปป เช่น 14/03/2538", "err");
+  else note("dob-note", "เช่น 14/03/2538");
+  showBirth(born);
   render();
-});
-$("tob").addEventListener("change", () => {
-  const t = $("tob-text"), v = $("tob").value;
-  t.textContent = v ? `${v} น.` : "ไม่ทราบก็ได้";
-  t.classList.toggle("placeholder", !v);
-});
-["dob", "tob"].forEach((id) => $(id).addEventListener("click", (e) => e.target.showPicker?.()));
+}
+$("dob").addEventListener("input", () => checkBirth(false));
+$("dob").addEventListener("blur", () => checkBirth(true));
+
+function checkTime(final) {
+  const v = $("tob").value.trim();
+  const m = v.match(/^(\d{2}):(\d{2})$/);
+  if (!v) note("tob-note", "แบบ 24 ชั่วโมง เช่น 08:30 หรือ 21:15");
+  else if (m && +m[1] < 24 && +m[2] < 60) note("tob-note", `${v} น.`, "ok");
+  else if (m) note("tob-note", "ชั่วโมงใส่ได้ 00 ถึง 23 นาทีใส่ได้ 00 ถึง 59", "err");
+  else if (final) note("tob-note", "ใส่ให้ครบตามแบบ ชช:นน เช่น 08:30", "err");
+}
+$("tob").addEventListener("input", () => checkTime(false));
+$("tob").addEventListener("blur", () => checkTime(true));
+function birthTime() {
+  return $("tob-note").classList.contains("ok") ? $("tob").value : "";
+}
+const birth = () => born;
 
 /* ---------- Topics, story, about you ---------- */
 document.querySelectorAll(".topic").forEach((b) => b.addEventListener("click", () => {
@@ -210,7 +268,7 @@ function missing() {
   const out = [];
   if (!state.day) out.push(["step-day", "วันนัด", null]);
   else if (state.channel !== "voice" && !state.time) out.push(["step-day", "เวลานัด", null]);
-  if (!$("dob").value) out.push(["step-birth", "วันเกิด", $("dob").closest(".field")]);
+  if (!born) out.push(["step-birth", "วันเกิด", $("dob")]);
   if (!$("nick").value.trim()) out.push(["step-you", "ชื่อเรียก", $("nick")]);
   if (!$("source").value) out.push(["step-you", "รู้จักเราจากไหน", $("source").parentElement]);
   if (!$("consent").checked) out.push(["step-you", "ความยินยอมเรื่องข้อมูล", $("consent").closest(".consent")]);
@@ -239,7 +297,7 @@ document.querySelectorAll("[data-send]").forEach((btn) => btn.addEventListener("
     "สวัสดีค่ะ อยากจองดูดวง 60 นาที",
     `ช่องทาง: ${CHANNELS[state.channel]}`,
     `วันนัด: ${when}`,
-    `วันเกิด: ${b.d} ${MONTHS[b.m - 1]} ${b.y + 543}${$("tob").value ? ` เวลา ${$("tob").value} น.` : ""} (เกิดวัน${b.day.name})`,
+    `วันเกิด: ${b.d} ${MONTHS[b.m - 1]} ${b.y + 543}${birthTime() ? ` เวลา ${birthTime()} น.` : ""} (เกิดวัน${b.day.name})`,
     state.topics.length ? `เรื่องที่อยากถาม: ${state.topics.join(", ")}` : null,
     $("story").value.trim() ? `เล่าสั้น ๆ: ${$("story").value.trim()}` : null,
     `ชื่อเรียก: ${$("nick").value.trim()}`,
