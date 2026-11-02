@@ -1,0 +1,256 @@
+// Booking: pick a channel, a day and an hour from a small honest supply, give a birth date,
+// and the slip on the right fills in. Sending is a prototype: it shows the LINE message.
+// Availability is a placeholder pattern until the reader's real hours are set.
+
+const DAYS = [
+  { name: "อาทิตย์", short: "อา.", color: "แดง", hex: "#D9534F" },
+  { name: "จันทร์", short: "จ.", color: "เหลือง", hex: "#E9C46A" },
+  { name: "อังคาร", short: "อ.", color: "ชมพู", hex: "#E8A1B8" },
+  { name: "พุธ", short: "พ.", color: "เขียว", hex: "#7FA283" },
+  { name: "พฤหัสบดี", short: "พฤ.", color: "ส้ม", hex: "#E39B5B" },
+  { name: "ศุกร์", short: "ศ.", color: "ฟ้า", hex: "#8DB8D8" },
+  { name: "เสาร์", short: "ส.", color: "ม่วง", hex: "#A98BC4" },
+];
+const MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+const MONTHS_S = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+const CHANNELS = { call: "โทรคุยทาง LINE", video: "วิดีโอคอล LINE", voice: "ส่งคำถาม รับเสียงกลับ" };
+// Reading hours by weekday (0 = Sunday): weekday evenings and weekend daytime.
+const HOURS = { 0: ["10:00", "13:00"], 2: ["20:00"], 4: ["20:00"], 6: ["10:00", "14:00"] };
+
+const $ = (id) => document.getElementById(id);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const narrow = matchMedia("(max-width: 960px)");
+
+const state = { channel: "call", day: null, time: null, topics: [] };
+
+/* ---------- Two weeks from this Monday ---------- */
+const today = new Date(); today.setHours(0, 0, 0, 0);
+const monday = new Date(today); monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+// A stable "already booked" pattern so the page shows real-looking scarcity.
+const taken = (key) => [...key].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 997, 7) % 3 === 0;
+
+const days = Array.from({ length: 14 }, (_, i) => {
+  const d = new Date(monday); d.setDate(monday.getDate() + i);
+  const past = d <= today;
+  const slots = past ? [] : (HOURS[d.getDay()] || []).map((t) => ({ t, free: !taken(iso(d) + t) }));
+  return { date: d, key: iso(d), past, isToday: +d === +today, slots, free: slots.filter((s) => s.free).length };
+});
+
+const head = $("cal-head");
+for (let i = 1; i <= 7; i++) {
+  const w = DAYS[i % 7];
+  head.insertAdjacentHTML("beforeend", `<span><i style="background:${w.hex}"></i>${w.name}</span>`);
+}
+
+const grid = $("cal-grid");
+days.forEach((d) => {
+  const w = DAYS[d.date.getDay()];
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "day";
+  b.dataset.key = d.key;
+  let note = "";
+  if (d.isToday) note = "วันนี้";
+  else if (d.past) note = "";
+  else if (!d.slots.length) note = "ไม่เปิด";
+  else if (!d.free) note = "เต็มแล้ว";
+  else note = `ว่าง ${d.free}<span class="long"> รอบ</span>`;
+  b.innerHTML = `<span class="wd"><i class="dot" style="background:${w.hex}"></i>${w.short}</span><b>${d.date.getDate()}</b><small>${note}</small>`;
+  if (d.past && !d.isToday) b.classList.add("past");
+  if (d.free) {
+    b.classList.add("open");
+    b.setAttribute("role", "radio");
+    b.setAttribute("aria-checked", "false");
+    b.setAttribute("aria-label", `วัน${w.name}ที่ ${d.date.getDate()} ${MONTHS[d.date.getMonth()]} ว่าง ${d.free} รอบ`);
+    b.addEventListener("click", () => pickDay(d.key));
+  } else {
+    b.disabled = true;
+    b.setAttribute("aria-hidden", "true");
+  }
+  grid.append(b);
+});
+function pickDay(key) {
+  state.day = days.find((d) => d.key === key);
+  state.time = null;
+  grid.querySelectorAll(".day.open").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.key === key)));
+  renderTimes();
+  render();
+}
+
+function renderTimes() {
+  const box = $("times"), title = $("times-title"), row = $("time-row");
+  box.classList.toggle("voice", state.channel === "voice");
+  row.innerHTML = "";
+  if (!state.day) {
+    title.textContent = "เลือกวันก่อน แล้วเวลาว่างจะขึ้นตรงนี้";
+    title.classList.add("idle");
+    return;
+  }
+  const d = state.day.date, w = DAYS[d.getDay()];
+  title.classList.remove("idle");
+  if (state.channel === "voice") {
+    title.textContent = `ได้คลิปเสียงคำทำนายในแชตภายในวัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+    return;
+  }
+  title.textContent = `เวลาว่าง ${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  state.day.slots.forEach((s) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "time";
+    b.textContent = `${s.t} – ${String(+s.t.slice(0, 2) + 1).padStart(2, "0")}:00 น.`;
+    if (!s.free) {
+      b.disabled = true;
+      b.setAttribute("aria-label", `${s.t} มีคนจองแล้ว`);
+    } else {
+      b.setAttribute("role", "radio");
+      b.setAttribute("aria-checked", String(state.time === s.t));
+      b.addEventListener("click", () => {
+        state.time = s.t;
+        row.querySelectorAll(".time[role=radio]").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+        render();
+      });
+    }
+    row.append(b);
+  });
+}
+
+/* ---------- Channel ---------- */
+document.querySelectorAll("input[name=channel]").forEach((r) => r.addEventListener("change", () => {
+  state.channel = r.value;
+  $("day-aside").textContent = r.value === "voice" ? "เลือกวันที่อยากได้คำทำนาย" : "เปิดรับสัปดาห์ละไม่กี่คิว เย็นวันธรรมดาและเสาร์อาทิตย์";
+  renderTimes();
+  render();
+}));
+
+/* ---------- Birth date and readout ---------- */
+function lifeNumber(isoDate) {
+  let n = isoDate.replace(/\D/g, "").split("").reduce((a, d) => a + Number(d), 0);
+  while (n > 9 && n !== 11 && n !== 22) n = String(n).split("").reduce((a, d) => a + Number(d), 0);
+  return n;
+}
+function swap(el, text, order) {
+  if (el.textContent === text) return;
+  if (reduce) { el.textContent = text; return; }
+  el.classList.add("dip");
+  setTimeout(() => { el.textContent = text; el.classList.remove("dip"); }, 110 + order * 50);
+}
+function birth() {
+  const v = $("dob").value;
+  if (!v) return null;
+  const [y, m, d] = v.split("-").map(Number);
+  return { y, m, d, day: DAYS[new Date(y, m - 1, d).getDay()], life: lifeNumber(v) };
+}
+$("dob").addEventListener("change", () => {
+  const b = birth();
+  const t = $("dob-text");
+  if (!b) { t.textContent = "เลือกวันเกิด"; t.classList.add("placeholder"); render(); return; }
+  t.textContent = `${b.d} ${MONTHS[b.m - 1]} ${b.y + 543}`;
+  t.classList.remove("placeholder");
+  $("out-swatch").style.background = b.day.hex;
+  swap($("out-day"), b.day.name, 0);
+  swap($("out-color"), b.day.color, 1);
+  swap($("out-num"), String(b.life), 2);
+  $("dob").closest(".field").classList.remove("need");
+  render();
+});
+$("tob").addEventListener("change", () => {
+  const t = $("tob-text"), v = $("tob").value;
+  t.textContent = v ? `${v} น.` : "ไม่ทราบก็ได้";
+  t.classList.toggle("placeholder", !v);
+});
+["dob", "tob"].forEach((id) => $(id).addEventListener("click", (e) => e.target.showPicker?.()));
+
+/* ---------- Topics, story, about you ---------- */
+document.querySelectorAll(".topic").forEach((b) => b.addEventListener("click", () => {
+  b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true"));
+  state.topics = [...document.querySelectorAll(".topic[aria-pressed=true]")].map((x) => x.textContent);
+  render();
+}));
+$("story").addEventListener("input", (e) => { $("count").textContent = `${e.target.value.length} / 500`; });
+$("nick").addEventListener("input", () => { $("nick").classList.remove("need"); render(); });
+$("source").addEventListener("change", () => $("source").parentElement.classList.remove("need"));
+$("consent").addEventListener("change", () => $("consent").closest(".consent").classList.remove("need"));
+
+/* ---------- Slip ---------- */
+function setRow(id, text, empty) {
+  const el = $(id);
+  el.textContent = text || empty;
+  el.classList.toggle("empty", !text);
+}
+function render() {
+  const when = document.querySelector(".slip-when");
+  setRow("s-channel", CHANNELS[state.channel]);
+  if (state.day) {
+    const d = state.day.date, w = DAYS[d.getDay()];
+    when.classList.remove("idle");
+    $("s-dot").style.background = w.hex;
+    $("s-weekday").textContent = `วัน${w.name}`;
+    $("s-date").textContent = `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543}`;
+    if (state.channel === "voice") $("s-time").textContent = "ได้คลิปเสียงภายในวันนี้";
+    else $("s-time").textContent = state.time ? `${state.time} – ${String(+state.time.slice(0, 2) + 1).padStart(2, "0")}:00 น.` : "ยังไม่ได้เลือกเวลา";
+    $("bb-meta").textContent = `${w.short} ${d.getDate()} ${MONTHS_S[d.getMonth()]}${state.channel === "voice" ? " ส่งเสียงกลับ" : state.time ? ` ${state.time} น.` : " เลือกเวลา"}`;
+    $("step-day").classList.remove("need");
+  } else {
+    when.classList.add("idle");
+    $("s-dot").style.background = "";
+    $("s-weekday").textContent = "ยังไม่ได้เลือกวัน";
+    $("s-date").textContent = "เลือกวันและเวลา";
+    $("s-time").textContent = narrow.matches ? "ด้านบน" : "ทางซ้ายมือ";
+    $("bb-meta").textContent = "ยังไม่ได้เลือกวัน";
+  }
+  const b = birth();
+  setRow("s-birth", b && `${b.d} ${MONTHS_S[b.m - 1]} ${b.y + 543} วัน${b.day.name}`, "ยังไม่ได้ใส่");
+  setRow("s-topics", state.topics.join(", "), "ยังไม่ได้เลือก");
+  setRow("s-nick", $("nick").value.trim(), "ยังไม่ได้ใส่");
+}
+
+/* ---------- Send (prototype: shows the message instead of opening LINE) ---------- */
+function missing() {
+  const out = [];
+  if (!state.day) out.push(["step-day", "วันนัด", null]);
+  else if (state.channel !== "voice" && !state.time) out.push(["step-day", "เวลานัด", null]);
+  if (!$("dob").value) out.push(["step-birth", "วันเกิด", $("dob").closest(".field")]);
+  if (!$("nick").value.trim()) out.push(["step-you", "ชื่อเรียก", $("nick")]);
+  if (!$("source").value) out.push(["step-you", "รู้จักเราจากไหน", $("source").parentElement]);
+  if (!$("consent").checked) out.push(["step-you", "ความยินยอมเรื่องข้อมูล", $("consent").closest(".consent")]);
+  return out;
+}
+document.querySelectorAll("[data-send]").forEach((btn) => btn.addEventListener("click", () => {
+  const miss = missing();
+  const box = $("missing");
+  if (miss.length) {
+    box.textContent = `ยังขาด ${miss.map((m) => m[1]).join(", ")}`;
+    box.hidden = false;
+    $("preview").hidden = true;
+    miss.forEach(([step, , el]) => {
+      if (el) el.classList.add("need");
+      else $(step).classList.add("need");
+    });
+    $(miss[0][0]).scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    return;
+  }
+  box.hidden = true;
+  const d = state.day.date, w = DAYS[d.getDay()], b = birth();
+  const when = state.channel === "voice"
+    ? `ขอรับคลิปเสียงภายในวัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543}`
+    : `วัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543} เวลา ${state.time} น.`;
+  const text = [
+    "สวัสดีค่ะ อยากจองดูดวง 60 นาที",
+    `ช่องทาง: ${CHANNELS[state.channel]}`,
+    `วันนัด: ${when}`,
+    `วันเกิด: ${b.d} ${MONTHS[b.m - 1]} ${b.y + 543}${$("tob").value ? ` เวลา ${$("tob").value} น.` : ""} (เกิดวัน${b.day.name})`,
+    state.topics.length ? `เรื่องที่อยากถาม: ${state.topics.join(", ")}` : null,
+    $("story").value.trim() ? `เล่าสั้น ๆ: ${$("story").value.trim()}` : null,
+    `ชื่อเรียก: ${$("nick").value.trim()}`,
+    `รู้จักร้านจาก: ${$("source").value}`,
+    "ค่าดูดวง 990 บาท",
+  ].filter(Boolean).join("\n");
+  $("preview-text").textContent = text;
+  $("preview").hidden = false;
+  if (narrow.matches) $("slip").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "end" });
+}));
+
+narrow.addEventListener("change", render);
+renderTimes();
+render();

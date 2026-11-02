@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>จองดูดวง 60 นาที · Minestone (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="booking.css">
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html" aria-label="Minestone หน้าแรก">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+      <span>Minestone</span>
+    </a>
+    <nav class="nav-links" aria-label="หลัก">
+      <a href="index.html#custom">กำไลตามดวง</a>
+      <a href="order.html">ร้อยกำไลเอง</a>
+      <a href="shop.html">กำไลพร้อมส่ง</a>
+      <a href="#">คลังหิน</a>
+      <a href="booking.html" aria-current="page">ดูดวงและฤกษ์</a>
+    </nav>
+    <div class="nav-end">
+      <span class="muted">@minestone</span>
+    </div>
+  </header>
+
+  <main class="booking">
+    <form class="bk-form" id="form" novalidate>
+      <div class="bk-intro">
+        <h1 id="bk-title">จองดูดวง 60 นาที</h1>
+        <p class="lede-l">เราดูไพ่ทาโรต์และเลขศาสตร์จากวันเกิดของคุณ คุยได้ทุกเรื่องที่ค้างใจ<br class="wide-only"> เลือกวันเวลาตรงนี้ แล้วส่งใบนัดไปยืนยันกับเราใน LINE</p>
+      </div>
+
+      <fieldset class="step" id="step-channel">
+        <legend class="step-head"><span class="step-title">คุยกันทางไหนดี</span><span class="step-aside">ทุกแบบได้คำทำนายครบเท่ากัน</span></legend>
+        <div class="channels" role="radiogroup" aria-label="ช่องทาง">
+          <label class="channel">
+            <input type="radio" name="channel" value="call" checked>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+            <span class="ch-copy"><b>โทรคุยทาง LINE</b><span>คุยด้วยเสียงสด ๆ ถามต่อได้ทันทีระหว่างดู</span></span>
+            <i class="radio" aria-hidden="true"></i>
+          </label>
+          <label class="channel">
+            <input type="radio" name="channel" value="video">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>
+            <span class="ch-copy"><b>วิดีโอคอล LINE</b><span>เห็นไพ่ที่เปิดให้คุณบนโต๊ะ กล้องส่องแค่ไพ่</span></span>
+            <i class="radio" aria-hidden="true"></i>
+          </label>
+          <label class="channel">
+            <input type="radio" name="channel" value="voice">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+            <span class="ch-copy"><b>ส่งคำถาม รับเสียงกลับ</b><span>ไม่ต้องว่างตรงกัน ได้คลิปเสียงคำทำนายในแชตภายในวันที่เลือก</span></span>
+            <i class="radio" aria-hidden="true"></i>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="step" id="step-day">
+        <legend class="step-head"><span class="step-title">เลือกวัน</span><span class="step-aside" id="day-aside">เปิดรับสัปดาห์ละไม่กี่คิว เย็นวันธรรมดาและเสาร์อาทิตย์</span></legend>
+        <div class="cal" id="cal">
+          <div class="cal-head" id="cal-head" aria-hidden="true"></div>
+          <div class="cal-grid" id="cal-grid" role="radiogroup" aria-label="วันที่ว่าง"></div>
+        </div>
+        <div class="times" id="times">
+          <p class="times-title" id="times-title">เลือกวันก่อน แล้วเวลาว่างจะขึ้นตรงนี้</p>
+          <div class="time-row" id="time-row" role="radiogroup" aria-labelledby="times-title"></div>
+          <p class="hint" id="times-hint">เวลาประเทศไทย เผื่อเวลาไว้ให้ถามต่ออีกนิดหลังครบชั่วโมง</p>
+        </div>
+      </fieldset>
+
+      <fieldset class="step" id="step-birth">
+        <legend class="step-head"><span class="step-title">วันเกิดของคุณ</span><span class="step-aside">เราเริ่มดูจากตรงนี้ก่อนถึงวันนัด</span></legend>
+        <div class="fields">
+          <div class="f-col f-date">
+            <label class="f-label" for="dob">วัน เดือน ปีเกิด</label>
+            <div class="field">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
+              <span id="dob-text" class="placeholder">เลือกวันเกิด</span>
+              <input id="dob" type="date" min="1920-01-01" max="2020-12-31" required>
+            </div>
+          </div>
+          <div class="f-col f-time">
+            <label class="f-label" for="tob">เวลาเกิด <span class="opt">ถ้าจำได้</span></label>
+            <div class="field">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+              <span id="tob-text" class="placeholder">ไม่ทราบก็ได้</span>
+              <input id="tob" type="time">
+            </div>
+          </div>
+        </div>
+        <div class="readout bk-readout" aria-live="polite">
+          <div class="r-cell"><span class="cap">เกิดวัน</span><strong id="out-day">–</strong></div>
+          <div class="r-cell"><span class="cap">สีประจำวันเกิด</span><strong><i class="dot" id="out-swatch"></i><span id="out-color">–</span></strong></div>
+          <div class="r-cell"><span class="cap">เลขชีวิต</span><strong id="out-num">–</strong></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="step" id="step-question">
+        <legend class="step-head"><span class="step-title">อยากถามเรื่องอะไร</span><span class="step-aside">เลือกได้หลายเรื่อง</span></legend>
+        <div class="topics" id="topics">
+          <button type="button" class="topic" aria-pressed="false">งานและการเรียน</button>
+          <button type="button" class="topic" aria-pressed="false">ความรัก</button>
+          <button type="button" class="topic" aria-pressed="false">การเงิน</button>
+          <button type="button" class="topic" aria-pressed="false">ครอบครัว</button>
+          <button type="button" class="topic" aria-pressed="false">ภาพรวมปีนี้</button>
+        </div>
+        <div class="f-col">
+          <label class="f-label" for="story">เล่าให้เราฟังสั้น ๆ</label>
+          <div class="area">
+            <textarea id="story" maxlength="500" rows="3" placeholder="เช่น กำลังคิดจะย้ายงานต้นปีหน้า อยากรู้ว่าช่วงไหนเหมาะ"></textarea>
+            <span class="count" id="count">0 / 500</span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="step last" id="step-you">
+        <legend class="step-head"><span class="step-title">เกี่ยวกับคุณอีกนิด</span></legend>
+        <div class="fields">
+          <div class="f-col">
+            <label class="f-label" for="nick">ให้เราเรียกคุณว่า</label>
+            <input class="input" id="nick" type="text" autocomplete="nickname" placeholder="ชื่อเล่น" required>
+          </div>
+          <div class="f-col">
+            <label class="f-label" for="source">รู้จักเราจากไหน</label>
+            <div class="select">
+              <select id="source" required>
+                <option value="" selected disabled>เลือก</option>
+                <option>TikTok</option>
+                <option>Instagram</option>
+                <option>Facebook</option>
+                <option>เพื่อนแนะนำ</option>
+                <option>ค้นใน Google</option>
+                <option>อื่น ๆ</option>
+              </select>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+        </div>
+        <label class="consent">
+          <input type="checkbox" id="consent" required>
+          <i class="box" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>
+          <span>ยินยอมให้เราใช้วันเกิดและคำถามนี้เพื่อดูดวงให้คุณเท่านั้น เห็นกันแค่สองคนในร้าน ขอลบได้ทุกเมื่อ</span>
+        </label>
+      </fieldset>
+    </form>
+
+    <aside class="slip-col" aria-label="ใบนัดของคุณ">
+      <div class="slip" id="slip">
+        <div class="slip-head"><h2>ใบนัดของคุณ</h2><span>ดูดวง 60 นาที</span></div>
+        <div class="slip-when" aria-live="polite">
+          <span class="when-day"><i class="dot" id="s-dot"></i><span id="s-weekday">ยังไม่ได้เลือกวัน</span></span>
+          <b id="s-date">เลือกวันและเวลา</b>
+          <span class="when-time" id="s-time">ทางซ้ายมือ</span>
+        </div>
+        <dl class="slip-rows">
+          <div><dt>ช่องทาง</dt><dd id="s-channel">โทรคุยทาง LINE</dd></div>
+          <div><dt>วันเกิด</dt><dd id="s-birth" class="empty">ยังไม่ได้ใส่</dd></div>
+          <div><dt>เรื่องที่ถาม</dt><dd id="s-topics" class="empty">ยังไม่ได้เลือก</dd></div>
+          <div><dt>ชื่อเรียก</dt><dd id="s-nick" class="empty">ยังไม่ได้ใส่</dd></div>
+        </dl>
+        <div class="slip-total"><span>ค่าดูดวง</span><b>990 บาท</b></div>
+        <button type="button" class="btn btn-dark btn-block send" data-send>
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="currentColor"/></svg>
+          ส่งใบนัดไปยืนยันทาง LINE
+        </button>
+        <p class="slip-note">แชตจะเปิดพร้อมใบนัดนี้ เราตอบกลับเพื่อยืนยันเวลา โอนผ่าน PromptPay แล้วคิวนี้เป็นของคุณ ราคาในหน้านี้เป็นตัวอย่าง</p>
+        <div class="missing" id="missing" hidden></div>
+        <div class="preview" id="preview" hidden>
+          <p>ต้นแบบนี้ยังไม่ได้ต่อ LINE จริง ข้อความที่จะส่งคือ</p>
+          <pre id="preview-text"></pre>
+        </div>
+      </div>
+      <ul class="terms">
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E6A5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>ดูจบแล้วยังสงสัย ถามเพิ่มได้อีก 1 คำถามฟรีทางแชต</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E6A5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>ไม่ใช้ AI ดูแทน ทุกคำทำนายมาจากคนอ่านไพ่จริง</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5M12 16h.01"/></svg>ดูดวงแล้วไม่รับคืนเงิน คำทำนายเล่าตามความเชื่อ ไม่รับประกันผล</li>
+      </ul>
+    </aside>
+  </main>
+
+  <div class="buybar" id="buybar">
+    <div><b>990 บาท</b><span id="bb-meta">ยังไม่ได้เลือกวัน</span></div>
+    <button type="button" class="btn btn-dark" data-send>
+      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="currentColor"/></svg>
+      ส่งใบนัดทาง LINE
+    </button>
+  </div>
+
+  <footer class="foot">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand brand-sm" href="index.html">
+          <svg width="24" height="24" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+          <span>Minestone</span>
+        </a>
+        <p class="muted">หินและกำไลตามดวง ร้อยมือทีละเม็ด</p>
+      </div>
+      <div class="foot-cols">
+        <div><span class="cap">ร้าน</span><a href="index.html#custom">กำไลตามดวง</a><a href="order.html">ร้อยกำไลเอง</a><a href="shop.html">กำไลพร้อมส่ง</a><a href="#">คลังหิน</a></div>
+        <div><span class="cap">อ่านเพิ่ม</span><a href="#">สารบัญบทความ</a><a href="#">ของไหว้เทศกาล</a><a href="booking.html">ดูดวงและฤกษ์</a></div>
+        <div><span class="cap">ติดต่อ</span><a href="#">LINE @minestone</a><a href="#">นโยบายหินแท้ &amp; คืนเงิน</a></div>
+      </div>
+    </div>
+    <p class="foot-legal">© 2569 Minestone&nbsp;&nbsp; ความหมายของหินเล่าตามความเชื่อ ไม่รับประกันผล</p>
+  </footer>
+
+  <script src="booking.js"></script>
+</body>
+</html>
