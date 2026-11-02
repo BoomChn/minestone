@@ -30,6 +30,7 @@ h1, h2, h3, p, ol, ul { margin: 0; }
 ol, ul { padding: 0; list-style: none; }
 
 .muted { color: var(--muted); font-size: 14px; line-height: 20px; }
+.sm-br { display: none; } /* a line break only phones use */
 .fine { color: var(--muted); font-size: 13px; line-height: 18px; text-align: center; }
 .cap { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
 
@@ -54,6 +55,18 @@ ol, ul { padding: 0; list-style: none; }
 }
 .nav-end { display: flex; align-items: center; gap: 20px; }
 .nav-end .muted { font-size: 15px; }
+
+/* Mobile menu (menu.js): the hamburger opens the main links as a panel under the nav. */
+.menu-btn {
+  display: none; align-items: center; justify-content: center;
+  width: 44px; height: 44px; margin-right: -11px; padding: 0;
+  border: 0; background: none; color: var(--ink); cursor: pointer;
+}
+.menu-btn path { transition: transform 200ms var(--ease-out); transform-origin: 11px 11px; }
+.nav.open .menu-btn .l1 { transform: translateY(4px) rotate(45deg); }
+.nav.open .menu-btn .l2 { transform: translateY(-4px) rotate(-45deg); }
+.menu-btn:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; border-radius: 8px; }
+@keyframes menu-in { from { opacity: 0; transform: translateY(-6px); } }
 
 /* Buttons */
 .btn {
@@ -371,11 +384,94 @@ h1 {
   .foot-cols { flex-wrap: wrap; gap: 28px; }
   .foot-cols div { width: 140px; }
 }
-@media (max-width: 480px) {
-  .cta-row { width: 100%; flex-direction: column; }
+/* Phone layout, following the Paper artboard "V6b Home — Mobile". */
+@media (max-width: 960px) {
+  .menu-btn { display: flex; }
+  .sm-br { display: inline; }
+  /* Centred copy wraps to even lines; left-aligned copy just avoids a lone last word. */
+  h1, h2, .lede, .narrow, .honest .body, .line .body, .fine { text-wrap: balance; }
+  .body, .card p, .muted { text-wrap: pretty; }
+  .nav:has(.menu-btn) .nav-end .btn { display: none; }
+  .nav.open { z-index: 30; }
+  .nav.open .nav-links {
+    display: flex; flex-direction: column; gap: 0;
+    position: absolute; top: 100%; left: 0; right: 0;
+    padding: 4px 20px 12px; background: #fff; border-bottom: 1px solid var(--rule);
+    font-size: 16px; line-height: 24px;
+    animation: menu-in 200ms var(--ease-out);
+  }
+  .nav.open .nav-links a { padding: 12px 0; }
+  .nav.open .nav-links a + a { border-top: 1px solid var(--rule); }
+  .nav.open .nav-links a::after { display: none; }
+
+  /* Eyebrow labels go; the headings carry the sections on their own. */
+  .kicker, .bd-copy > .label, .custom-copy > .label { display: none; }
+  h1 { font-size: 36px; line-height: 52px; }
+  .h-lg { font-size: 28px; line-height: 42px; }
+  .h-md { font-size: 28px; line-height: 42px; }
+  .hero { gap: 18px; padding: 40px 20px 0; }
+  .hero-stage { width: calc(100% + 80px); max-width: none; } /* bleeds 20px past each edge */
+  /* Floating stones sit on the upper edge of the still life, not against the nav. */
+  .hero { --art-h: calc((100vw + 40px) * 0.591); }
+  .f-rose { width: 44px; left: 18px; top: auto; bottom: calc(var(--art-h) - 40px); }
+  .f-jade { display: block; width: 26px; left: 52px; top: auto; bottom: calc(var(--art-h) - 92px); }
+  .f-amethyst { width: 48px; left: auto; right: 16px; top: auto; bottom: calc(var(--art-h) - 34px); }
+
+  .honest { padding: 40px 20px 0; gap: 12px; }
+  .steps { padding: 88px 20px 0; gap: 12px; }
+  /* Steps read as a ruled list on a phone, icon in its own lane. */
+  .step-grid { grid-template-columns: 1fr; gap: 0; width: 100%; max-width: 480px; padding-top: 22px; }
+  .card {
+    display: grid; grid-template-columns: 44px 1fr; column-gap: 16px; row-gap: 4px; align-content: start;
+    padding: 20px 0; border: 0; border-top: 1px solid var(--rule); border-radius: 0;
+  }
+  .card:last-child { border-bottom: 1px solid var(--rule); }
+  .card .icon { grid-row: 1 / span 3; }
+  .card .step-no { padding-top: 0; }
+  .card h3 { font-size: 18px; line-height: 28px; }
+  .card p { font-size: 15px; line-height: 25px; }
+
+  .birthday { gap: 32px; padding: 80px 20px 0; }
+  .sphere { width: 240px; height: 240px; }
+  .bd-copy { gap: 12px; }
+  .bd-copy .h-md br { display: none; }
+  .bd-copy .stones { flex-direction: column; align-items: flex-start; gap: 8px; } /* order.html has its own .stones grid */
+
+  .intent { padding: 104px 0 0; gap: 12px; }
+  .intent > .h-lg, .intent > .body { padding-inline: 20px; }
+  .chips {
+    flex-wrap: nowrap; justify-content: flex-start; gap: 10px; width: 100%;
+    overflow-x: auto; padding: 18px 20px 4px; scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex-shrink: 0; padding: 12px 18px; }
+  .row-art { width: 100%; }
+
+  .custom { align-items: stretch; gap: 28px; padding: 96px 20px 0; }
+  .custom-copy { gap: 12px; }
+  .offer { align-self: center; }
+  .line { padding: 120px 20px 64px; gap: 14px; }
+  .line .btn { width: 100%; max-width: 440px; }
+  .f-jade2 { width: 34px; left: 34px; top: 52px; }
+  .f-rose2 { width: 44px; left: auto; right: 36px; top: 66px; }
+
+  .foot { margin-top: 0; padding: 40px 20px 36px; }
+  .foot-cols { flex-wrap: wrap; column-gap: 0; row-gap: 28px; }
+  .foot-cols div { width: 50%; gap: 4px; font-size: 15px; line-height: 22px; }
+  .foot-cols div:last-child { width: 100%; }
+  .foot-cols .cap { padding-bottom: 4px; }
+  .foot-cols a { padding: 6px 0; }
+}
+@media (max-width: 600px) {
+  .cta-row { width: 100%; flex-direction: column; gap: 10px; padding-top: 8px; }
   .cta-row .btn { width: 100%; }
-  .facts { flex-direction: column; gap: 4px; }
+  /* The three promises become a ruled strip of equal cells. */
+  .facts { width: 100%; gap: 0; flex-wrap: nowrap; align-items: stretch; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); font-size: 13px; line-height: 19px; }
+  .facts li { flex: 1 1 0; display: flex; align-items: center; justify-content: center; padding: 12px 6px; text-align: center; }
+  .facts li + li { border-left: 1px solid var(--rule); }
   .facts li + li::before { display: none; }
+  .cell { flex-direction: row; gap: 10px; text-align: left; padding-block: 14px; }
+  .cell svg, .cell .swatch { flex-shrink: 0; }
 }
 
 /* Reduced motion: keep fades that explain change, drop everything that moves. */

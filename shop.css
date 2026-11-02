@@ -163,6 +163,48 @@
   .key-list li { flex-direction: column; gap: 10px; }
 }
 
+/* On desktop the scroll wrappers step out of the layout. */
+.tray-scroll, .tray-track { display: contents; }
+
+/* Phone layout, following the Paper artboard "Shop — Mobile". */
+@media (max-width: 960px) {
+  .shop-head { gap: 12px; padding: 36px 20px 0; }
+  .shop-head h1 { letter-spacing: -0.01em; }
+  .intents { margin: 0 -20px; padding: 24px 20px 4px; gap: 8px; }
+  /* The tray keeps a readable size and scrolls sideways instead of shrinking to a strip. */
+  .tray-wrap { padding: 16px 0 0; }
+  .tray-scroll { display: block; position: relative; width: 100%; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .tray-scroll::-webkit-scrollbar { display: none; }
+  .tray-track { display: block; width: 604px; }
+  .tray, .captions { width: 640px; max-width: none; margin-left: -36px; }
+  .captions { height: 46px; margin-top: 4px; }
+  .captions li { width: 110px; margin-left: -55px; gap: 2px; }
+  .captions b { font-size: 15px; line-height: 22px; }
+  .captions small { display: block; font-size: 13px; line-height: 18px; }
+  .belief-line { padding: 14px 20px 0; min-height: 0; }
+  .results { padding: 56px 20px 0; }
+  .bar { flex-direction: column; align-items: stretch; gap: 14px; padding-bottom: 16px; }
+  .bar-tools { justify-content: space-between; gap: 12px; font-size: 15px; }
+  .grid { row-gap: 36px; padding-top: 24px; }
+  .card-p { gap: 6px; }
+  .card-p .meta { gap: 6px; padding-top: 4px; }
+  .card-p .tags { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .price-row { gap: 8px; padding-top: 2px; }
+  .price-row b { font-size: 16px; line-height: 24px; }
+  /* The personal card keeps its slot in the grid instead of spanning the row. */
+  .custom-card { grid-column: auto; gap: 16px; padding: 20px 16px 18px; border-radius: 14px; }
+  .custom-card .top { gap: 12px; }
+  .custom-card .ic { width: 40px; height: 40px; }
+  .custom-card h3 { font-size: 17px; line-height: 26px; }
+  .custom-card p { font-size: 14px; line-height: 22px; }
+  .grid-note { padding-top: 36px; }
+  .key { padding: 88px 20px 96px; }
+  .key-in { gap: 24px; }
+  .key-text { gap: 12px; }
+  .key-text .h-sm { font-size: 24px; line-height: 36px; }
+  .key-list li { gap: 8px; padding: 20px 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tray, .tray .base, .captions li { transition: none; }
   .grid .card-p, .grid .custom-card, .grid .empty { transition: none; }

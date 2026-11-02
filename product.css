@@ -170,8 +170,94 @@
   .big br, .num p br { display: none; }
 }
 
+/* Phone buy bar: hidden on desktop, where the sticky product bar carries the button. */
+.mbar { display: none; }
+
+/* Phone layout, following the Paper artboard "Product — Mobile". */
+@media (max-width: 960px) {
+  .nav-static { border-bottom: 0; padding-bottom: 10px; }
+  /* The sticky bar turns into a row of chapter tabs that scrolls sideways. */
+  .pbar { padding: 0 20px; background: rgba(255, 255, 255, 0.96); }
+  .pbar-name, .pbar-end { display: none; }
+  .pbar-links {
+    display: flex; gap: 22px; width: 100%; overflow-x: auto; scrollbar-width: none;
+    font-size: 15px; line-height: 22px;
+  }
+  .pbar-links::-webkit-scrollbar { display: none; }
+  .pbar-links a { flex-shrink: 0; padding: 12px 0 10px; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .pbar-links a.on { border-bottom-color: var(--ink); }
+  .chapter { scroll-margin-top: 56px; }
+
+  .mbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 25;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 20px max(20px, env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--rule);
+    transition: transform 260ms var(--ease-out), opacity 200ms ease;
+  }
+  .mbar.away { transform: translateY(100%); opacity: 0; pointer-events: none; }
+  .mbar-price { display: flex; flex-direction: column; }
+  .mbar-price b { font-family: var(--head); font-weight: 600; font-size: 20px; line-height: 28px; }
+  .mbar-price span { color: var(--muted); font-size: 12px; line-height: 16px; }
+  .mbar .btn { height: 50px; padding: 0 20px; gap: 8px; font-size: 15px; }
+  body:has(.mbar) .foot { padding-bottom: 120px; }
+
+  .p-hero { gap: 8px; padding-top: 40px; }
+  .p-hero h1 { font-size: 36px; line-height: 52px; letter-spacing: -0.01em; }
+  .p-tag { padding-top: 0; font-size: 17px; line-height: 28px; }
+  .p-price { padding: 0 0 12px; font-size: 15px; line-height: 22px; }
+  .p-hero-plate { margin-top: 0; width: calc(100% + 8px); }
+  .statement { gap: 16px; padding: 88px 20px 0; }
+  .big { font-size: 28px; line-height: 42px; }
+  .big br { display: inline; }
+  .lede { font-size: 16px; line-height: 28px; }
+  .stone, .stone + .stone { gap: 20px; padding: 80px 20px 0; }
+  .stone + .stone { padding-top: 72px; }
+  .stone-plate { width: 280px; max-width: 100%; }
+  .stone-text { gap: 12px; }
+  .stone-text h3 { font-size: 32px; line-height: 46px; }
+  .numbers { align-items: stretch; padding: 104px 20px 0; }
+  .numbers .big { text-align: center; }
+  .size, .close { padding-inline: 20px; }
+  .size { padding-top: 104px; }
+  .size-in { gap: 14px; }
+  .size-text { gap: 14px; }
+  .size-text h2 { font-size: 28px; line-height: 42px; }
+  .size-pick { gap: 14px; padding-top: 14px; }
+  .size-pick legend { margin-bottom: 14px; }
+  #guarantee { padding-top: 104px !important; }
+  .close { padding-top: 96px; padding-bottom: 120px; }
+  .close-plate { width: 240px; height: 240px; }
+  .close h2 { padding-top: 12px; font-size: 26px; line-height: 38px; }
+  .close .sub { font-size: 15px; line-height: 22px; }
+  .close .cta-row { gap: 10px; padding-top: 24px; max-width: 440px; }
+  .close .cta-row .btn { width: 100%; }
+}
+@media (max-width: 600px) {
+  /* Beliefs: the label sits above its line instead of beside it. */
+  .belief div { flex-direction: column; gap: 2px; padding: 14px 0; }
+  .belief dt { width: auto; font-size: 14px; line-height: 22px; }
+  .belief dd { font-size: 15px; line-height: 24px; }
+  /* Numbers: one ruled row each, figure in a fixed lane on the left. */
+  .num-row { margin-top: 20px; padding-top: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .num { flex-direction: row; align-items: center; gap: 16px; padding: 18px 0; text-align: left; }
+  .num b { width: 132px; flex-shrink: 0; font-size: 44px; line-height: 56px; }
+  .num b small { font-size: 17px; }
+  .num p { font-size: 15px; line-height: 24px; }
+  .num p br { display: inline; }
+  .numbers .note { padding-top: 20px; text-align: left; }
+  .facts3 { gap: 0; padding-top: 8px; }
+  .facts3 div { gap: 2px; padding: 16px 0; }
+  .facts3 div:last-child { border-bottom: 1px solid var(--rule); }
+  .facts3 h3 { font-size: 16px; line-height: 24px; }
+  .facts3 p { font-size: 15px; line-height: 24px; }
+  .sizes { flex-wrap: nowrap; gap: 8px; }
+  .sizes button { flex: 1 1 0; padding: 12px 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pbar { transition: none; }
+  .pbar, .mbar { transition: none; }
   .p-hero-plate { transform: none !important; }
   .aura, .aura-on .aura { transform: none; }
 }

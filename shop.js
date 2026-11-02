@@ -10,6 +10,7 @@ const INTENT = { love: "rose", work: "citrine", money: "aventurine", protect: "o
 
 const intents = document.getElementById("intents");
 const tray = document.getElementById("tray");
+const scroller = document.getElementById("tray-scroll");
 const caps = [...document.querySelectorAll("#captions li")];
 const belief = document.getElementById("belief");
 const grid = document.getElementById("grid");
@@ -29,6 +30,11 @@ function render(animate) {
   tray.classList.toggle("all", !stone);
   if (stone) tray.style.setProperty("--lx", STONES[stone].x);
   caps.forEach((li) => li.classList.toggle("on", !stone || li.dataset.stone === stone));
+  // On a phone the tray scrolls sideways; bring the lit stone to the middle.
+  if (stone && scroller.scrollWidth > scroller.clientWidth) {
+    const x = (parseFloat(STONES[stone].x) / 100) * tray.offsetWidth + tray.offsetLeft; // offsetParent is the scroller
+    scroller.scrollTo({ left: x - scroller.clientWidth / 2, behavior: animate && !reduce ? "smooth" : "auto" });
+  }
 
   // Belief line
   if (stone) {

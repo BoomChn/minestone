@@ -31,6 +31,12 @@ const chapterIo = new IntersectionObserver(
       if (!e.isIntersecting) return;
       const i = chapters.indexOf(e.target);
       links.forEach((a, j) => a.classList.toggle("on", i === j));
+      // On a phone the chapter row scrolls; keep the current chapter in view.
+      const row = links[i]?.parentElement;
+      if (row && row.scrollWidth > row.clientWidth) {
+        const a = links[i];
+        row.scrollTo({ left: a.offsetLeft - row.offsetLeft - 20, behavior: reduce ? "auto" : "smooth" });
+      }
     }),
   { rootMargin: "-30% 0px -65% 0px" }
 );
@@ -38,7 +44,11 @@ chapters.forEach((c) => c && chapterIo.observe(c));
 
 // The close chapter carries its own black button, so the bar steps aside there.
 const pbar = document.getElementById("pbar");
-new IntersectionObserver(([e]) => pbar.classList.toggle("away", e.isIntersecting), { threshold: 0.35 })
+const mbar = document.getElementById("mbar");
+new IntersectionObserver(([e]) => {
+  pbar.classList.toggle("away", e.isIntersecting);
+  mbar.classList.toggle("away", e.isIntersecting);
+}, { threshold: 0.35 })
   .observe(document.getElementById("line"));
 
 // Size picker: one pressed at a time, mirrored into the closing line.
@@ -49,6 +59,7 @@ sizes.addEventListener("click", (ev) => {
   if (!b) return;
   sizes.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
   out.textContent = b.textContent;
+  document.getElementById("mbar-size").textContent = b.textContent;
 });
 
 // Hero plate settles from 1.06 to 1 as it scrolls up into view, like a product being set down.

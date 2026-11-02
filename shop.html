@@ -17,7 +17,7 @@
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
       <span>Minestone</span>
     </a>
-    <nav class="nav-links" aria-label="หลัก">
+    <nav class="nav-links" id="nav-links" aria-label="หลัก">
       <a href="index.html#custom">กำไลตามดวง</a>
       <a href="order.html">ร้อยกำไลเอง</a>
       <a href="shop.html" aria-current="page">กำไลพร้อมส่ง</a>
@@ -27,12 +27,13 @@
     <div class="nav-end">
       <span class="muted">@minestone</span>
       <a class="btn btn-dark btn-sm" href="#">สั่งทาง LINE</a>
+      <button class="menu-btn" type="button" aria-label="เมนู" aria-expanded="false" aria-controls="nav-links"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path class="l1" d="M3 7h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path class="l2" d="M3 15h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
     </div>
   </header>
 
   <main>
     <section class="shop-head">
-      <h1>ใจอยู่ที่เรื่องไหน หินจะบอกเอง</h1>
+      <h1>ใจอยู่ที่เรื่องไหน <br class="sm-br">หินจะบอกเอง</h1>
       <p class="body">กำไลพร้อมส่งทุกเส้นบอกชนิดหินตามจริง เลือกเรื่องที่อยากได้แรงหนุน หินที่เชื่อกันว่าเกี่ยวกับเรื่องนั้นจะสว่างขึ้น แล้วกำไลด้านล่างจะเหลือเฉพาะเส้นที่มีหินเม็ดนั้น</p>
       <div class="intents" id="intents" role="group" aria-label="เรื่องที่อยากได้แรงหนุน">
         <button type="button" data-intent="all" aria-pressed="false">ทั้งหมด</button>
@@ -45,6 +46,7 @@
     </section>
 
     <section class="tray-wrap">
+      <div class="tray-scroll" id="tray-scroll"><div class="tray-track">
       <div class="tray" id="tray" role="img" aria-label="ถาดหินสีน้ำห้าเม็ด โรสควอตซ์ ซิทริน กรีนอะเวนเจอรีน ออนิกซ์ดำ อเมทิสต์">
         <i class="base"></i><i class="lit"></i>
       </div>
@@ -55,6 +57,7 @@
         <li data-stone="onyx" style="left:66.8%"><b>ออนิกซ์ดำ</b><small>ย้อมสี</small></li>
         <li data-stone="amethyst" style="left:82.7%"><b>อเมทิสต์</b><small>หินธรรมชาติ</small></li>
       </ul>
+      </div></div>
       <p class="belief-line" id="belief" aria-live="polite">ตามความเชื่อ โรสควอตซ์เกี่ยวกับความรัก ความอ่อนโยน และการเปิดใจให้ตัวเอง <a href="product.html#stones">อ่านเรื่องของหินเม็ดนี้</a></p>
     </section>
 
@@ -165,9 +168,10 @@
         <div><span class="cap">ติดต่อ</span><a href="#">LINE @minestone</a><a href="#">นโยบายหินแท้ &amp; คืนเงิน</a></div>
       </div>
     </div>
-    <p class="foot-legal">© 2569 Minestone&nbsp;&nbsp; ความหมายของหินเล่าตามความเชื่อ ไม่รับประกันผล</p>
+    <p class="foot-legal">© 2569 Minestone&nbsp;&nbsp; <br class="sm-br">ความหมายของหินเล่าตามความเชื่อ ไม่รับประกันผล</p>
   </footer>
 
+  <script src="menu.js"></script>
   <script src="shop.js"></script>
 </body>
 </html>
