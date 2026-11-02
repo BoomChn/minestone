@@ -41,7 +41,7 @@ function render(animate) {
     const s = STONES[stone];
     belief.innerHTML = s.belief + (s.link ? ` <a href="${s.link}">อ่านเรื่องของหินเม็ดนี้</a>` : "");
   } else {
-    belief.textContent = "ทุกเม็ดในถาดติดป้ายชนิดตามจริง ความหมายเล่าตามความเชื่อไทยและจีน ไม่รับประกันผล";
+    belief.textContent = "ทุกเม็ดในถาดติดป้ายชนิดตามจริง ความหมายเล่าตามความเชื่อ ไม่รับประกันผล";
   }
 
   // Filter + sort

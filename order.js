@@ -19,7 +19,7 @@ const SIZES = { 6: 0.75, 8: 1, 10: 1.4 }; // price multiplier per bead size
 const THREADS = {
   clear: { name: "เชือกยืดใส", note: "ใส่ถอดง่าย มองแทบไม่เห็นเชือก", extra: 0, stroke: "#C9C6BF" },
   black: { name: "เชือกยืดสีดำ", note: "เข้ากับหินสีเข้ม เช่น ออนิกซ์หรืออเมทิสต์", extra: 0, stroke: "#222" },
-  red:   { name: "ด้ายแดงถัก ปรับขนาดได้", note: "ตามความเชื่อจีน ด้ายแดงเกี่ยวกับโชคและการคุ้มครอง", extra: 60, stroke: "#B23A3A" },
+  red:   { name: "ด้ายแดงถัก ปรับขนาดได้", note: "ตามความเชื่อ ด้ายแดงเกี่ยวกับโชคและการคุ้มครอง", extra: 60, stroke: "#B23A3A" },
 };
 const WRISTS = [14, 15, 16, 17, 18, 19];
 const LABOUR = 120;
