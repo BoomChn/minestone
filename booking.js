@@ -296,6 +296,19 @@ document.querySelectorAll("[data-send]").forEach((btn) => btn.addEventListener("
     "แนบสลิปแล้ว เวลาจะหยุดนับ เราตรวจยอดแล้วยืนยันคิวให้ทาง LINE",
   ].filter(Boolean).join("\n");
   $("preview-text").textContent = text;
+  // Hand the booking to the status page so the "คิวของคุณ" link opens this one.
+  localStorage.setItem("ms-booking", JSON.stringify({
+    code, weekday: `วัน${w.name}`, dot: w.hex, date: `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543}`,
+    time: `${state.time} – ${String(+state.time.slice(0, 2) + 1).padStart(2, "0")}:00 น.`, price: 990, holdUntil: hold.getTime(), slip: false,
+  }));
+  let go = $("preview").querySelector(".go-status");
+  if (!go) {
+    go = document.createElement("a");
+    go.className = "btn btn-line btn-block go-status";
+    go.href = "status.html?k=booking";
+    go.textContent = "เปิดหน้าคิวของคุณ";
+    $("preview").append(go);
+  }
   $("preview").hidden = false;
   if (narrow.matches) $("slip").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "end" });
 }));

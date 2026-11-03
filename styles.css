@@ -486,3 +486,26 @@ h1 {
   .swap.is-swapping { filter: none; transform: none; }
   .btn:active, .chip:active { transform: none; }
 }
+
+/* Cart link in the nav (cart.js keeps the count). */
+.cart-link { position: relative; display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; line-height: 22px; }
+.cart-link svg { flex-shrink: 0; }
+.cart-link b { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; line-height: 20px; text-align: center; }
+.cart-link b[hidden] { display: none; }
+.cart-link[aria-current="page"] .cart-label { text-decoration: underline 1px; text-underline-offset: 8px; }
+.cart-toast {
+  position: fixed; left: 50%; bottom: 28px; z-index: 60; display: flex; align-items: center; gap: 18px;
+  padding: 12px 18px; border-radius: 12px; background: var(--ink); color: #fff; font-size: 14px; line-height: 20px;
+  transform: translate(-50%, 16px); opacity: 0; pointer-events: none;
+  transition: transform 220ms var(--ease-out), opacity 220ms var(--ease-out);
+}
+.cart-toast.on { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.cart-toast a { font-weight: 600; text-decoration: underline 1px; text-underline-offset: 4px; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .cart-toast { transition: opacity 120ms ease; transform: translate(-50%, 0); } }
+@media (max-width: 960px) {
+  .cart-label { display: none; }
+  .cart-link b { position: absolute; top: -7px; right: -10px; min-width: 17px; height: 17px; padding: 0 4px; font-size: 11px; line-height: 17px; }
+  .cart-toast { left: 16px; right: 16px; bottom: 96px; transform: translateY(16px); justify-content: space-between; }
+  .cart-toast.on { transform: none; }
+}
+.btn-dark:where(button, label) { border: 0; font-family: inherit; cursor: pointer; }

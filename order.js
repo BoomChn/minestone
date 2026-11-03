@@ -341,22 +341,17 @@ function render(changedIdx) {
   $("preview").hidden = true;
 }
 
-/* ---------- Send (prototype: shows the message instead of opening LINE) ---------- */
+/* ---------- Add to cart: the design goes in as one line; we check the stones after ordering ---------- */
 document.querySelectorAll("[data-send]").forEach((b) => b.addEventListener("click", () => {
-  const n = state.beads.length;
-  const pattern = state.beads.map((_, i) => STONES[stoneAt(i)].name).join(", ");
-  const text = [
-    "สวัสดีค่ะ อยากสั่งกำไลแบบนี้",
-    `ข้อมือ ${state.wrist} ซม. (กำไลยาว ${state.wrist + 1} ซม.) เม็ด ${state.size} มม. จำนวน ${n} เม็ด`,
-    `หินหลัก: ${STONES[state.main].name}`,
-    `เส้นด้าย: ${THREADS[state.thread].name}`,
-    ...state.lines.map(([l, p]) => `- ${l} ${baht(p)}`),
-    `รวม ${baht(state.total)}`,
-    `ลายรอบวง: ${pattern}`,
-  ].join("\n");
-  $("preview-text").textContent = text;
-  $("preview").hidden = false;
-  if (narrow.matches) $("summary").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "end" });
+  const { by } = tally();
+  const mix = Object.entries(by).filter(([, c]) => c).map(([id, c]) => `${STONES[id].name} ${c}`).join(" ");
+  Cart.add({
+    kind: "custom",
+    name: "กำไลที่คุณร้อยเอง",
+    meta: `${mix} เม็ด ${state.size} มม. ${THREADS[state.thread].name} ข้อมือ ${state.wrist} ซม.`,
+    price: state.total,
+    img: `assets/b-${state.main}.jpg`,
+  });
 }));
 
 /* ---------- Wrist guide ---------- */

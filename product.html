@@ -45,7 +45,7 @@
       <a href="#">คลังหิน</a>
       <a href="booking.html">ดูดวงและฤกษ์</a>
     </nav>
-    <div class="nav-end"><span class="muted">@minestone</span><button class="menu-btn" type="button" aria-label="เมนู" aria-expanded="false" aria-controls="nav-links"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path class="l1" d="M3 7h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path class="l2" d="M3 15h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>
+    <div class="nav-end"><span class="muted">@minestone</span><a class="cart-link" href="cart.html" aria-label="ตะกร้า"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="cart-label">ตะกร้า</span><b data-cart-count hidden>0</b></a><button class="menu-btn" type="button" aria-label="เมนู" aria-expanded="false" aria-controls="nav-links"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path class="l1" d="M3 7h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path class="l2" d="M3 15h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>
   </header>
 
   <div class="pbar" id="pbar">
@@ -59,10 +59,7 @@
     </nav>
     <div class="pbar-end">
       <span class="price">790 บาท</span>
-      <a class="btn btn-dark btn-sm" href="#line">
-        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="#fff"/></svg>
-        สั่งทาง LINE
-      </a>
+      <button type="button" class="btn btn-dark btn-sm" data-add><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>ใส่ตะกร้า</button>
     </div>
   </div>
 
@@ -166,23 +163,17 @@
       <h2 class="reveal">โรสควอตซ์คั่นมูนสโตน</h2>
       <p class="sub reveal">790 บาท ขนาด <span id="size-out">16 ซม.</span> พร้อมส่ง</p>
       <div class="cta-row reveal">
-        <a class="btn btn-dark" href="#">
-          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="#fff"/></svg>
-          สั่งทาง LINE
-        </a>
+        <button type="button" class="btn btn-dark" data-add><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>ใส่ตะกร้า</button>
         <a class="btn btn-line" href="index.html#custom">ให้เราเลือกจากวันเกิดแทน</a>
       </div>
-      <p class="note">กดแล้วจะเปิดแชต LINE พร้อมชื่อกำไลและขนาดที่เลือก</p>
+      <p class="note">ใส่ตะกร้าไว้แล้วเลือกเส้นอื่นต่อได้ จ่ายครั้งเดียวตอนสั่ง</p>
     </section>
   </main>
 
   <!-- Phones: the order button lives in a bar at the bottom of the screen. -->
   <div class="mbar" id="mbar">
     <div class="mbar-price"><b>790 บาท</b><span>ขนาด <span id="mbar-size">16 ซม.</span> พร้อมส่ง</span></div>
-    <a class="btn btn-dark" href="#line">
-      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="#fff"/></svg>
-      สั่งทาง LINE
-    </a>
+    <button type="button" class="btn btn-dark" data-add><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>ใส่ตะกร้า</button>
   </div>
 
   <footer class="foot">
@@ -204,6 +195,7 @@
   </footer>
 
   <script src="menu.js"></script>
+  <script src="cart.js"></script>
   <script src="product.js"></script>
 </body>
 </html>

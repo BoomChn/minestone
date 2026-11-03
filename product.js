@@ -121,3 +121,9 @@ document.querySelectorAll(".stone").forEach((stone) => {
   });
   plate.addEventListener("pointerleave", () => { target = [0, 0]; wake(); });
 });
+
+// Add to cart: the size picked above goes with it.
+document.querySelectorAll("[data-add]").forEach((b) => b.addEventListener("click", () => {
+  const size = document.getElementById("size-out").textContent;
+  Cart.add({ kind: "ready", name: "โรสควอตซ์คั่นมูนสโตน", meta: `พร้อมส่ง ข้อมือ ${size}`, price: 790, img: "assets/p-close.png" });
+}));
