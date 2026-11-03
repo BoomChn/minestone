@@ -17,7 +17,7 @@ const steps = (list, at) => `<ol class="st-steps">${list.map((s, i) => `<li clas
 
 // Data, with samples so the page can be opened on its own.
 const booking = read("ms-booking") || {
-  code: "MS-0412", weekday: "วันเสาร์", dot: "#A98BC4", date: "7 พฤศจิกายน 2569", time: "10:00 – 11:00 น.", price: 990,
+  code: "SL-0412", weekday: "วันเสาร์", dot: "#A98BC4", date: "7 พฤศจิกายน 2569", time: "10:00 – 11:00 น.", price: 990,
   holdUntil: Date.now() + 102 * 6e4, slip: false,
 };
 const order = read("ms-order") || {

@@ -286,7 +286,7 @@ function place() {
   const d = state.day.date, w = DAYS[d.getDay()], b = birth();
   const when = `วัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543} เวลา ${state.time} น.`;
   // Prototype stand-in for the "คิวของคุณ" page: a short code and a 2-hour hold to pay.
-  const code = `MS-${String(1000 + ([...state.day.key + state.time].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 9000, 7))).padStart(4, "0")}`;
+  const code = `SL-${String(1000 + ([...state.day.key + state.time].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 9000, 7))).padStart(4, "0")}`;
   const hold = new Date(Date.now() + 2 * 36e5);
   const holdText = `${String(hold.getHours()).padStart(2, "0")}:${String(hold.getMinutes()).padStart(2, "0")} น.`;
   const text = [
