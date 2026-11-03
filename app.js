@@ -1,13 +1,13 @@
 // Birthday readout: weekday, Thai day colour, life-path number, and belief-based stones.
 // Stone lists are prototype placeholders until the shop confirms its own canon.
 const DAYS = [
-  { name: "อาทิตย์", color: "แดง", hex: "#D9534F", stones: "ทับทิม การ์เน็ต และซันสโตน" },
-  { name: "จันทร์", color: "เหลือง", hex: "#E9C46A", stones: "มูนสโตน ซิทริน และไข่มุก" },
-  { name: "อังคาร", color: "ชมพู", hex: "#E8A1B8", stones: "การ์เน็ต โรสควอตซ์ และมูนสโตน" },
-  { name: "พุธ", color: "เขียว", hex: "#7FA283", stones: "หยก มรกต และอะเวนจูรีน" },
-  { name: "พฤหัสบดี", color: "ส้ม", hex: "#E39B5B", stones: "ซิทริน ไทเกอร์อาย และคาร์เนเลียน" },
-  { name: "ศุกร์", color: "ฟ้า", hex: "#8DB8D8", stones: "อะความารีน ลาพิส ลาซูลี และบลูเลซ" },
-  { name: "เสาร์", color: "ม่วง", hex: "#A98BC4", stones: "อเมทิสต์ ออนิกซ์ และการ์เน็ต" },
+  { name: "อาทิตย์", color: "แดง", hex: "#D9534F", stones: "ทับทิม การ์เน็ต และซันสโตน", bead: "stone-ruby.glb", beadName: "ทับทิม" },
+  { name: "จันทร์", color: "เหลือง", hex: "#E9C46A", stones: "มูนสโตน ซิทริน และไข่มุก", bead: "stone-moonstone.glb", beadName: "มูนสโตน" },
+  { name: "อังคาร", color: "ชมพู", hex: "#E8A1B8", stones: "การ์เน็ต โรสควอตซ์ และมูนสโตน", bead: "rose-quartz-bead.glb", beadName: "โรสควอตซ์" },
+  { name: "พุธ", color: "เขียว", hex: "#7FA283", stones: "หยก มรกต และอะเวนจูรีน", bead: "stone-jade.glb", beadName: "หยก" },
+  { name: "พฤหัสบดี", color: "ส้ม", hex: "#E39B5B", stones: "ซิทริน ไทเกอร์อาย และคาร์เนเลียน", bead: "stone-citrine.glb", beadName: "ซิทริน" },
+  { name: "ศุกร์", color: "ฟ้า", hex: "#8DB8D8", stones: "อะความารีน ลาพิส ลาซูลี และบลูเลซ", bead: "stone-aquamarine.glb", beadName: "อะความารีน" },
+  { name: "เสาร์", color: "ม่วง", hex: "#A98BC4", stones: "อเมทิสต์ ออนิกซ์ และการ์เน็ต", bead: "stone-amethyst.glb", beadName: "อเมทิสต์" },
 ];
 const MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
@@ -45,6 +45,25 @@ function renderBirthday(animate = true) {
   swapText($("out-num"), String(lifeNumber(iso)), 2, animate);
   swapText($("out-stones"), day.stones, 3, animate);
   swapText($("out-note"), `หินของคนเกิดวัน${day.name} ตามความเชื่อ`, 4, animate);
+  setBead(day, animate);
+}
+
+// The 3D bead follows the first stone of the day. Fade out, swap the model, fade back in once it has loaded.
+function setBead(day, animate) {
+  const mv = $("bead");
+  if (!mv) return;
+  const src = `assets/${day.bead}`;
+  if (mv.getAttribute("src") === src) return;
+  const swap = () => {
+    mv.setAttribute("src", src);
+    mv.setAttribute("alt", `ลูกปัด${day.beadName} ลากเพื่อหมุนดู`);
+  };
+  if (!animate) return swap();
+  mv.style.opacity = "0";
+  const show = () => { mv.style.opacity = "1"; };
+  mv.addEventListener("load", show, { once: true });
+  mv.addEventListener("error", show, { once: true });
+  setTimeout(swap, 220);
 }
 
 $("dob").addEventListener("change", () => renderBirthday());
