@@ -223,8 +223,6 @@ h1 {
   padding: 40px 24px 160px;
 }
 .sphere { position: relative; width: 480px; height: 480px; flex-shrink: 0; }
-/* 3D rose quartz bead; drag to turn it. Zoom is off so the wheel still scrolls the page. */
-.sphere model-viewer { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
 .sphere img, .sphere canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 /* The WebGL layer sits over the still painting and only fades in once it has drawn a frame. */
 .sphere canvas { opacity: 0; transition: opacity 400ms ease; }
@@ -490,10 +488,11 @@ h1 {
 }
 
 /* Cart link in the nav (cart.js keeps the count). */
-.cart-link { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0; }
+.cart-link { position: relative; display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; line-height: 22px; }
 .cart-link svg { flex-shrink: 0; }
-.cart-link b { position: absolute; top: -5px; right: -8px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 600; line-height: 17px; text-align: center; }
+.cart-link b { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; line-height: 20px; text-align: center; }
 .cart-link b[hidden] { display: none; }
+.cart-link[aria-current="page"] .cart-label { text-decoration: underline 1px; text-underline-offset: 8px; }
 .cart-toast {
   position: fixed; left: 50%; bottom: 28px; z-index: 60; display: flex; align-items: center; gap: 18px;
   padding: 12px 18px; border-radius: 12px; background: var(--ink); color: #fff; font-size: 14px; line-height: 20px;
@@ -504,11 +503,30 @@ h1 {
 .cart-toast a { font-weight: 600; text-decoration: underline 1px; text-underline-offset: 4px; white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .cart-toast { transition: opacity 120ms ease; transform: translate(-50%, 0); } }
 @media (max-width: 960px) {
-  /* Phones keep only the cart and menu in the nav; the journal pages also keep the LINE button, as in Paper. */
-  .nav-end .nav-line { display: none; }
-  .nav .nav-end .nav-line.keep-sm { display: inline-flex; height: 36px; padding: 0 12px; font-size: 13px; white-space: nowrap; }
-  .nav-end:has(.keep-sm) { gap: 14px; }
+  .cart-label { display: none; }
+  .cart-link b { position: absolute; top: -7px; right: -10px; min-width: 17px; height: 17px; padding: 0 4px; font-size: 11px; line-height: 17px; }
   .cart-toast { left: 16px; right: 16px; bottom: 96px; transform: translateY(16px); justify-content: space-between; }
   .cart-toast.on { transform: none; }
 }
 .btn-dark:where(button, label) { border: 0; font-family: inherit; cursor: pointer; }
+
+/* LINE Login stand-in (line-login.js), used by checkout and booking */
+body.ll-open { overflow: hidden; }
+.ll[hidden] { display: none; }
+.ll { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(17, 24, 39, 0.45); }
+.ll-card { width: 100%; max-width: 380px; overflow: hidden; border-radius: 18px; background: #fff; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18); }
+.ll-bar { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 18px; background: #06C755; color: #fff; font-weight: 600; font-size: 16px; }
+.ll-body { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 28px 24px 22px; text-align: center; }
+.ll-app { width: 64px; height: 64px; display: grid; place-items: center; border: 1px solid var(--rule); border-radius: 16px; margin-bottom: 6px; }
+.ll-body h2 { font-family: var(--head); font-weight: 600; font-size: 20px; line-height: 28px; }
+.ll-body > p { color: var(--muted); font-size: 14px; line-height: 20px; }
+.ll-list { width: 100%; margin-top: 14px; border-top: 1px solid var(--rule); text-align: left; }
+.ll-list li { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--rule); font-size: 14px; line-height: 20px; }
+.ll-list b { font-weight: 500; }
+.ll-list span { color: var(--muted); }
+.ll-friend { display: flex; gap: 10px; align-items: flex-start; width: 100%; padding-top: 14px; text-align: left; font-size: 14px; line-height: 20px; cursor: pointer; }
+.ll-friend input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: #06C755; flex-shrink: 0; }
+.ll-acts { display: flex; gap: 10px; width: 100%; padding-top: 20px; }
+.ll-btn { flex: 1; display: grid; place-items: center; height: 48px; border: 0; border-radius: 10px; background: #06C755; color: #fff; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+.ll-btn.ghost { background: #F2F2F2; color: var(--ink); }
+.ll-proto { padding: 12px 18px; background: #F7F6F3; color: var(--muted); font-size: 12px; line-height: 18px; text-align: center; }

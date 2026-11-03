@@ -22,29 +22,18 @@ $("after").textContent = hasCustom
   ? "กดแล้วยังไม่ต้องโอน เราเช็กหินกำไลร้อยเองก่อน ตอบทาง LINE ภายใน 24 ชั่วโมง"
   : "กดแล้วเราเก็บของไว้ให้ 2 ชั่วโมง โอนผ่าน PromptPay แล้วแนบสลิปในหน้าถัดไป";
 
-// LINE account
+// LINE account (line-login.js). Backing out of LINE returns to the cart.
+const toCart = () => location.assign("cart.html");
 function signedIn(line) {
-  $("login").hidden = true;
-  document.body.classList.remove("ll-open");
   $("account").hidden = false;
   $("acc-name").textContent = line.name;
   showSaved(Cart.read("ms-address", null));
 }
-function askLogin() {
-  $("login").hidden = false;
-  document.body.classList.add("ll-open");
-  $("allow").focus();
-}
-$("allow").addEventListener("click", () => {
-  const line = { name: "มิน", userId: "U-demo" };
-  localStorage.setItem("ms-line", JSON.stringify(line));
-  signedIn(line);
-});
 $("switch").addEventListener("click", () => {
-  localStorage.removeItem("ms-line");
-  localStorage.removeItem("ms-address");
+  LineLogin.signOut();
   $("account").hidden = true;
-  askLogin();
+  showSaved(null);
+  LineLogin.ensure(signedIn, toCart);
 });
 
 // Saved address: shown as a card, the form opens only to change it.
@@ -67,7 +56,7 @@ $("edit").addEventListener("click", () => {
 });
 
 // Validation: say what is wrong under the field, only after the first try.
-const HELP = { tel: "ขนส่งโทรหาเบอร์นี้ตอนไปส่ง" };
+const HELP = { tel: "ขนส่งโทรหาเบอร์นี้ตอนไปส่ง", zip: "พิมพ์แล้วเราเติมเขตและจังหวัดให้" };
 function check(f) {
   const el = $(`f-${f}`), v = el.value.trim();
   let err = "";
@@ -83,7 +72,7 @@ function check(f) {
 }
 let tried = false;
 FIELDS.forEach((f) => $(`f-${f}`).addEventListener("input", () => { if (tried) check(f); }));
-$("f-zip").addEventListener("input", (e) => { e.target.value = digits(e.target.value); });
+$("f-zip").addEventListener("input", (e) => { e.target.value = digits(e.target.value); fillFromZip(e.target.value); });
 
 $("form").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -109,5 +98,36 @@ $("form").addEventListener("submit", (e) => {
   location.href = "status.html?k=order";
 });
 
-const line = Cart.read("ms-line", null);
-if (line) signedIn(line); else askLogin();
+LineLogin.ensure(signedIn, toCart);
+
+// Postcode first: fill province and district, and let the customer pick the subdistrict
+// when one postcode covers several. Everything stays editable.
+function setField(f, v) { const el = $(`f-${f}`); el.value = v; if (tried) check(f); }
+function fillFromZip(zip) {
+  $("pick").hidden = true;
+  if (zip.length !== 5 || !window.ZIP_TH) return;
+  const { P, A, Z } = window.ZIP_TH;
+  const rows = (Z[zip] || []).map(([sub, a]) => ({ sub, dist: A[a][0], prov: P[A[a][1]] }));
+  const note = $("n-zip");
+  note.classList.remove("err");
+  if (!rows.length) { note.textContent = "ไม่พบรหัสนี้ กรอกเขตและจังหวัดเองได้"; return; }
+  setField("prov", rows[0].prov);
+  const dists = [...new Set(rows.map((r) => r.dist))];
+  setField("dist", dists.length === 1 ? dists[0] : "");
+  setField("sub", rows.length === 1 ? rows[0].sub : "");
+  note.textContent = "เติมให้แล้ว แก้ได้ถ้าไม่ตรง";
+  if (rows.length === 1) return;
+  const unit = rows[0].prov === "กรุงเทพมหานคร" ? "แขวง" : "ตำบล";
+  $("pick-label").textContent = dists.length === 1 ? `รหัสนี้มีหลาย${unit} เลือกของคุณ` : "รหัสนี้มีหลายพื้นที่ เลือกของคุณ";
+  $("chips").innerHTML = rows.map((r, i) => `<button type="button" class="ck-chip" data-i="${i}" aria-pressed="false"></button>`).join("");
+  [...$("chips").children].forEach((b, i) => { b.textContent = dists.length === 1 ? rows[i].sub : `${rows[i].sub} ${unit === "แขวง" ? "เขต" : "อำเภอ"}${rows[i].dist}`; });
+  $("chips").onclick = (e) => {
+    const b = e.target.closest(".ck-chip");
+    if (!b) return;
+    const r = rows[b.dataset.i];
+    setField("sub", r.sub);
+    setField("dist", r.dist);
+    [...$("chips").children].forEach((c) => c.setAttribute("aria-pressed", String(c === b)));
+  };
+  $("pick").hidden = false;
+}

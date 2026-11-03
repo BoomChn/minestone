@@ -133,7 +133,7 @@
 .ck-crumbs .now { color: var(--ink); font-weight: 600; }
 .ck-link { padding: 0; border: 0; background: none; font: inherit; font-size: 14px; line-height: 20px; color: var(--sage); text-decoration: underline 1px; text-underline-offset: 4px; cursor: pointer; }
 .ck-account { display: flex; align-items: center; gap: 14px; padding: 20px 0; border-bottom: 1px solid var(--rule); }
-.ck-account[hidden], .ck-saved[hidden], .ll[hidden] { display: none; }
+.ck-account[hidden], .ck-saved[hidden] { display: none; }
 .ck-account > div { flex: 1; display: flex; flex-direction: column; }
 .ck-account small { color: var(--muted); font-size: 13px; line-height: 18px; }
 .ck-account b { font-size: 16px; line-height: 24px; font-weight: 600; }
@@ -175,25 +175,6 @@
 .st-ship b { display: block; padding-top: 2px; font-size: 15px; line-height: 22px; font-weight: 600; white-space: pre; }
 .st-ship p { color: var(--muted); font-size: 14px; line-height: 20px; }
 
-/* Stand-in for LINE's consent screen */
-body.ll-open { overflow: hidden; }
-.ll { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(17, 24, 39, 0.45); }
-.ll-card { width: 100%; max-width: 380px; overflow: hidden; border-radius: 18px; background: #fff; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18); }
-.ll-bar { display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 18px; background: #06C755; color: #fff; font-weight: 600; font-size: 16px; }
-.ll-body { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 28px 24px 22px; text-align: center; }
-.ll-app { width: 64px; height: 64px; display: grid; place-items: center; border: 1px solid var(--rule); border-radius: 16px; margin-bottom: 6px; }
-.ll-body h2 { font-family: var(--head); font-weight: 600; font-size: 20px; line-height: 28px; }
-.ll-body > p { color: var(--muted); font-size: 14px; line-height: 20px; }
-.ll-list { width: 100%; margin-top: 14px; border-top: 1px solid var(--rule); text-align: left; }
-.ll-list li { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--rule); font-size: 14px; line-height: 20px; }
-.ll-list b { font-weight: 500; }
-.ll-list span { color: var(--muted); }
-.ll-friend { display: flex; gap: 10px; align-items: flex-start; width: 100%; padding-top: 14px; text-align: left; font-size: 14px; line-height: 20px; cursor: pointer; }
-.ll-friend input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: #06C755; flex-shrink: 0; }
-.ll-acts { display: flex; gap: 10px; width: 100%; padding-top: 20px; }
-.ll-btn { flex: 1; display: grid; place-items: center; height: 48px; border: 0; border-radius: 10px; background: #06C755; color: #fff; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
-.ll-btn.ghost { background: #F2F2F2; color: var(--ink); }
-.ll-proto { padding: 12px 18px; background: #F7F6F3; color: var(--muted); font-size: 12px; line-height: 18px; text-align: center; }
 
 @media (max-width: 960px) {
   .ck .fields { gap: 12px; }
@@ -201,3 +182,13 @@ body.ll-open { overflow: hidden; }
   .ck-crumbs { font-size: 13px; }
   .ck .sum-head { display: flex; }
 }
+
+/* Postcode lookup: pick the subdistrict when a postcode covers several */
+.ck-pick { display: flex; flex-direction: column; gap: 10px; padding: 2px 0 8px; }
+.ck-pick[hidden] { display: none; }
+.ck-pick > span { font-size: 14px; line-height: 20px; font-weight: 500; }
+.ck-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ck-chip { padding: 9px 16px; border: 1px solid var(--rule); border-radius: 999px; background: #fff; font: inherit; font-size: 15px; line-height: 20px; color: var(--ink); cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease; }
+.ck-chip[aria-pressed="true"] { border-color: var(--ink); background: #F7F6F3; font-weight: 500; }
+.ck-chip:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
+@media (hover: hover) { .ck-chip:hover { border-color: #C4BCA8; } }

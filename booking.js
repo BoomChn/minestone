@@ -278,6 +278,11 @@ document.querySelectorAll("[data-send]").forEach((btn) => btn.addEventListener("
     return;
   }
   box.hidden = true;
+  // Booking needs the LINE account: it is who we call, and where the status goes.
+  LineLogin.ensure(place);
+}));
+
+function place() {
   const d = state.day.date, w = DAYS[d.getDay()], b = birth();
   const when = `วัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543} เวลา ${state.time} น.`;
   // Prototype stand-in for the "คิวของคุณ" page: a short code and a 2-hour hold to pay.
@@ -311,7 +316,7 @@ document.querySelectorAll("[data-send]").forEach((btn) => btn.addEventListener("
   }
   $("preview").hidden = false;
   if (narrow.matches) $("slip").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "end" });
-}));
+}
 
 narrow.addEventListener("change", render);
 renderTimes();
