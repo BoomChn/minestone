@@ -20,21 +20,6 @@
 .step-title { font-family: var(--head); font-weight: 600; font-size: 20px; line-height: 30px; }
 .step-aside { color: var(--muted); font-size: 14px; line-height: 20px; text-align: right; }
 
-/* Channel: three bordered options */
-.channels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.channel {
-  position: relative; display: flex; flex-direction: column; gap: 12px;
-  padding: 20px 20px 22px; border: 1px solid var(--rule); border-radius: 14px; background: #fff; cursor: pointer;
-  transition: border-color 160ms ease, background-color 160ms ease;
-}
-.channel input { position: absolute; opacity: 0; pointer-events: none; }
-.channel .radio { position: absolute; top: 20px; right: 20px; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--field); background: #fff; transition: border-width 160ms var(--ease-out), border-color 160ms ease; }
-.ch-copy { display: flex; flex-direction: column; gap: 4px; }
-.ch-copy b { font-size: 16px; font-weight: 600; line-height: 24px; }
-.ch-copy span { color: var(--muted); font-size: 14px; line-height: 22px; }
-.channel:has(input:checked) { border-color: var(--ink); background: #F7F6F3; }
-.channel:has(input:checked) .radio { border: 5px solid var(--ink); }
-.channel:has(input:focus-visible) { outline: 2px solid var(--sage); outline-offset: 2px; }
 
 /* Two-week calendar */
 .cal { display: flex; flex-direction: column; gap: 8px; }
@@ -70,7 +55,6 @@
 .time[aria-checked="true"] { border-color: var(--ink); background: #F7F6F3; font-weight: 500; }
 .time:disabled { border-style: dashed; border-color: #D4D0C8; color: #A3A8B0; text-decoration: line-through; cursor: default; }
 .hint { color: var(--muted); font-size: 14px; line-height: 22px; }
-.times.voice .time-row, .times.voice #times-hint { display: none; }
 
 /* Fields */
 .fields { display: flex; gap: 12px; }
@@ -157,8 +141,6 @@
 .buybar { display: none; }
 
 @media (hover: hover) and (pointer: fine) {
-  .channel:hover { border-color: #D4D0C8; }
-  .channel:has(input:checked):hover { border-color: var(--ink); }
   .day.open:hover, .time:not(:disabled):hover, .topic:hover { border-color: #C9C6BF; }
   .day.open[aria-checked="true"]:hover, .time[aria-checked="true"]:hover, .topic[aria-pressed="true"]:hover { border-color: var(--ink); }
   .input:hover, .select select:hover, .area textarea:hover { border-color: #C4BCA8; }
@@ -183,11 +165,6 @@
   .step-head { flex-direction: column; gap: 2px; }
   .step-title { font-size: 19px; line-height: 28px; }
   .step-aside { text-align: left; }
-  .channels { grid-template-columns: 1fr; }
-  .channel { flex-direction: row; align-items: flex-start; gap: 14px; padding: 16px 48px 16px 16px; }
-  .channel > svg { flex-shrink: 0; margin-top: 2px; }
-  .channel .radio { top: 19px; right: 16px; }
-  .ch-copy { gap: 2px; }
 
   /* Calendar turns into a horizontal day strip */
   .cal-head { display: none; }

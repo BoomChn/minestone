@@ -1,4 +1,4 @@
-// Booking: pick a channel, a day and an hour from a small honest supply, give a birth date,
+// Booking: pick a day and an hour from a small honest supply, give a birth date,
 // and the slip on the right fills in. Sending is a prototype: it shows the LINE message.
 // Availability is a placeholder pattern until the reader's real hours are set.
 
@@ -13,7 +13,6 @@ const DAYS = [
 ];
 const MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 const MONTHS_S = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-const CHANNELS = { call: "โทรคุยทาง LINE", video: "วิดีโอคอล LINE", voice: "ส่งคำถาม รับเสียงกลับ" };
 // Reading hours by weekday (0 = Sunday): weekday evenings and weekend daytime.
 const HOURS = { 0: ["10:00", "13:00"], 2: ["20:00"], 4: ["20:00"], 6: ["10:00", "14:00"] };
 
@@ -21,7 +20,7 @@ const $ = (id) => document.getElementById(id);
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const narrow = matchMedia("(max-width: 960px)");
 
-const state = { channel: "call", day: null, time: null, topics: [] };
+const state = { day: null, time: null, topics: [] };
 
 /* ---------- Two weeks from this Monday ---------- */
 const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -79,8 +78,7 @@ function pickDay(key) {
 }
 
 function renderTimes() {
-  const box = $("times"), title = $("times-title"), row = $("time-row");
-  box.classList.toggle("voice", state.channel === "voice");
+  const title = $("times-title"), row = $("time-row");
   row.innerHTML = "";
   if (!state.day) {
     title.textContent = "เลือกวันก่อน แล้วเวลาว่างจะขึ้นตรงนี้";
@@ -89,10 +87,6 @@ function renderTimes() {
   }
   const d = state.day.date, w = DAYS[d.getDay()];
   title.classList.remove("idle");
-  if (state.channel === "voice") {
-    title.textContent = `ได้คลิปเสียงคำทำนายในแชตภายในวัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
-    return;
-  }
   title.textContent = `เวลาว่าง ${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
   state.day.slots.forEach((s) => {
     const b = document.createElement("button");
@@ -115,13 +109,6 @@ function renderTimes() {
   });
 }
 
-/* ---------- Channel ---------- */
-document.querySelectorAll("input[name=channel]").forEach((r) => r.addEventListener("change", () => {
-  state.channel = r.value;
-  $("day-aside").textContent = r.value === "voice" ? "เลือกวันที่อยากได้คำทำนาย" : "เปิดรับสัปดาห์ละไม่กี่คิว เย็นวันธรรมดาและเสาร์อาทิตย์";
-  renderTimes();
-  render();
-}));
 
 /* ---------- Birth date and readout ---------- */
 function lifeNumber(isoDate) {
@@ -238,16 +225,14 @@ function setRow(id, text, empty) {
 }
 function render() {
   const when = document.querySelector(".slip-when");
-  setRow("s-channel", CHANNELS[state.channel]);
   if (state.day) {
     const d = state.day.date, w = DAYS[d.getDay()];
     when.classList.remove("idle");
     $("s-dot").style.background = w.hex;
     $("s-weekday").textContent = `วัน${w.name}`;
     $("s-date").textContent = `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543}`;
-    if (state.channel === "voice") $("s-time").textContent = "ได้คลิปเสียงภายในวันนี้";
-    else $("s-time").textContent = state.time ? `${state.time} – ${String(+state.time.slice(0, 2) + 1).padStart(2, "0")}:00 น.` : "ยังไม่ได้เลือกเวลา";
-    $("bb-meta").textContent = `${w.short} ${d.getDate()} ${MONTHS_S[d.getMonth()]}${state.channel === "voice" ? " ส่งเสียงกลับ" : state.time ? ` ${state.time} น.` : " เลือกเวลา"}`;
+    $("s-time").textContent = state.time ? `${state.time} – ${String(+state.time.slice(0, 2) + 1).padStart(2, "0")}:00 น.` : "ยังไม่ได้เลือกเวลา";
+    $("bb-meta").textContent = `${w.short} ${d.getDate()} ${MONTHS_S[d.getMonth()]}${state.time ? ` ${state.time} น.` : " เลือกเวลา"}`;
     $("step-day").classList.remove("need");
   } else {
     when.classList.add("idle");
@@ -267,7 +252,7 @@ function render() {
 function missing() {
   const out = [];
   if (!state.day) out.push(["step-day", "วันนัด", null]);
-  else if (state.channel !== "voice" && !state.time) out.push(["step-day", "เวลานัด", null]);
+  else if (!state.time) out.push(["step-day", "เวลานัด", null]);
   if (!born) out.push(["step-birth", "วันเกิด", $("dob")]);
   if (!$("nick").value.trim()) out.push(["step-you", "ชื่อเรียก", $("nick")]);
   if (!$("source").value) out.push(["step-you", "รู้จักเราจากไหน", $("source").parentElement]);
@@ -290,12 +275,10 @@ document.querySelectorAll("[data-send]").forEach((btn) => btn.addEventListener("
   }
   box.hidden = true;
   const d = state.day.date, w = DAYS[d.getDay()], b = birth();
-  const when = state.channel === "voice"
-    ? `ขอรับคลิปเสียงภายในวัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543}`
-    : `วัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543} เวลา ${state.time} น.`;
+  const when = `วัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543} เวลา ${state.time} น.`;
   const text = [
     "สวัสดีค่ะ อยากจองดูดวง 60 นาที",
-    `ช่องทาง: ${CHANNELS[state.channel]}`,
+    "ช่องทาง: โทรคุยทาง LINE",
     `วันนัด: ${when}`,
     `วันเกิด: ${b.d} ${MONTHS[b.m - 1]} ${b.y + 543}${birthTime() ? ` เวลา ${birthTime()} น.` : ""} (เกิดวัน${b.day.name})`,
     state.topics.length ? `เรื่องที่อยากถาม: ${state.topics.join(", ")}` : null,
