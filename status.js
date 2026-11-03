@@ -94,6 +94,7 @@ function renderOrder() {
       <div class="st-sub">${sub}</div>
     </div>
     <div class="st-block"><ul class="st-items" id="st-items">${items}</ul></div>
+    ${rec.address ? `<div class="st-block st-ship"><span>ส่งที่</span><b id="st-to"></b><p id="st-addr"></p></div>` : ""}
     ${check
       ? `<div class="st-block pay"><div class="pay-head"><h2>ยังไม่ต้องโอนเงิน</h2><b>${baht(rec.total)}</b></div><p class="wait-note">หินครบแล้วเราจะทักไปทาง LINE หน้านี้จะขึ้น QR PromptPay ให้ แล้วมีเวลาโอน 2 ชั่วโมง รวมค่าส่ง ${rec.ship} บาทแล้ว</p><button type="button" class="btn btn-line btn-block" id="demo-ok">ต้นแบบ: ลองกดเป็น "หินครบแล้ว"</button></div>`
       : payBlock(rec.total)}
@@ -101,6 +102,11 @@ function renderOrder() {
     <div class="st-help"><span>${check ? "อยากเปลี่ยนหิน บอกเราได้ก่อนโอน" : "มีอะไรสงสัย ทักเราได้เลย"}</span><a href="#">คุยกับเราทาง LINE</a></div>
     <p class="proto-note">ต้นแบบ: หน้านี้ยังไม่ได้ต่อระบบจริง QR เป็นภาพตัวอย่าง และสลิปที่แนบไม่ได้ส่งไปไหน</p>`;
   [...document.querySelectorAll("#st-items b")].forEach((b, i) => { b.textContent = rec.items[i].name; });
+  if (rec.address) {
+    const a = rec.address;
+    $("st-to").textContent = `${a.name}  ${a.tel}`;
+    $("st-addr").textContent = `${a.line1} ${a.sub} ${a.dist} ${a.prov} ${a.zip}`;
+  }
 }
 
 function render() {

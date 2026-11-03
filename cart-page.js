@@ -1,5 +1,5 @@
-// Cart page: lists what's in Cart, totals it, and "orders" it. In the prototype ordering
-// skips LINE Login and opens the order's status page with a made-up order code.
+// Cart page: lists what's in Cart and totals it. Ordering continues on checkout.html
+// (LINE Login, then the delivery address).
 const $ = (id) => document.getElementById(id);
 const baht = (n) => `${n.toLocaleString("en-US")} บาท`;
 const SHIP = 50;
@@ -47,21 +47,7 @@ $("items").addEventListener("click", (e) => {
 });
 
 document.querySelectorAll("[data-checkout]").forEach((b) => b.addEventListener("click", () => {
-  const items = Cart.items();
-  if (!items.length) return;
-  const code = `MO-${String(Date.now() % 9000 + 1000)}`;
-  const hasCustom = items.some((i) => i.kind === "custom");
-  const order = {
-    code, items, ship: SHIP,
-    total: items.reduce((a, i) => a + i.price, 0) + SHIP,
-    placed: Date.now(),
-    // Ready-made only: pay now within 2 hours. Any custom piece: we check stones first.
-    status: hasCustom ? "check" : "pay",
-    holdUntil: hasCustom ? null : Date.now() + 2 * 36e5,
-  };
-  localStorage.setItem("ms-order", JSON.stringify(order));
-  Cart.clear();
-  location.href = "status.html?k=order";
+  if (Cart.items().length) location.href = "checkout.html";
 }));
 
 render();

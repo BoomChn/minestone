@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ที่อยู่จัดส่ง Minestone (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="checkout.css">
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="index.html" aria-label="Minestone หน้าแรก">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg>
+      <span>Minestone</span>
+    </a>
+    <nav class="nav-links" aria-label="หลัก">
+      <a href="index.html#custom">กำไลตามดวง</a>
+      <a href="order.html">ร้อยกำไลเอง</a>
+      <a href="shop.html">กำไลพร้อมส่ง</a>
+      <a href="#">คลังหิน</a>
+      <a href="booking.html">ดูดวงและฤกษ์</a>
+    </nav>
+    <div class="nav-end">
+      <span class="muted">@minestone</span><a class="cart-link" href="cart.html" aria-label="ตะกร้า"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="cart-label">ตะกร้า</span><b data-cart-count hidden>0</b></a>
+    </div>
+  </header>
+
+  <main class="cart ck">
+    <section class="cart-items" aria-labelledby="ck-title">
+      <ol class="ck-crumbs" aria-label="ขั้นตอนการสั่ง">
+        <li class="done"><a href="cart.html">ตะกร้า</a></li>
+        <li class="now" aria-current="step">ที่อยู่จัดส่ง</li>
+        <li>โอนเงิน</li>
+      </ol>
+      <div class="cart-head"><h1 id="ck-title">ส่งไปที่ไหนดี</h1></div>
+
+      <div class="ck-account" id="account" hidden>
+        <span class="ck-avatar" aria-hidden="true">M</span>
+        <div><small>เข้าสู่ระบบด้วย LINE แล้ว</small><b id="acc-name"></b></div>
+        <button type="button" class="ck-link" id="switch">ไม่ใช่คุณ?</button>
+      </div>
+
+      <div class="ck-saved" id="saved" hidden>
+        <div class="ck-saved-top"><span class="ck-tag">ที่อยู่ที่บันทึกไว้</span><button type="button" class="ck-link" id="edit">แก้ไข</button></div>
+        <b id="sv-name"></b>
+        <p id="sv-addr"></p>
+      </div>
+
+      <form class="ck-form" id="form" novalidate>
+        <div class="fields stack">
+          <div class="f-col">
+            <label class="f-label" for="f-name">ชื่อผู้รับ</label>
+            <input class="input" id="f-name" autocomplete="name" placeholder="ชื่อ นามสกุล" required>
+            <p class="f-note" id="n-name"></p>
+          </div>
+          <div class="f-col">
+            <label class="f-label" for="f-tel">เบอร์โทร</label>
+            <input class="input" id="f-tel" type="tel" inputmode="numeric" autocomplete="tel" placeholder="08x xxx xxxx" maxlength="12" required>
+            <p class="f-note" id="n-tel">ขนส่งโทรหาเบอร์นี้ตอนไปส่ง</p>
+          </div>
+        </div>
+        <div class="f-col">
+          <label class="f-label" for="f-line1">ที่อยู่</label>
+          <input class="input" id="f-line1" autocomplete="address-line1" placeholder="บ้านเลขที่ หมู่บ้านหรืออาคาร ซอย ถนน" required>
+          <p class="f-note" id="n-line1"></p>
+        </div>
+        <div class="fields">
+          <div class="f-col">
+            <label class="f-label" for="f-sub">แขวง / ตำบล</label>
+            <input class="input" id="f-sub" autocomplete="address-level3" required>
+            <p class="f-note" id="n-sub"></p>
+          </div>
+          <div class="f-col">
+            <label class="f-label" for="f-dist">เขต / อำเภอ</label>
+            <input class="input" id="f-dist" autocomplete="address-level2" required>
+            <p class="f-note" id="n-dist"></p>
+          </div>
+        </div>
+        <div class="fields">
+          <div class="f-col">
+            <label class="f-label" for="f-prov">จังหวัด</label>
+            <input class="input" id="f-prov" autocomplete="address-level1" required>
+            <p class="f-note" id="n-prov"></p>
+          </div>
+          <div class="f-col">
+            <label class="f-label" for="f-zip">รหัสไปรษณีย์</label>
+            <input class="input" id="f-zip" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="5 หลัก" required>
+            <p class="f-note" id="n-zip"></p>
+          </div>
+        </div>
+        <div class="f-col">
+          <label class="f-label" for="f-note">ฝากบอกขนส่ง <span class="opt">ไม่บังคับ</span></label>
+          <input class="input" id="f-note" maxlength="100" placeholder="เช่น ฝากไว้ที่ป้อม รปภ.">
+        </div>
+        <label class="consent">
+          <input type="checkbox" id="remember" checked>
+          <i class="box" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>
+          <span>จำที่อยู่นี้ไว้กับบัญชี LINE ครั้งหน้าไม่ต้องกรอกใหม่</span>
+        </label>
+        <p class="ck-pdpa">เราใช้ชื่อ เบอร์โทร และที่อยู่นี้เพื่อส่งของและติดต่อเรื่องออเดอร์เท่านั้น ส่งต่อให้บริษัทขนส่งเท่าที่ต้องใช้ ขอแก้หรือขอลบได้ทาง LINE <a href="#">อ่านนโยบายความเป็นส่วนตัว</a></p>
+      </form>
+    </section>
+
+    <aside class="sum-col" aria-label="สรุปออเดอร์">
+      <div class="sum">
+        <div class="sum-head"><h2>สรุปออเดอร์</h2><a class="ck-link" href="cart.html">แก้ตะกร้า</a></div>
+        <ul class="ck-mini" id="mini"></ul>
+        <dl class="sum-rows">
+          <div><dt id="sum-n">กำไล</dt><dd id="sum-sub">0 บาท</dd></div>
+          <div><dt>ค่าส่ง Flash ทั่วประเทศ</dt><dd>50 บาท</dd></div>
+        </dl>
+        <div class="sum-total"><span>รวม</span><b id="sum-total">0 บาท</b></div>
+        <p class="ck-after" id="after"></p>
+        <button type="submit" form="form" class="btn btn-dark btn-block">ยืนยันสั่งซื้อ</button>
+        <p class="sum-note">ราคาในหน้านี้เป็นตัวอย่าง</p>
+      </div>
+    </aside>
+  </main>
+
+  <div class="buybar cart-bar">
+    <div><b id="bb-total">0 บาท</b><span>รวมค่าส่งแล้ว</span></div>
+    <button type="submit" form="form" class="btn btn-dark">ยืนยันสั่งซื้อ</button>
+  </div>
+
+  <!-- Prototype stand-in for LINE's own consent screen. The real one is shown by LINE (access.line.me). -->
+  <div class="ll" id="login" hidden>
+    <div class="ll-card" role="dialog" aria-modal="true" aria-labelledby="ll-title">
+      <div class="ll-bar"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="#fff"/></svg>LINE</div>
+      <div class="ll-body">
+        <span class="ll-app" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="10.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="currentColor"/><circle cx="24.1" cy="20.2" r="3" fill="currentColor"/><circle cx="5.9" cy="20.2" r="3" fill="currentColor"/></svg></span>
+        <h2 id="ll-title">Minestone</h2>
+        <p>ขอสิทธิ์เข้าถึงข้อมูลนี้ในบัญชี LINE ของคุณ</p>
+        <ul class="ll-list">
+          <li><b>ชื่อที่แสดงและรูปโปรไฟล์</b><span>จำเป็น</span></li>
+          <li><b>รหัสผู้ใช้ภายใน</b><span>จำเป็น</span></li>
+        </ul>
+        <label class="ll-friend"><input type="checkbox" checked> เพิ่มเพื่อน Minestone เพื่อรับแจ้งสถานะ</label>
+        <div class="ll-acts"><a class="ll-btn ghost" href="cart.html">ยกเลิก</a><button type="button" class="ll-btn" id="allow">อนุญาต</button></div>
+      </div>
+      <p class="ll-proto">ต้นแบบ: ของจริงหน้านี้ LINE เป็นคนแสดง ถ้าเคยอนุญาตแล้วจะข้ามไปเลย</p>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <p class="foot-legal">© 2569 Minestone&nbsp;&nbsp; ความหมายของหินเล่าตามความเชื่อ ไม่รับประกันผล</p>
+  </footer>
+
+  <script src="cart.js"></script>
+  <script src="checkout.js"></script>
+</body>
+</html>
