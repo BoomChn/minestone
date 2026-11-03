@@ -18,10 +18,10 @@
       <div class="ll-bar">${bubble}LINE</div>
       <div class="ll-body">
         <span class="ll-app">${logo}</span>
-        <h2 id="ll-title">Minestone</h2>
+        <h2 id="ll-title">Silamani</h2>
         <p>ขอสิทธิ์เข้าถึงข้อมูลนี้ในบัญชี LINE ของคุณ</p>
         <ul class="ll-list"><li><b>ชื่อที่แสดงและรูปโปรไฟล์</b><span>จำเป็น</span></li><li><b>รหัสผู้ใช้ภายใน</b><span>จำเป็น</span></li></ul>
-        <label class="ll-friend"><input type="checkbox" checked> เพิ่มเพื่อน Minestone เพื่อรับแจ้งสถานะ</label>
+        <label class="ll-friend"><input type="checkbox" checked> เพิ่มเพื่อน Silamani เพื่อรับแจ้งสถานะ</label>
         <div class="ll-acts"><button type="button" class="ll-btn ghost" data-ll="cancel">ยกเลิก</button><button type="button" class="ll-btn" data-ll="allow">อนุญาต</button></div>
       </div>
       <p class="ll-proto">ต้นแบบ: ของจริงหน้านี้ LINE เป็นคนแสดง ถ้าเคยอนุญาตแล้วจะข้ามไปเลย</p>

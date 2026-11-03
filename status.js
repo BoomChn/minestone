@@ -42,7 +42,7 @@ function payBlock(amount) {
   }
   return `<div class="st-block pay">
     <div class="pay-head"><h2>โอนผ่าน PromptPay</h2><b>${baht(amount)}</b></div>
-    <div class="pay-qr"><div class="qr">${qr}</div><p><b>ร้าน Minestone</b>สแกนในแอปธนาคาร ยอดขึ้นให้แล้ว แตะค้างที่รูปเพื่อบันทึก</p></div>
+    <div class="pay-qr"><div class="qr">${qr}</div><p><b>ร้าน Silamani</b>สแกนในแอปธนาคาร ยอดขึ้นให้แล้ว แตะค้างที่รูปเพื่อบันทึก</p></div>
     <label class="btn btn-dark btn-block" for="slip">${upload}แนบสลิป</label>
     <input type="file" id="slip" accept="image/*" hidden>
     <p class="fine-l">แนบแล้วเวลาจะหยุดนับ ${k === "booking" ? "คิวยังเป็นของคุณ" : "ของยังเก็บไว้ให้"} เราตรวจยอดแล้วยืนยันให้ทาง LINE</p>
@@ -51,7 +51,7 @@ function payBlock(amount) {
 
 function renderBooking() {
   const waiting = !rec.slip;
-  document.title = `คิวของคุณ ${rec.code} Minestone (prototype)`;
+  document.title = `คิวของคุณ ${rec.code} Silamani (prototype)`;
   $("status").innerHTML = `
     <div class="st-head">
       <span class="st-code">คิวของคุณ ${rec.code}</span>
@@ -74,7 +74,7 @@ function renderOrder() {
   const placedText = `สั่งเมื่อ ${placed.getDate()} ${MONTHS_S[placed.getMonth()]} ${hhmm(rec.placed)}`;
   const check = rec.status === "check";
   const waitingPay = rec.status === "pay" && !rec.slip;
-  document.title = `ออเดอร์ของคุณ ${rec.code} Minestone (prototype)`;
+  document.title = `ออเดอร์ของคุณ ${rec.code} Silamani (prototype)`;
   const title = check ? "รอเช็กหิน" : waitingPay ? "รอชำระ" : "ส่งสลิปแล้ว รอตรวจ";
   const sub = check
     ? `<span class="pill ok">${clock}ตอบภายใน 24 ชั่วโมง</span>${placedText}`

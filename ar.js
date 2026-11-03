@@ -296,7 +296,7 @@ shot.addEventListener("click", async () => {
   root.classList.remove("flash"); void root.offsetWidth; root.classList.add("flash");
   const blob = await new Promise((ok) => out.toBlob(ok, "image/jpeg", 0.92));
   if (!blob) return;
-  const file = new File([blob], "minestone-bracelet.jpg", { type: "image/jpeg" });
+  const file = new File([blob], "silamani-bracelet.jpg", { type: "image/jpeg" });
   if (navigator.canShare?.({ files: [file] })) {
     try { await navigator.share({ files: [file] }); return; }
     catch (e) { if (e.name === "AbortError") return; }
