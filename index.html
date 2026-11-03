@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261103">
   <!-- Decide before first paint whether the WebGL bloom (bloom.js) takes over from the CSS one. -->
   <script>if (!matchMedia("(prefers-reduced-motion: reduce)").matches && document.createElement("canvas").getContext("webgl")) document.documentElement.classList.add("gl-bloom");</script>
 </head>
@@ -90,7 +90,7 @@
 
     <section class="birthday" id="birthday">
       <div class="sphere reveal" id="sphere">
-        <model-viewer src="assets/rose-quartz-bead.glb" alt="ลูกปัดโรสควอตซ์ ลากเพื่อหมุนดู"
+        <model-viewer style="position:absolute;inset:0;width:100%;height:100%" src="assets/rose-quartz-bead.glb" alt="ลูกปัดโรสควอตซ์ ลากเพื่อหมุนดู"
           environment-image="assets/studio.hdr" tone-mapping="neutral" exposure="1.0" shadow-intensity="0"
           camera-controls disable-zoom disable-pan interaction-prompt="none"
           auto-rotate auto-rotate-delay="3000" rotation-per-second="18deg"
