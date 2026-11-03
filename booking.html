@@ -33,7 +33,7 @@
     <form class="bk-form" id="form" novalidate>
       <div class="bk-intro">
         <h1 id="bk-title">จองดูดวง 60 นาที</h1>
-        <p class="lede-l">เราดูไพ่ทาโรต์และเลขศาสตร์จากวันเกิดของคุณ โทรคุยกันทาง LINE ถามได้ทุกเรื่องที่ค้างใจ<br class="wide-only"> เลือกวันเวลาตรงนี้ แล้วส่งใบนัดไปยืนยันกับเราใน LINE</p>
+        <p class="lede-l">เราดูไพ่ทาโรต์และเลขศาสตร์จากวันเกิดของคุณ โทรคุยกันทาง LINE ถามได้ทุกเรื่องที่ค้างใจ<br class="wide-only"> เลือกวันเวลาตรงนี้ แล้วกดจองด้วย LINE เราเก็บคิวไว้ให้คุณทันที</p>
       </div>
 
       <fieldset class="step" id="step-day">
@@ -45,7 +45,7 @@
         <div class="times" id="times">
           <p class="times-title" id="times-title">เลือกวันก่อน แล้วเวลาว่างจะขึ้นตรงนี้</p>
           <div class="time-row" id="time-row" role="radiogroup" aria-labelledby="times-title"></div>
-          <p class="hint" id="times-hint">เวลาประเทศไทย เผื่อเวลาไว้ให้ถามต่ออีกนิดหลังครบชั่วโมง</p>
+          <p class="hint" id="times-hint">เวลาประเทศไทย จองล่วงหน้าได้ตั้งแต่ 1 วันถึง 2 สัปดาห์</p>
         </div>
       </fieldset>
 
@@ -120,7 +120,12 @@
         <label class="consent">
           <input type="checkbox" id="consent" required>
           <i class="box" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>
-          <span>ยินยอมให้เราใช้วันเกิดและคำถามนี้เพื่อดูดวงให้คุณเท่านั้น เห็นกันแค่สองคนในร้าน ขอลบได้ทุกเมื่อ</span>
+          <span>ยินยอมให้เราเก็บวันเกิดและคำถามไว้ดูดวงให้คุณ ครั้งนี้และครั้งต่อไป เห็นกันแค่สองคนในร้าน เก็บไม่เกิน 2 ปีหลังใช้บริการครั้งล่าสุด ขอลบได้ทุกเมื่อ</span>
+        </label>
+        <label class="consent">
+          <input type="checkbox" id="consent2">
+          <i class="box" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>
+          <span>ถ้าเล่าเรื่องสุขภาพหรือความเชื่อไว้ ยินยอมให้เราใช้เรื่องนั้นเพื่อดูดวงให้คุณเท่านั้น</span>
         </label>
       </fieldset>
     </form>
@@ -142,17 +147,17 @@
         <div class="slip-total"><span>ค่าดูดวง</span><b>990 บาท</b></div>
         <button type="button" class="btn btn-dark btn-block send" data-send>
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="currentColor"/></svg>
-          ส่งใบนัดไปยืนยันทาง LINE
+          จองคิวด้วย LINE
         </button>
-        <p class="slip-note">แชตจะเปิดพร้อมใบนัดนี้ เราตอบกลับเพื่อยืนยันเวลา โอนผ่าน PromptPay แล้วคิวนี้เป็นของคุณ ราคาในหน้านี้เป็นตัวอย่าง</p>
+        <p class="slip-note">เข้าสู่ระบบด้วย LINE แล้วเราเก็บคิวนี้ไว้ให้ 2 ชั่วโมง โอนผ่าน PromptPay แล้วแนบสลิปในหน้าคิวของคุณ ราคาในหน้านี้เป็นตัวอย่าง</p>
         <div class="missing" id="missing" hidden></div>
         <div class="preview" id="preview" hidden>
-          <p>ต้นแบบนี้ยังไม่ได้ต่อ LINE จริง ข้อความที่จะส่งคือ</p>
+          <p>ต้นแบบนี้ยังไม่ได้ต่อ LINE จริง ถ้าต่อแล้ว เข้าสู่ระบบด้วย LINE แล้วคุณจะได้หน้าคิวแบบนี้</p>
           <pre id="preview-text"></pre>
         </div>
       </div>
       <ul class="terms">
-        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E6A5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>ดูจบแล้วยังสงสัย ถามเพิ่มได้อีก 1 คำถามฟรีทางแชต</li>
+        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E6A5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>ขอเลื่อนวันได้ 1 ครั้ง ก่อนถึงนัด 24 ชั่วโมง</li>
         <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E6A5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>ไม่ใช้ AI ดูแทน ทุกคำทำนายมาจากคนอ่านไพ่จริง</li>
         <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5M12 16h.01"/></svg>ดูดวงแล้วไม่รับคืนเงิน คำทำนายเล่าตามความเชื่อ ไม่รับประกันผล</li>
       </ul>
@@ -163,7 +168,7 @@
     <div><b>990 บาท</b><span id="bb-meta">ยังไม่ได้เลือกวัน</span></div>
     <button type="button" class="btn btn-dark" data-send>
       <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 3.9 3.5 7.2 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.5 1.1-.5 5.9-3.5 8-5.9C21.5 14.3 22 12.7 22 11c0-4.4-4.5-8-10-8Z" fill="currentColor"/></svg>
-      ส่งใบนัดทาง LINE
+      จองด้วย LINE
     </button>
   </div>
 

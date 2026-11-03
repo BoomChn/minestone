@@ -32,7 +32,9 @@ const taken = (key) => [...key].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 99
 const days = Array.from({ length: 14 }, (_, i) => {
   const d = new Date(monday); d.setDate(monday.getDate() + i);
   const past = d <= today;
-  const slots = past ? [] : (HOURS[d.getDay()] || []).map((t) => ({ t, free: !taken(iso(d) + t) }));
+  // Book at least 24 hours ahead: hours closer than that aren't offered at all.
+  const at = (t) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), +t.slice(0, 2), +t.slice(3)).getTime();
+  const slots = past ? [] : (HOURS[d.getDay()] || []).filter((t) => at(t) - Date.now() >= 864e5).map((t) => ({ t, free: !taken(iso(d) + t) }));
   return { date: d, key: iso(d), past, isToday: +d === +today, slots, free: slots.filter((s) => s.free).length };
 });
 
@@ -215,7 +217,7 @@ document.querySelectorAll(".topic").forEach((b) => b.addEventListener("click", (
 $("story").addEventListener("input", (e) => { $("count").textContent = `${e.target.value.length} / 500`; });
 $("nick").addEventListener("input", () => { $("nick").classList.remove("need"); render(); });
 $("source").addEventListener("change", () => $("source").parentElement.classList.remove("need"));
-$("consent").addEventListener("change", () => $("consent").closest(".consent").classList.remove("need"));
+["consent", "consent2"].forEach((id) => $(id).addEventListener("change", () => $(id).closest(".consent").classList.remove("need")));
 
 /* ---------- Slip ---------- */
 function setRow(id, text, empty) {
@@ -257,6 +259,8 @@ function missing() {
   if (!$("nick").value.trim()) out.push(["step-you", "ชื่อเรียก", $("nick")]);
   if (!$("source").value) out.push(["step-you", "รู้จักเราจากไหน", $("source").parentElement]);
   if (!$("consent").checked) out.push(["step-you", "ความยินยอมเรื่องข้อมูล", $("consent").closest(".consent")]);
+  // The story may hold health or belief details, which need their own consent.
+  if ($("story").value.trim() && !$("consent2").checked) out.push(["step-you", "ความยินยอมเรื่องที่เล่า", $("consent2").closest(".consent")]);
   return out;
 }
 document.querySelectorAll("[data-send]").forEach((btn) => btn.addEventListener("click", () => {
@@ -276,16 +280,20 @@ document.querySelectorAll("[data-send]").forEach((btn) => btn.addEventListener("
   box.hidden = true;
   const d = state.day.date, w = DAYS[d.getDay()], b = birth();
   const when = `วัน${w.name} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear() + 543} เวลา ${state.time} น.`;
+  // Prototype stand-in for the "คิวของคุณ" page: a short code and a 2-hour hold to pay.
+  const code = `MS-${String(1000 + ([...state.day.key + state.time].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 9000, 7))).padStart(4, "0")}`;
+  const hold = new Date(Date.now() + 2 * 36e5);
+  const holdText = `${String(hold.getHours()).padStart(2, "0")}:${String(hold.getMinutes()).padStart(2, "0")} น.`;
   const text = [
-    "สวัสดีค่ะ อยากจองดูดวง 60 นาที",
-    "ช่องทาง: โทรคุยทาง LINE",
+    `คิวของคุณ ${code}`,
+    `สถานะ: รอชำระ เก็บคิวไว้ให้ถึง ${holdText}`,
     `วันนัด: ${when}`,
+    "ช่องทาง: โทรคุยทาง LINE",
     `วันเกิด: ${b.d} ${MONTHS[b.m - 1]} ${b.y + 543}${birthTime() ? ` เวลา ${birthTime()} น.` : ""} (เกิดวัน${b.day.name})`,
     state.topics.length ? `เรื่องที่อยากถาม: ${state.topics.join(", ")}` : null,
-    $("story").value.trim() ? `เล่าสั้น ๆ: ${$("story").value.trim()}` : null,
     `ชื่อเรียก: ${$("nick").value.trim()}`,
-    `รู้จักร้านจาก: ${$("source").value}`,
-    "ค่าดูดวง 990 บาท",
+    "ค่าดูดวง 990 บาท โอนผ่าน PromptPay แล้วแนบสลิปในหน้านี้",
+    "แนบสลิปแล้ว เวลาจะหยุดนับ เราตรวจยอดแล้วยืนยันคิวให้ทาง LINE",
   ].filter(Boolean).join("\n");
   $("preview-text").textContent = text;
   $("preview").hidden = false;
