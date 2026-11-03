@@ -90,8 +90,11 @@
 
     <section class="birthday" id="birthday">
       <div class="sphere reveal" id="sphere">
-        <img src="assets/sphere.png" alt="ลูกหินอะความารีน" width="480" height="480">
-        <canvas aria-hidden="true"></canvas>
+        <model-viewer src="assets/rose-quartz-bead.glb" alt="ลูกปัดโรสควอตซ์ ลากเพื่อหมุนดู"
+          environment-image="assets/studio.hdr" tone-mapping="neutral" exposure="1.0" shadow-intensity="0"
+          camera-controls disable-zoom disable-pan interaction-prompt="none"
+          auto-rotate auto-rotate-delay="3000" rotation-per-second="18deg"
+          camera-orbit="0deg 64deg 3m" field-of-view="24deg"></model-viewer>
       </div>
       <div class="bd-copy">
         <p class="label sand-text reveal">หินประจำวันเกิด</p>
@@ -197,7 +200,7 @@
 
   <script src="menu.js"></script>
   <script src="app.js"></script>
-  <script src="sphere.js"></script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
   <script src="bloom.js"></script>
 </body>
 </html>

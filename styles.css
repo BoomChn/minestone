@@ -223,6 +223,8 @@ h1 {
   padding: 40px 24px 160px;
 }
 .sphere { position: relative; width: 480px; height: 480px; flex-shrink: 0; }
+/* 3D rose quartz bead; drag to turn it. Zoom is off so the wheel still scrolls the page. */
+.sphere model-viewer { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
 .sphere img, .sphere canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 /* The WebGL layer sits over the still painting and only fades in once it has drawn a frame. */
 .sphere canvas { opacity: 0; transition: opacity 400ms ease; }
