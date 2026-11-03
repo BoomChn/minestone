@@ -490,11 +490,10 @@ h1 {
 }
 
 /* Cart link in the nav (cart.js keeps the count). */
-.cart-link { position: relative; display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; line-height: 22px; }
+.cart-link { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0; }
 .cart-link svg { flex-shrink: 0; }
-.cart-link b { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; line-height: 20px; text-align: center; }
+.cart-link b { position: absolute; top: -5px; right: -8px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 600; line-height: 17px; text-align: center; }
 .cart-link b[hidden] { display: none; }
-.cart-link[aria-current="page"] .cart-label { text-decoration: underline 1px; text-underline-offset: 8px; }
 .cart-toast {
   position: fixed; left: 50%; bottom: 28px; z-index: 60; display: flex; align-items: center; gap: 18px;
   padding: 12px 18px; border-radius: 12px; background: var(--ink); color: #fff; font-size: 14px; line-height: 20px;
@@ -505,8 +504,10 @@ h1 {
 .cart-toast a { font-weight: 600; text-decoration: underline 1px; text-underline-offset: 4px; white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .cart-toast { transition: opacity 120ms ease; transform: translate(-50%, 0); } }
 @media (max-width: 960px) {
-  .cart-label { display: none; }
-  .cart-link b { position: absolute; top: -7px; right: -10px; min-width: 17px; height: 17px; padding: 0 4px; font-size: 11px; line-height: 17px; }
+  /* Phones keep only the cart and menu in the nav; the journal pages also keep the LINE button, as in Paper. */
+  .nav-end .nav-line { display: none; }
+  .nav .nav-end .nav-line.keep-sm { display: inline-flex; height: 36px; padding: 0 12px; font-size: 13px; white-space: nowrap; }
+  .nav-end:has(.keep-sm) { gap: 14px; }
   .cart-toast { left: 16px; right: 16px; bottom: 96px; transform: translateY(16px); justify-content: space-between; }
   .cart-toast.on { transform: none; }
 }
