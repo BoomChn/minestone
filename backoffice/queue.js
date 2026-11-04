@@ -81,7 +81,10 @@
   var S;
   try { S = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) { S = null; }
   if (!S) S = { sel: { next: "SL-0420", past: "SL-0402" }, moved: {}, memo: {}, sent: {}, cancelled: {}, filter: { next: "all", past: "all" }, draft: {}, skip: {} };
+  if (!S.notes) S.notes = {};
   function save() { sessionStorage.setItem(KEY, JSON.stringify(S)); }
+  // Note being written: { code, i } where i is a saved note's index or "new"; askDel = index waiting for delete confirm.
+  var edit = null, askDel = null;
 
   // Apply reschedules saved earlier: { code: { from: "8|14:00", to: "14|14:00" } }
   Object.keys(S.moved).forEach(function (code) {
@@ -96,7 +99,10 @@
   var CHEV = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var LOCK = '<svg width="12" height="13" viewBox="0 0 12 13" aria-hidden="true"><rect x="1.5" y="5.5" width="9" height="6.5" rx="1.5" fill="none" stroke="#6B7280" stroke-width="1.3"/><path d="M3.8 5.5V3.8a2.2 2.2 0 0 1 4.4 0v1.7" fill="none" stroke="#6B7280" stroke-width="1.3"/></svg>';
   var DOC = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="2" width="12" height="14" rx="2" fill="none" stroke="#111827" stroke-width="1.4"/><path d="M6 6.5h6M6 9.5h6M6 12.5h3.5" fill="none" stroke="#111827" stroke-width="1.4" stroke-linecap="round"/></svg>';
-  var SPARK = '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1l1.2 3.3L10.5 5.5 7.2 6.7 6 10 4.8 6.7 1.5 5.5 4.8 4.3z" fill="#8A5A2E"/></svg>';
+  var PEN = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9.6 2.2l2.2 2.2-7.3 7.3-2.8.6.6-2.8 7.3-7.3z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+  var BIN = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 4h9M5.5 4V2.6h3V4M3.6 4l.6 7.6h5.6l.6-7.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  var PLUS = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 2.5v9M2.5 7h9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  var SPARK ='<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1l1.2 3.3L10.5 5.5 7.2 6.7 6 10 4.8 6.7 1.5 5.5 4.8 4.3z" fill="#8A5A2E"/></svg>';
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function toast(m) { window.boToast(m); }
@@ -192,6 +198,7 @@
   list.addEventListener("click", function (e) {
     var r = e.target.closest("[data-code]");
     if (!r) return;
+    askDel = null;
     keepMemo();
     S.sel[tab] = r.dataset.code; mode = "detail"; save(); renderList(); renderDetail();
   });
@@ -218,9 +225,42 @@
     return '<div class="qd-sec"><h3>ความคืบหน้า</h3><div class="tl">' + s.join("") + "</div></div>";
   }
 
+  // Keep what is typed: a new note's text stays as a draft, an edit in progress stays in `edit`.
   function keepMemo() {
     var ta = pane.querySelector("[data-memo]");
-    if (ta) { S.memo[ta.dataset.memo] = ta.value; save(); }
+    if (!ta) return;
+    if (edit && edit.code === ta.dataset.memo && edit.i !== "new") edit.text = ta.value;
+    else { S.memo[ta.dataset.memo] = ta.value; save(); }
+  }
+  function notesOf(code) { return S.notes[code] || (S.notes[code] = []); }
+  function editingIn(code) {
+    if (edit && edit.code === code) return edit.i;
+    return notesOf(code).length ? null : "new";
+  }
+  function stamp() {
+    var d = new Date();
+    return "4 พ.ย. " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+
+  /* Saved notes read as plain records with edit/delete; only one note is open for writing at a time. */
+  function notesBlock(code, draft) {
+    var list = notesOf(code), open = editingIn(code), cancellable = list.length > 0;
+    function editor(text) {
+      return '<label class="memo"><textarea data-memo="' + code + '" aria-label="บันทึกการดูดวง" placeholder="จดสิ่งที่อยากจำไว้ก่อนหรือหลังดูดวง">' + esc(text) + "</textarea>" +
+        '<span class="foot">' + (cancellable ? '<button class="u-act" type="button" data-memo-cancel>ยกเลิก</button>' : "<span>จดได้ทั้งก่อนและหลังดูดวง</span>") +
+        "<span>ผูกกับ " + code + "</span></span></label>";
+    }
+    var rows = list.map(function (n, i) {
+      if (open === i) return editor(edit.text != null ? edit.text : n.text);
+      var acts = askDel === i
+        ? '<span class="n-ask">ลบบันทึกนี้?</span><button class="n-act" type="button" data-note-keep>ไม่ลบ</button><button class="n-act danger" type="button" data-note-del-ok="' + i + '">ลบเลย</button>'
+        : '<button class="n-act" type="button" data-note-edit="' + i + '" aria-label="แก้ไขบันทึก">' + PEN + "แก้ไข</button>" +
+          '<button class="n-act danger" type="button" data-note-del="' + i + '" aria-label="ลบบันทึก">' + BIN + "ลบ</button>";
+      return '<div class="qnote"><div class="n-meta"><span>' + (n.edited ? "แก้เมื่อ " + n.edited : "บันทึกเมื่อ " + n.at) + '</span><span class="n-acts">' + acts + "</span></div>" +
+        '<p class="n-text">' + esc(n.text) + "</p></div>";
+    }).join("");
+    var tail = open === "new" ? editor(draft) : (open == null ? '<button class="qnote-add" type="button" data-note-add>' + PLUS + "เพิ่มบันทึก</button>" : "");
+    return '<div class="qnotes">' + rows + tail + "</div>";
   }
 
   function renderDetail() {
@@ -247,15 +287,14 @@
         timeline(code, at) +
         '<div class="qd-sec"><h3>เรื่องที่อยากถาม</h3><p class="ask-txt">' + b.ask + "</p></div>" +
         '<div class="qd-sec" style="padding-top:28px"><div class="hrow"><h3>บันทึกการดูดวง</h3><span class="lock">' + LOCK + "ลูกค้าจะไม่เห็นบันทึกนี้</span></div>" +
-          '<label class="memo"><textarea data-memo="' + code + '" aria-label="บันทึกการดูดวง" placeholder="จดสิ่งที่อยากจำไว้ก่อนหรือหลังดูดวง">' + esc(memo) + "</textarea>" +
-          '<span class="foot"><span>จดได้ทั้งก่อนและหลังดูดวง</span><span>ผูกกับ ' + code + "</span></span></label></div>" +
+          notesBlock(code, memo) + "</div>" +
         past +
       "</div>" +
       '<div class="qd-foot"><p class="note-foot">' + foot + "</p>" +
         '<div class="acts">' +
           '<button class="btn-danger" type="button" data-cancel>ร้านยกเลิกคิว</button>' +
           '<button class="btn btn-lg" type="button" data-move>เลื่อนคิว</button>' +
-          '<button class="btn-primary" type="button" data-save-memo>บันทึกโน้ต</button>' +
+          (editingIn(code) != null ? '<button class="btn-primary" type="button" data-save-memo>บันทึกโน้ต</button>' : "") +
         "</div></div>";
   }
 
@@ -361,8 +400,41 @@
   pane.addEventListener("click", function (e) {
     var t = e.target;
     if (t.closest("[data-save-memo]")) {
-      keepMemo();
+      var ta0 = pane.querySelector("[data-memo]");
+      if (!ta0) return;
+      var mc = ta0.dataset.memo, v0 = ta0.value.trim(), open = editingIn(mc);
+      if (!v0) { ta0.focus(); toast("พิมพ์บันทึกก่อนกดบันทึก"); return; }
+      if (open === "new") { notesOf(mc).push({ text: v0, at: stamp() }); S.memo[mc] = ""; }
+      else { var n0 = notesOf(mc)[open]; if (n0.text !== v0) { n0.text = v0; n0.edited = stamp(); } }
+      edit = null; askDel = null; save(); renderDetail();
       toast("บันทึกโน้ตแล้ว ลูกค้าไม่เห็นโน้ตนี้");
+      return;
+    }
+    if (t.closest("[data-memo-cancel]")) {
+      if (editingIn(S.sel[tab]) === "new") { S.memo[S.sel[tab]] = ""; save(); }
+      edit = null; renderDetail(); return;
+    }
+    if (t.closest("[data-note-add]")) {
+      edit = { code: S.sel[tab], i: "new" }; askDel = null; renderDetail();
+      pane.querySelector("[data-memo]").focus(); return;
+    }
+    var ne = t.closest("[data-note-edit]");
+    if (ne) {
+      keepMemo();
+      edit = { code: S.sel[tab], i: +ne.dataset.noteEdit }; askDel = null; renderDetail();
+      var ta1 = pane.querySelector("[data-memo]"); ta1.focus(); ta1.setSelectionRange(ta1.value.length, ta1.value.length);
+      return;
+    }
+    var nd0 = t.closest("[data-note-del]");
+    if (nd0) { keepMemo(); askDel = +nd0.dataset.noteDel; renderDetail(); return; }
+    if (t.closest("[data-note-keep]")) { askDel = null; renderDetail(); return; }
+    var ndk = t.closest("[data-note-del-ok]");
+    if (ndk) {
+      var dc = S.sel[tab], di = +ndk.dataset.noteDelOk;
+      notesOf(dc).splice(di, 1);
+      if (edit && edit.code === dc && typeof edit.i === "number" && edit.i > di) edit.i--;
+      askDel = null; save(); renderDetail();
+      toast("ลบบันทึกแล้ว");
       return;
     }
     if (t.closest("[data-cancel]")) {

@@ -184,3 +184,18 @@ button.qslot:hover { background: #FBFAF8; }
 .add-row .btn { font-size: 14px; }
 .offer .rm { font-size: 13px; line-height: 18px; color: var(--muted); }
 .offer .rm:hover { color: var(--error); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Reading notes: saved notes are records with edit/delete; one note open for writing at a time. */
+.qnotes { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.qnotes .memo { margin-top: 0; }
+.qnote { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px 18px; background: #F6F5F2; border-radius: 10px; }
+.n-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 30px; font-size: 13px; line-height: 18px; color: var(--muted); }
+.n-acts { display: flex; align-items: center; gap: 4px; }
+.n-act { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 8px; font-size: 14px; font-weight: 500; line-height: 18px; color: var(--ink); transition: background-color 150ms var(--ease-out); }
+.n-act:hover { background: rgba(17, 24, 39, 0.06); }
+.n-act.danger { color: #9B2C2C; }
+.n-act.danger:hover { background: rgba(155, 44, 44, 0.08); }
+.n-ask { padding-right: 6px; color: var(--ink); font-weight: 500; }
+.n-text { font-size: 15px; line-height: 24px; color: var(--ink); white-space: pre-wrap; }
+.qnote-add { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px dashed #CFCBC3; border-radius: 10px; font-size: 14px; font-weight: 500; line-height: 18px; color: var(--ink); text-align: left; transition: border-color 150ms var(--ease-out); }
+.qnote-add:hover { border-color: var(--ink); }
