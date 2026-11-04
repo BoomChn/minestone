@@ -53,6 +53,23 @@
     toast(t.dataset.todo || "หน้านี้ยังไม่ได้ออกแบบ");
   });
 
+  // Copy a shop link to send in any chat. data-copy is relative to this page.
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-copy]");
+    if (!b) return;
+    var url = new URL(b.dataset.copy, location.href).href;
+    var label = b.querySelector("[data-label]");
+    if (!b.dataset.idle) b.dataset.idle = label.textContent;
+    function shown() {
+      b.classList.add("is-done");
+      label.textContent = b.dataset.done || "คัดลอกแล้ว";
+      clearTimeout(b._t);
+      b._t = setTimeout(function () { b.classList.remove("is-done"); label.textContent = b.dataset.idle; }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(shown, shown);
+    else shown();
+  });
+
   var side = document.querySelector("[data-side]");
   if (!side) return;
   var page = body.dataset.page;

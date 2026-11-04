@@ -17,15 +17,28 @@
   <aside class="side" data-side></aside>
 
   <section class="pane todo" aria-labelledby="todo-h">
-    <div class="pane-head">
+    <div class="pane-head has-links">
       <div>
         <h1 class="h-sm" id="todo-h">ต้องทำตอนนี้</h1>
         <p class="ui muted">พุธ 4 พฤศจิกายน 2569 เรียงจากด่วนที่สุด</p>
       </div>
-      <a class="btn" href="#" data-todo="หน้าเพิ่มออเดอร์จากแชทยังไม่ได้ออกแบบ">
+      <a class="btn" href="add-order.html">
         <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" fill="none" stroke="#111827" stroke-width="1.6" stroke-linecap="round"/></svg>
         เพิ่มออเดอร์จากแชท
       </a>
+      <div class="share-links" aria-label="ส่งลิงก์ให้ลูกค้าสั่งเอง">
+        <span class="small muted">ส่งให้ลูกค้าสั่งเอง</span>
+        <button class="copy-link" type="button" data-copy="../shop.html" data-done="คัดลอกลิงก์หน้าร้านแล้ว">
+          <svg class="i-copy" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="4.5" y="4.5" width="7.5" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 2.5V2A1 1 0 0 0 8.5 1H3A2 2 0 0 0 1 3v5.5a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          <svg class="i-ok" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.2l2.8 2.8 6.2-6.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span data-label>ลิงก์หน้าร้าน</span>
+        </button>
+        <button class="copy-link" type="button" data-copy="../order.html" data-done="คัดลอกลิงก์ร้อยเองแล้ว">
+          <svg class="i-copy" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="4.5" y="4.5" width="7.5" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 2.5V2A1 1 0 0 0 8.5 1H3A2 2 0 0 0 1 3v5.5a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+          <svg class="i-ok" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.2l2.8 2.8 6.2-6.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span data-label>ลิงก์ร้อยเอง</span>
+        </button>
+      </div>
     </div>
 
     <div class="todo-list">

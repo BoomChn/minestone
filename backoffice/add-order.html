@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>เพิ่มออเดอร์จากแชท หลังบ้าน Silamani (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bo.css">
+  <link rel="stylesheet" href="add-order.css">
+</head>
+<body data-page="today">
+<div class="bo">
+  <aside class="side" data-side></aside>
+
+  <main class="ao-form" aria-labelledby="ao-h">
+    <header class="ao-head">
+      <a class="back small muted" href="today.html">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2.5L4.5 7 9 11.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        วันนี้
+      </a>
+      <h1 class="h-sm" id="ao-h">เพิ่มออเดอร์จากแชท</h1>
+      <p class="ui muted">กรอกตามที่ตกลงกันในแชท ระบบสร้างหน้าออเดอร์ให้ลูกค้าจ่ายเงินและแนบสลิปเอง</p>
+    </header>
+
+    <div class="ao-sections">
+      <!-- วางแชท -->
+      <section class="ao-sec" aria-labelledby="s-paste">
+        <div class="ao-label">
+          <h2 class="h-group" id="s-paste">วางแชท</h2>
+          <p class="cap muted">ไม่บังคับ ข้ามไปกรอกเองได้</p>
+        </div>
+        <div class="ao-field">
+          <div class="paste" data-paste>
+            <textarea class="paste-in" rows="3" data-paste-in aria-label="ข้อความที่คุยกับลูกค้า" placeholder="วางข้อความที่คุยกับลูกค้า AI แยกชื่อ เบอร์ ที่อยู่ และกำไลที่สั่งมาใส่ฟอร์มให้"></textarea>
+            <div class="paste-foot">
+              <span class="cap muted" data-paste-note>ส่งให้ AI เฉพาะตอนกดปุ่ม ไม่เก็บข้อความนี้ และตัดวันเกิดออกก่อนส่ง <button class="u-act" type="button" data-sample>ลองด้วยแชทตัวอย่าง</button></span>
+              <button class="ai-btn" type="button" data-ai disabled>
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1.5l1.3 3.2L11.5 6 8.3 7.3 7 10.5 5.7 7.3 2.5 6l3.2-1.3z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M11.5 10v3M10 11.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                <span data-ai-label>ให้ AI ช่วยกรอก</span>
+              </button>
+            </div>
+          </div>
+          <div class="ai-result" data-result hidden>
+            <div class="grow">
+              <p class="ui"><b class="w6" data-r-count>AI กรอกให้ 5 ช่อง</b> ช่องพื้นเขียวมาจากแชท ตรวจก่อนสร้าง</p>
+              <p class="small sand-ink" data-r-miss></p>
+              <p class="small muted" data-r-bday hidden>ตัดวันเกิดออกก่อนส่งให้ AI แล้ว ถ้าต้องใช้ ใส่เองในหน้าประวัติลูกค้า</p>
+            </div>
+            <button class="btn btn-sm" type="button" data-repaste>
+              <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1.5l1.3 3.2L11.5 6 8.3 7.3 7 10.5 5.7 7.3 2.5 6l3.2-1.3z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M11.5 10v3M10 11.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              วางใหม่
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ลูกค้า -->
+      <section class="ao-sec" aria-labelledby="s-cust">
+        <div class="ao-label">
+          <h2 class="h-group" id="s-cust">ลูกค้า</h2>
+          <p class="cap muted">เลือกช่องทางที่ลูกค้าทักมาก่อน</p>
+        </div>
+        <div class="ao-field">
+          <div class="seg" role="radiogroup" aria-label="ช่องทางที่ลูกค้าทักมา" data-channels>
+            <button class="seg-b is-on" type="button" role="radio" aria-checked="true" data-ch="line"><span class="line-dot" aria-hidden="true"></span>LINE ร้าน</button>
+            <button class="seg-b" type="button" role="radio" aria-checked="false" data-ch="ig">Instagram</button>
+            <button class="seg-b" type="button" role="radio" aria-checked="false" data-ch="tt">TikTok</button>
+            <button class="seg-b" type="button" role="radio" aria-checked="false" data-ch="fb">Facebook</button>
+            <button class="seg-b" type="button" role="radio" aria-checked="false" data-ch="other">อื่นๆ</button>
+          </div>
+
+          <div class="cust-line" data-cust-line>
+            <label class="search">
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#6B7280" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input type="search" placeholder="ค้นชื่อ LINE หรือชื่อเรียก" aria-label="ค้นลูกค้าที่ทักแชท LINE ร้าน" data-q>
+            </label>
+            <div class="people" role="listbox" aria-label="คนที่ทักแชท LINE ร้าน" data-people></div>
+            <p class="cap sage linked">
+              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#2E6A5C"/><path d="M4.6 8.2l2.2 2.2 4.6-4.8" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              รายชื่อนี้เชื่อม LINE แล้วทุกคน ระบบส่งลิงก์ออเดอร์ทาง LINE ร้านให้เลย
+            </p>
+          </div>
+
+          <div class="cust-other" data-cust-other hidden>
+            <div class="two">
+              <label class="fld"><span class="cap muted" data-handle-label>ชื่อบัญชี Instagram</span><input class="in" type="text" placeholder="@" data-f="handle"></label>
+              <label class="fld"><span class="cap muted">ชื่อเรียก</span><input class="in" type="text" placeholder="เช่น คุณมิ้นท์" data-f="name"></label>
+            </div>
+            <label class="fld"><span class="cap muted">เบอร์โทร ใช้หาว่าเคยเป็นลูกค้าหรือยัง</span><input class="in num" type="tel" placeholder="08x xxx xxxx" data-f="phone"></label>
+            <div class="not-linked">
+              <p class="small w6 sand-ink">ยังไม่ได้เชื่อม LINE</p>
+              <p class="small" data-nl-text>ระบบส่งข้อความหาลูกค้าไม่ได้ ให้คัดลอกลิงก์ไปส่งใน Instagram เอง ลูกค้าเข้าสู่ระบบด้วย LINE ตอนเปิดลิงก์ แล้วระบบเชื่อมให้ ข้อความหลังจากนั้นส่งทาง LINE ได้</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- กำไล -->
+      <section class="ao-sec" aria-labelledby="s-items">
+        <div class="ao-label">
+          <h2 class="h-group" id="s-items" data-items-h>กำไล</h2>
+          <p class="cap muted">สำเร็จรูปกับร้อยเอง<br>รวมจ่ายครั้งเดียวได้</p>
+        </div>
+        <div class="ao-field">
+          <div class="items" data-items></div>
+          <div class="add-row">
+            <div class="add-wrap">
+              <button class="add-b" type="button" data-add-ready aria-expanded="false">
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" fill="none" stroke="#111827" stroke-width="1.6" stroke-linecap="round"/></svg>
+                กำไลสำเร็จรูป
+              </button>
+              <div class="menu" data-ready-menu role="menu" hidden></div>
+            </div>
+            <button class="add-b" type="button" data-add-custom>
+              <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" fill="none" stroke="#111827" stroke-width="1.6" stroke-linecap="round"/></svg>
+              ร้อยเองจากสูตรหิน
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ส่งไปที่ -->
+      <section class="ao-sec" aria-labelledby="s-ship">
+        <div class="ao-label">
+          <h2 class="h-group" id="s-ship">ส่งไปที่</h2>
+          <p class="cap muted">ชื่อ เบอร์ ที่อยู่<br>ที่ลูกค้าส่งมาในแชท</p>
+        </div>
+        <div class="ao-field">
+          <textarea class="in addr-in" rows="2" placeholder="ชื่อ เบอร์ ที่อยู่" aria-label="ที่อยู่จัดส่ง" data-f="addr"></textarea>
+          <div class="inline">
+            <span class="cap muted lane">ขนส่ง</span>
+            <div class="seg" role="radiogroup" aria-label="ขนส่ง" data-carriers>
+              <button class="seg-b is-on" type="button" role="radio" aria-checked="true" data-carrier="Flash" data-fee="50">Flash 50 ฿</button>
+              <button class="seg-b" type="button" role="radio" aria-checked="false" data-carrier="Kerry" data-fee="60">Kerry 60 ฿</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- รู้จักจากไหน -->
+      <section class="ao-sec" aria-labelledby="s-src">
+        <div class="ao-label">
+          <h2 class="h-group" id="s-src">รู้จักเราจากไหน</h2>
+          <p class="cap muted">ถามในแชทถ้ายังไม่รู้</p>
+        </div>
+        <div class="ao-field">
+          <div class="chips" role="radiogroup" aria-label="รู้จักเราจากไหน" data-src>
+            <button class="chip" type="button" role="radio" aria-checked="false">TikTok</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">Instagram</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">เพื่อนแนะนำ</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">ลูกค้าเก่า</button>
+            <button class="chip" type="button" role="radio" aria-checked="false">อื่นๆ</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="ao-sum" aria-labelledby="sum-h">
+    <div class="sum-top">
+      <h2 class="h-title" id="sum-h">สรุปออเดอร์</h2>
+      <div class="lines" data-lines></div>
+      <div class="next card" data-next hidden>
+        <p class="ui w6">กดสร้างแล้ว</p>
+        <ul data-next-list></ul>
+      </div>
+      <div class="made card" data-made hidden>
+        <p class="ui w6" data-made-h>สร้าง SL-0423 แล้ว</p>
+        <p class="small" data-made-p></p>
+        <a class="link ui-tight" href="today.html">กลับหน้าวันนี้</a>
+      </div>
+    </div>
+    <div class="sum-foot">
+      <button class="btn-primary num" type="button" data-create disabled>สร้างออเดอร์และส่งลิงก์</button>
+      <p class="cap muted" data-why></p>
+      <div class="sum-meta">
+        <span class="cap muted">ระบบบันทึกว่าใครสร้างออเดอร์นี้</span>
+        <button class="u-act" type="button" data-draft>บันทึกร่างไว้ก่อน</button>
+      </div>
+    </div>
+  </aside>
+</div>
+<script src="bo.js"></script>
+<script src="add-order.js"></script>
+</body>
+</html>

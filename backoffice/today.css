@@ -41,3 +41,18 @@
 .detail-foot .note { max-width: 250px; }
 .detail-foot .acts { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 .empty { display: flex; flex-direction: column; gap: 6px; padding: 30px 40px; }
+
+/* Header: copy-link row under the title. Tier 3 action: quiet text buttons, one click, always in the same spot. */
+.pane-head.has-links { flex-wrap: wrap; row-gap: 14px; }
+.share-links { width: 100%; display: flex; align-items: center; gap: 4px; }
+.share-links > .muted { padding-right: 4px; }
+.copy-link {
+  height: 30px; display: inline-flex; align-items: center; gap: 6px; padding: 0 8px; border-radius: 6px;
+  font-size: 14px; line-height: 18px; font-weight: 500; color: var(--ink);
+  transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out);
+}
+.copy-link:hover { background: var(--sel); }
+.copy-link .i-ok { display: none; }
+.copy-link.is-done { background: var(--sage-wash); color: var(--sage); }
+.copy-link.is-done .i-copy { display: none; }
+.copy-link.is-done .i-ok { display: block; }
