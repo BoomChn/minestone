@@ -79,12 +79,12 @@
         </a>
       </div>
 
-      <div class="group">
+      <div class="group" data-group="merge">
         <div class="group-head"><h2 class="h-group">อาจเป็นคนเดียวกัน</h2><span class="ui-tight muted">1</span></div>
-        <a class="row" href="#" data-todo="หน้าเทียบลูกค้ายังไม่ได้ออกแบบ">
+        <button class="row" type="button" data-merge-row>
           <span class="who"><span class="ui w6">คุณนุ่น <span class="w4 muted">กับ</span> Noon.p</span><span class="cap muted">เบอร์โทรเดียวกัน ระบบไม่รวมให้เอง</span></span>
           <span class="wide ui-tight w5">เทียบแล้วรวม</span>
-        </a>
+        </button>
       </div>
     </div>
   </section>
@@ -147,9 +147,12 @@
       </div>
     </div>
   </section>
+
+  <section class="pane-fill merge" aria-live="polite" data-merge hidden></section>
 </div>
 <script src="bo.js"></script>
 <script src="today.js"></script>
 <script src="slip-viewer.js"></script>
+<script src="merge.js"></script>
 </body>
 </html>
