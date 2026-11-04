@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="bo.css">
   <link rel="stylesheet" href="today.css">
+  <link rel="stylesheet" href="slip-viewer.css">
 </head>
 <body data-page="today">
 <div class="bo">
@@ -101,7 +102,7 @@
       </div>
       <div class="detail-body">
         <div class="slip-col">
-          <div class="slip" aria-label="รูปสลิปที่ลูกค้าแนบ">
+          <div class="slip" aria-label="รูปสลิปที่ลูกค้าแนบ กดเพื่อดูรูปเต็ม" data-view-slip title="ดูรูปเต็ม">
             <div class="ok"><span class="dot"></span><span><span class="cap w6" style="display:block;color:#1B7F4B;line-height:16px">โอนเงินสำเร็จ</span><span class="tiny muted" data-f="slipTime">4 พ.ย. 69 14:08 น.</span></span></div>
             <div class="f"><span class="tiny muted">จาก</span><span class="cap w5" data-f="payer">น.ส. แพรวา ว.</span><span class="tiny muted" data-f="acct">xxx-x-x4821-x</span></div>
             <div class="f"><span class="tiny muted">ไปยัง</span><span class="cap w5">ร้าน Silamani</span><span class="tiny muted">พร้อมเพย์ xxx-xxx-7720</span></div>
@@ -110,7 +111,7 @@
           </div>
           <div style="display:flex;justify-content:space-between">
             <span class="cap muted" data-f="attached">ลูกค้าแนบ 14:11 น.</span>
-            <a class="cap w5 ink" href="#" data-todo="ในของจริงจะเปิดรูปสลิปเต็มจอ">ดูรูปเต็ม</a>
+            <button class="u-act" type="button" data-view-slip>ดูรูปเต็ม</button>
           </div>
         </div>
 
@@ -149,5 +150,6 @@
 </div>
 <script src="bo.js"></script>
 <script src="today.js"></script>
+<script src="slip-viewer.js"></script>
 </body>
 </html>

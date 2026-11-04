@@ -56,3 +56,5 @@
 .copy-link.is-done { background: var(--sage-wash); color: var(--sage); }
 .copy-link.is-done .i-copy { display: none; }
 .copy-link.is-done .i-ok { display: block; }
+.slip[data-view-slip] { cursor: zoom-in; transition: border-color 150ms var(--ease-out); }
+.slip[data-view-slip]:hover { border-color: var(--field); }
