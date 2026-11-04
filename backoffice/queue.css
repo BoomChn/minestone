@@ -199,3 +199,15 @@ button.qslot:hover { background: #FBFAF8; }
 .n-text { font-size: 15px; line-height: 24px; color: var(--ink); white-space: pre-wrap; }
 .qnote-add { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px dashed #CFCBC3; border-radius: 10px; font-size: 14px; font-weight: 500; line-height: 18px; color: var(--ink); text-align: left; transition: border-color 150ms var(--ease-out); }
 .qnote-add:hover { border-color: var(--ink); }
+
+/* Earlier-reading rows: quiet icon actions, edit in place, delete asks in the row. */
+.past > div { align-items: flex-start; }
+.p-acts { display: flex; gap: 2px; flex-shrink: 0; }
+.p-icon { display: flex; align-items: center; justify-content: center; width: 28px; height: 22px; border-radius: 6px; color: var(--muted); transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out); }
+.p-icon:hover { background: rgba(17, 24, 39, 0.06); color: var(--ink); }
+.p-icon.danger:hover { background: rgba(155, 44, 44, 0.08); color: #9B2C2C; }
+.p-edit { display: block; width: 100%; resize: vertical; min-height: 70px; padding: 8px 10px; border: 1.5px solid var(--ink); border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; color: var(--ink); background: var(--paper); outline: none; }
+.p-btns, .p-ask { display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding-top: 8px; }
+.p-ask > span { padding-right: 6px; font-size: 13px; font-weight: 500; color: var(--ink); }
+.p-ask .n-act, .p-btns .n-act { height: 30px; font-size: 13px; }
+.p-save { height: 30px; padding: 0 14px; border-radius: 8px; background: var(--action); color: var(--paper); font-size: 13px; font-weight: 600; }

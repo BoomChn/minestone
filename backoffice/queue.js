@@ -82,6 +82,8 @@
   try { S = JSON.parse(sessionStorage.getItem(KEY)); } catch (e) { S = null; }
   if (!S) S = { sel: { next: "SL-0420", past: "SL-0402" }, moved: {}, memo: {}, sent: {}, cancelled: {}, filter: { next: "all", past: "all" }, draft: {}, skip: {} };
   if (!S.notes) S.notes = {};
+  if (!S.past) S.past = {};
+  var pastEdit = null, pastDel = null; // { code, i, text? }
   function save() { sessionStorage.setItem(KEY, JSON.stringify(S)); }
   // Note being written: { code, i } where i is a saved note's index or "new"; askDel = index waiting for delete confirm.
   var edit = null, askDel = null;
@@ -198,7 +200,7 @@
   list.addEventListener("click", function (e) {
     var r = e.target.closest("[data-code]");
     if (!r) return;
-    askDel = null;
+    askDel = null; pastEdit = null; pastDel = null;
     keepMemo();
     S.sel[tab] = r.dataset.code; mode = "detail"; save(); renderList(); renderDetail();
   });
@@ -263,6 +265,33 @@
     return '<div class="qnotes">' + rows + tail + "</div>";
   }
 
+  /* Notes from earlier readings: each row can be edited in place or deleted (with a confirm in the row). */
+  function pastOf(code) { return S.past[code] || B[code].past; }
+  function pastBlock(code) {
+    var list = pastOf(code);
+    var cap = '<div class="cap">ครั้งก่อนๆ</div>';
+    if (!list.length) {
+      var msg = B[code].past.length ? "ไม่มีบันทึกจากครั้งก่อน" : "ครั้งแรกที่ดูกับเรา";
+      return '<div class="past">' + cap + '<div><span class="x muted">' + msg + "</span></div></div>";
+    }
+    return '<div class="past">' + cap + list.map(function (p, i) {
+      var body, acts = "";
+      if (pastEdit && pastEdit.code === code && pastEdit.i === i) {
+        body = '<span class="x"><textarea class="p-edit" data-past-text aria-label="แก้บันทึกครั้ง ' + esc(p[0]) + '" rows="3">' + esc(pastEdit.text != null ? pastEdit.text : p[1]) + "</textarea>" +
+          '<span class="p-btns"><button class="n-act" type="button" data-past-cancel>ยกเลิก</button><button class="p-save" type="button" data-past-save>บันทึก</button></span></span>';
+      } else if (pastDel && pastDel.code === code && pastDel.i === i) {
+        body = '<span class="x">' + esc(p[1]) + '<span class="p-ask"><span>ลบบันทึกครั้งนี้?</span><button class="n-act" type="button" data-past-keep>ไม่ลบ</button>' +
+          '<button class="n-act danger" type="button" data-past-del-ok="' + i + '">ลบเลย</button></span></span>';
+      } else {
+        body = '<span class="x">' + esc(p[1]) + "</span>";
+        acts = '<span class="p-acts"><button class="p-icon" type="button" data-past-edit="' + i + '" aria-label="แก้ไขบันทึกครั้ง ' + esc(p[0]) + '" title="แก้ไข">' + PEN + "</button>" +
+          '<button class="p-icon danger" type="button" data-past-del="' + i + '" aria-label="ลบบันทึกครั้ง ' + esc(p[0]) + '" title="ลบ">' + BIN + "</button></span>";
+      }
+      return '<div><span class="d">' + p[0] + "</span>" + body + acts + "</div>";
+    }).join("") + "</div>";
+  }
+  function setPast(code, list) { S.past[code] = list; save(); }
+
   function renderDetail() {
     var all = codes();
     if (all.indexOf(S.sel[tab]) < 0) { S.sel[tab] = all[0] || null; save(); renderList(); }
@@ -275,9 +304,7 @@
   function renderNext(code) {
     var b = B[code], at = where(code);
     var memo = S.memo[code] != null ? S.memo[code] : (b.memo || "");
-    var past = b.past.length ? '<div class="past"><div class="cap">ครั้งก่อนๆ</div>' + b.past.map(function (p) {
-      return '<div><span class="d">' + p[0] + '</span><span class="x">' + p[1] + "</span></div>";
-    }).join("") + "</div>" : '<div class="past"><div class="cap">ครั้งก่อนๆ</div><div><span class="x muted">ครั้งแรกที่ดูกับเรา</span></div></div>';
+    var past = pastBlock(code);
     var left = S.moved[code] && S.moved[code].byCustomer ? 0 : b.moves;
     var foot = left ? "ลูกค้าเลื่อนได้อีก " + left + " ครั้ง<br>ถึง" + b.moveBy : "ลูกค้าใช้สิทธิ์เลื่อนไปแล้ว<br>ร้านยังเลื่อนให้ได้ถ้าจำเป็น";
 
@@ -391,6 +418,7 @@
 
   /* ---------- actions ---------- */
   pane.addEventListener("input", function (e) {
+    if (e.target.matches("[data-past-text]") && pastEdit) pastEdit.text = e.target.value;
     if (e.target.matches("[data-draft]")) {
       S.draft[e.target.dataset.draft] = e.target.value; save();
       var s = pane.querySelector("[data-saved]");
@@ -408,6 +436,36 @@
       else { var n0 = notesOf(mc)[open]; if (n0.text !== v0) { n0.text = v0; n0.edited = stamp(); } }
       edit = null; askDel = null; save(); renderDetail();
       toast("บันทึกโน้ตแล้ว ลูกค้าไม่เห็นโน้ตนี้");
+      return;
+    }
+    var pe = t.closest("[data-past-edit]");
+    if (pe) {
+      keepMemo();
+      pastEdit = { code: S.sel[tab], i: +pe.dataset.pastEdit }; pastDel = null; renderDetail();
+      var pt = pane.querySelector("[data-past-text]"); pt.focus(); pt.setSelectionRange(pt.value.length, pt.value.length);
+      return;
+    }
+    if (t.closest("[data-past-cancel]")) { keepMemo(); pastEdit = null; renderDetail(); return; }
+    if (t.closest("[data-past-save]")) {
+      var pv = pane.querySelector("[data-past-text]").value.trim();
+      if (!pv) { pane.querySelector("[data-past-text]").focus(); toast("ถ้าไม่อยากเก็บบันทึกนี้ ให้กดลบแทน"); return; }
+      keepMemo();
+      var pl = pastOf(pastEdit.code).slice();
+      pl[pastEdit.i] = [pl[pastEdit.i][0], pv];
+      setPast(pastEdit.code, pl); pastEdit = null; renderDetail();
+      toast("แก้บันทึกครั้งก่อนแล้ว");
+      return;
+    }
+    var pdl = t.closest("[data-past-del]");
+    if (pdl) { keepMemo(); pastDel = { code: S.sel[tab], i: +pdl.dataset.pastDel }; pastEdit = null; renderDetail(); return; }
+    if (t.closest("[data-past-keep]")) { keepMemo(); pastDel = null; renderDetail(); return; }
+    var pdo = t.closest("[data-past-del-ok]");
+    if (pdo) {
+      keepMemo();
+      var pc = S.sel[tab], pl2 = pastOf(pc).slice();
+      pl2.splice(+pdo.dataset.pastDelOk, 1);
+      setPast(pc, pl2); pastDel = null; renderDetail();
+      toast("ลบบันทึกครั้งก่อนแล้ว");
       return;
     }
     if (t.closest("[data-memo-cancel]")) {
