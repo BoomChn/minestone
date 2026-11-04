@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>แพ็กและส่ง หลังบ้าน Silamani (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bo.css">
+  <link rel="stylesheet" href="today.css">
+  <link rel="stylesheet" href="shop-flow.css">
+</head>
+<body data-page="today">
+<div class="bo">
+  <aside class="side" data-side></aside>
+
+  <section class="pane todo" aria-labelledby="todo-h">
+    <div class="pane-head">
+      <div>
+        <h1 class="h-sm" id="todo-h">ต้องทำตอนนี้</h1>
+        <p class="ui muted">พุธ 4 พฤศจิกายน 2569 เรียงจากด่วนที่สุด</p>
+      </div>
+      <a class="btn" href="#" data-todo="หน้าเพิ่มออเดอร์จากแชทยังไม่ได้ออกแบบ">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" fill="none" stroke="#111827" stroke-width="1.6" stroke-linecap="round"/></svg>
+        เพิ่มออเดอร์จากแชท
+      </a>
+    </div>
+
+    <div class="todo-list">
+      <div class="group">
+        <div class="group-head"><h2 class="h-group">สลิปรอตรวจ</h2><span class="ui-tight muted">2</span></div>
+        <a class="row" href="today.html">
+          <span class="who"><span class="ui w6">SL-0412 <span class="w4">คุณแพร</span></span><span class="cap muted">ดูดวง 60 นาที เสาร์ 7 พ.ย. 10:00</span></span>
+          <span class="amt ui-tight w5 num">990 ฿</span>
+          <span class="when"><span class="pill pill-sand">รอมา 12 นาที</span></span>
+        </a>
+        <a class="row" href="today.html#SL-0421">
+          <span class="who"><span class="ui w6">SL-0421 <span class="w4">คุณมายด์</span></span><span class="cap muted">กำไล 2 เส้น สำเร็จรูปและร้อยเอง</span></span>
+          <span class="amt ui-tight w5 num">1,780 ฿</span>
+          <span class="when"><span class="pill pill-sand">รอมา 3 นาที</span></span>
+        </a>
+      </div>
+
+      <div class="group">
+        <div class="group-head"><h2 class="h-group">ร้อยเองรอเช็กของ</h2><span class="ui-tight muted">1</span></div>
+        <a class="row" href="custom-check.html">
+          <span class="who"><span class="ui w6">SL-0418 <span class="w4">คุณต้นข้าว</span></span><span class="cap muted">ร้อยเอง 1 เส้น 21 เม็ด หิน 3 ชนิด</span></span>
+          <span class="amt ui-tight w5 num">1,190 ฿</span>
+          <span class="when"><span class="pill pill-sand">ตอบใน 18 ชม.</span></span>
+        </a>
+      </div>
+
+      <div class="group" data-group="pack">
+        <div class="group-head"><h2 class="h-group">ต้องแพ็กและส่ง</h2><span class="ui-tight muted" data-count>2</span></div>
+        <button class="row is-sel" type="button" aria-current="true" data-order="SL-0409">
+          <span class="who"><span class="ui w6">SL-0409 <span class="w4">คุณเบล</span></span><span class="cap muted">กำไลสำเร็จรูป ไหมทอง 1 เส้น</span></span>
+          <span class="amt ui-tight w5 num">690 ฿</span>
+          <span class="when cap muted">ชำระเมื่อวาน</span>
+        </button>
+        <button class="row" type="button" data-order="SL-0410">
+          <span class="who"><span class="ui w6">SL-0410 <span class="w4">คุณโอ๊ต</span></span><span class="cap muted">กำไล 2 เส้น แพ็กแล้ว รอเลขพัสดุ</span></span>
+          <span class="amt ui-tight w5 num">1,380 ฿</span>
+          <span class="when cap muted">ชำระ 2 พ.ย.</span>
+        </button>
+      </div>
+
+      <div class="group">
+        <div class="group-head"><h2 class="h-group">อาจเป็นคนเดียวกัน</h2><span class="ui-tight muted">1</span></div>
+        <a class="row" href="#" data-todo="หน้าเทียบลูกค้ายังไม่ได้ออกแบบ">
+          <span class="who"><span class="ui w6">คุณนุ่น <span class="w4 muted">กับ</span> Noon.p</span><span class="cap muted">เบอร์โทรเดียวกัน ระบบไม่รวมให้เอง</span></span>
+          <span class="wide ui-tight w5">เทียบแล้วรวม</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pane-fill" aria-labelledby="pack-h" data-detail data-flow="pack">
+    <div>
+      <div class="detail-head">
+        <div class="head-text">
+          <h2 class="h-sm" id="pack-h">แพ็กและส่ง <span data-f="code">SL-0409</span></h2>
+          <p class="ui muted" data-f="sub">คุณเบล กำไลสำเร็จรูป 1 เส้น ชำระแล้ว 3 พ.ย. 19:20 น.</p>
+        </div>
+        <a class="link ui-tight" href="customer.html" style="height:40px">ประวัติลูกค้า
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <div class="flow-body pack-body">
+        <div class="ship-to sect">
+          <div class="addr">
+            <span class="cap muted">ส่งถึง</span>
+            <span class="addr-name w6"><span data-f="name">เบญจมาศ ส.</span> <span class="w4 muted num" data-f="phone">081-234-5678</span></span>
+            <span class="ui addr-line" data-f="addr">88/14 ซอยลาดพร้าว 71 แขวงสะพานสอง เขตวังทองหลาง กรุงเทพฯ 10310</span>
+          </div>
+          <button class="btn" type="button" data-copy>คัดลอกที่อยู่</button>
+        </div>
+
+        <div class="sect box-items">
+          <h3 class="h-group">ของในกล่อง</h3>
+          <ul data-items>
+            <li class="item"><span class="sw" style="background:#BFA36A" aria-hidden="true"></span><span class="ui grow">กำไลไหมทอง 8 มม. ธรรมชาติ</span><span class="cap muted">รหัสเส้น RT-08-03</span></li>
+            <li class="item"><span class="sw sw-ring" aria-hidden="true"></span><span class="ui grow">การ์ดความหมายหิน และถุงผ้า</span><span class="cap muted">ถ่ายวิดีโอตอนแพ็กเก็บไว้</span></li>
+          </ul>
+        </div>
+
+        <div class="track">
+          <h3 class="h-group" id="track-h">เลขพัสดุ</h3>
+          <div class="track-row">
+            <div class="carriers" role="radiogroup" aria-labelledby="track-h">
+              <button class="carrier is-on" type="button" role="radio" aria-checked="true" data-carrier="Flash">Flash</button>
+              <button class="carrier" type="button" role="radio" aria-checked="false" data-carrier="Kerry">Kerry</button>
+            </div>
+            <input class="track-in" type="text" value="TH0141 2B7K 9Q" placeholder="กรอกเลขพัสดุ" aria-label="เลขพัสดุ" autocomplete="off" spellcheck="false" data-track>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-foot">
+      <p class="note cap muted" style="line-height:20px">ลูกค้าได้เลขพัสดุทาง LINE ออเดอร์เปลี่ยนเป็น "ส่งแล้ว"</p>
+      <div class="acts">
+        <button class="btn btn-lg" type="button" data-preview>ดูข้อความก่อนส่ง</button>
+        <button class="btn-primary" type="button" data-confirm>ส่งเลขพัสดุให้ลูกค้า</button>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="bo.js"></script>
+<script src="shop-flow.js"></script>
+</body>
+</html>

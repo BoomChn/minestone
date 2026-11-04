@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ลืมรหัสผ่าน หลังบ้าน Silamani (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bo.css">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body data-auth="forgot">
+<div class="auth">
+  <main class="auth-main">
+    <div class="auth-brand" aria-label="Silamani หลังบ้าน">
+      <span class="mark"><svg width="24" height="24" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="10.5" fill="none" stroke="#111827" stroke-width="1.4"/><circle cx="15" cy="4.5" r="3" fill="#111827"/><circle cx="24.1" cy="20.2" r="3" fill="#111827"/><circle cx="5.9" cy="20.2" r="3" fill="#111827"/></svg><span>Silamani</span></span>
+      <span class="sub">หลังบ้าน</span>
+    </div>
+
+    <form class="auth-form" id="forgot" novalidate>
+      <div class="auth-head">
+        <a class="auth-back ui" href="index.html"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5L5.5 8L10 12.5" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>กลับไปหน้าเข้าสู่ระบบ</span></a>
+        <h1 class="h-auth">ลืมรหัสผ่าน</h1>
+        <p class="lede">กรอกอีเมลของบัญชีนี้ เราจะส่งลิงก์ตั้งรหัสใหม่ไปให้</p>
+      </div>
+
+      <div class="field">
+        <label class="ui" for="email">อีเมล</label>
+        <div class="box"><input id="email" type="email" autocomplete="username" autofocus></div>
+      </div>
+
+      <div class="auth-actions">
+        <button class="btn-primary btn-block" type="submit">ส่งลิงก์ตั้งรหัสใหม่</button>
+        <p class="note">เข้าอีเมลนี้ไม่ได้แล้ว ให้อีกคนเปลี่ยนอีเมลของบัญชีให้ที่หน้าตั้งค่า</p>
+      </div>
+    </form>
+
+    <p class="small muted">หน้านี้สำหรับร้านกับผู้อ่านเท่านั้น</p>
+  </main>
+
+  <aside class="auth-side">
+    <div class="panel">
+      <svg width="620" height="620" viewBox="0 0 620 620" aria-hidden="true"><circle cx="310" cy="310" r="228" fill="none" stroke="#DBD5C6" stroke-width="1.4"/><circle cx="310" cy="82" r="34" fill="#DBD5C6"/><circle cx="507.5" cy="424" r="34" fill="#DBD5C6"/><circle cx="112.5" cy="424" r="34" fill="#DBD5C6"/><circle cx="310" cy="310" r="150" fill="none" stroke="#E8E6E2"/></svg>
+      <div class="panel-note">
+        <h2>ลิงก์ส่งไปที่อีเมลของบัญชีเท่านั้น</h2>
+        <p>ขอลิงก์ได้ไม่เกิน 3 ครั้งต่อชั่วโมง กรอกอีเมลที่ไม่มีบัญชี ระบบก็ตอบเหมือนกัน คนอื่นจะได้เดาไม่ได้ว่าอีเมลไหนมีบัญชี</p>
+      </div>
+    </div>
+  </aside>
+</div>
+<script src="auth.js"></script>
+</body>
+</html>

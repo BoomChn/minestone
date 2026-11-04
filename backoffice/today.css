@@ -1,0 +1,43 @@
+/* วันนี้ / ต้องทำตอนนี้: task list + slip check */
+.todo { width: 548px; }
+.todo-list { display: flex; flex-direction: column; padding: 0 16px 24px; }
+.group { display: flex; flex-direction: column; padding-bottom: 18px; }
+.group + .group { padding-top: 16px; border-top: 1px solid var(--rule); }
+.group-head { display: flex; align-items: baseline; gap: 8px; padding: 10px 16px 8px; }
+.row .who { display: flex; flex-direction: column; min-width: 0; flex: 1 1 0; }
+.row .amt { width: 84px; flex-shrink: 0; text-align: right; }
+.row .when { width: 112px; flex-shrink: 0; display: flex; justify-content: flex-end; text-align: right; }
+.row .wide { width: 212px; flex-shrink: 0; text-align: right; }
+
+.detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding: 30px 40px 24px; border-bottom: 1px solid var(--rule); }
+.detail-body { display: flex; gap: 40px; padding: 32px 40px; }
+.slip-col { width: 228px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
+.slip {
+  height: 392px; display: flex; flex-direction: column; gap: 18px; padding: 22px 20px;
+  border-radius: 14px; background: #FAFAF8; border: 1px solid var(--rule);
+}
+.slip .ok { display: flex; align-items: center; gap: 8px; }
+.slip .dot { width: 26px; height: 26px; border-radius: 999px; background: #1B7F4B; flex-shrink: 0; }
+.slip .f { display: flex; flex-direction: column; gap: 2px; }
+.slip .f.money { padding-top: 14px; border-top: 1px dashed #D9D6D0; }
+.slip .big { font-family: var(--head); font-weight: 600; font-size: 26px; line-height: 36px; }
+.check { min-width: 0; flex: 1 1 0; display: flex; flex-direction: column; gap: 28px; }
+.kv { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.kv:first-child { padding-top: 0; }
+.kv:last-child { border-bottom: 0; }
+.kv .match { display: flex; align-items: center; gap: 8px; }
+.bank { display: flex; flex-direction: column; gap: 12px; padding: 20px 22px; }
+.tick { display: flex; align-items: center; gap: 10px; cursor: pointer; width: max-content; }
+.tick input { position: absolute; opacity: 0; pointer-events: none; }
+.tick .box {
+  width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--field); transition: background-color 150ms var(--ease-out), border-color 150ms var(--ease-out);
+}
+.tick .box svg { opacity: 0; transition: opacity 120ms var(--ease-out); }
+.tick input:checked + .box { background: var(--ink); border-color: var(--ink); }
+.tick input:checked + .box svg { opacity: 1; }
+.tick input:focus-visible + .box { outline: 2px solid var(--ink); outline-offset: 2px; }
+.detail-foot { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 40px 24px; border-top: 1px solid var(--rule); }
+.detail-foot .note { max-width: 250px; }
+.detail-foot .acts { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.empty { display: flex; flex-direction: column; gap: 6px; padding: 30px 40px; }

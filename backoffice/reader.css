@@ -1,0 +1,88 @@
+/* ฝั่งผู้อ่าน: คิวของฉัน + ปิดวัน. List on the left is shared by both pages. */
+.queue { width: 600px; }
+.queue-list { display: flex; flex-direction: column; padding: 0 32px 24px; }
+
+.day { display: flex; gap: 20px; padding: 16px 0; border-top: 1px solid var(--rule); transition: background-color 150ms var(--ease-out); }
+.day.is-pick { background: var(--sel); border-radius: 10px; padding-left: 12px; }
+.mode-block .day.can-pick { cursor: pointer; }
+.mode-block .day.can-pick:not(.is-pick):hover { background: #FBFAF8; border-radius: 10px; }
+.day-label { width: 56px; flex-shrink: 0; display: flex; flex-direction: column; text-align: left; align-self: flex-start; border-radius: 6px; }
+.day-label .wd { font-size: 13px; line-height: 18px; color: var(--muted); }
+.day-label .wd.soon { color: var(--sage); font-weight: 500; }
+.day-label .dn { font-family: var(--head); font-weight: 600; font-size: 22px; line-height: 32px; color: var(--action); white-space: nowrap; }
+.day-label .dn.off { color: var(--muted); }
+a.day-label:hover .dn { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+
+.slots { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.slot {
+  display: flex; align-items: center; gap: 16px; padding: 10px 14px; border-radius: 10px;
+  width: 100%; text-align: left; transition: background-color 150ms var(--ease-out);
+}
+button.slot:hover, a.slot:hover { background: #FBFAF8; }
+.slot.is-sel, .slot.is-sel:hover { background: var(--sel); }
+.slot .t { width: 52px; flex-shrink: 0; font-size: 15px; line-height: 18px; }
+.slot .t.strike { text-decoration: line-through 1px; color: var(--muted); }
+.slot .who { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.slot .txt { flex: 1 1 0; min-width: 0; font-size: 15px; line-height: 18px; color: var(--muted); }
+.slot .st { width: 110px; flex-shrink: 0; text-align: right; font-size: 13px; line-height: 16px; font-weight: 500; }
+.reopen { font-size: 13px; line-height: 16px; font-weight: 500; color: var(--action); padding: 6px 0 6px 8px; }
+.reopen:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Detail pane */
+.detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding: 30px 40px 24px; border-bottom: 1px solid var(--rule); }
+.detail-head .sub { margin-top: 4px; }
+.detail-body { display: flex; flex-direction: column; gap: 28px; padding: 28px 40px; }
+.facts { display: flex; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.facts > div { flex: 1 1 0; display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border-right: 1px solid var(--rule); }
+.facts > div:first-child { padding-left: 0; }
+.facts > div:last-child { border-right: 0; }
+.facts .v { font-size: 16px; line-height: 24px; font-weight: 600; }
+.ask { display: flex; flex-direction: column; gap: 8px; }
+.ask p { font-size: 16px; line-height: 28px; }
+.notes { display: flex; flex-direction: column; gap: 10px; padding: 20px 22px; }
+.notes-head { display: flex; justify-content: space-between; align-items: center; }
+.notes-head .lock { display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 16px; color: var(--muted); }
+.note { font-size: 15px; line-height: 26px; color: var(--ink); }
+.note-add { align-self: flex-start; font-size: 13px; line-height: 18px; color: var(--muted); }
+.note-add:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.note-form { display: flex; flex-direction: column; gap: 10px; }
+.note-form textarea {
+  width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px;
+  border: 1px solid var(--field); border-radius: 10px; background: var(--paper);
+  font: inherit; font-size: 15px; line-height: 24px; color: var(--ink);
+}
+.note-form textarea:focus { outline: none; border-color: var(--ink); }
+.note-form .acts { display: flex; align-items: center; gap: 14px; }
+.note-form .btn { height: 36px; padding: 0 14px; }
+.note-form .cancel { font-size: 14px; line-height: 20px; color: var(--muted); }
+
+.detail-foot { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 40px 24px; border-top: 1px solid var(--rule); }
+.detail-foot .note-foot { max-width: 280px; font-size: 13px; line-height: 20px; color: var(--muted); }
+.detail-foot .acts { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.btn:disabled { color: var(--muted); cursor: default; background: none; transform: none; }
+.btn-primary:disabled { background: #B3B3B3; }
+.empty { display: flex; flex-direction: column; gap: 6px; padding: 30px 40px; }
+
+/* Block day */
+.blk-sec { display: flex; flex-direction: column; gap: 10px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  height: 44px; display: inline-flex; align-items: center; padding: 0 18px; border-radius: 999px;
+  border: 1px solid var(--rule); font-size: 15px; line-height: 18px; color: var(--action);
+  transition: background-color 150ms var(--ease-out), border-color 150ms var(--ease-out), transform 120ms var(--ease-out);
+}
+.chip:hover { border-color: var(--field); }
+.chip:active { transform: scale(0.97); }
+.chip[aria-pressed="true"] { background: var(--sel); border-color: var(--ink); font-weight: 500; }
+.warn { display: flex; flex-direction: column; gap: 16px; padding: 22px 24px; border: 1px solid #E9D3CF; border-radius: 14px; }
+.warn-top { display: flex; align-items: flex-start; gap: 12px; }
+.warn-top svg { flex-shrink: 0; margin-top: 3px; }
+.warn-top .ttl { font-size: 17px; line-height: 26px; font-weight: 600; color: var(--error); }
+.warn-top p { font-size: 15px; line-height: 24px; color: var(--ink); margin-top: 4px; }
+.warn-list { display: flex; flex-direction: column; padding-left: 32px; }
+.warn-list > div { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid var(--rule); }
+.warn-list .t { width: 48px; flex-shrink: 0; font-size: 15px; line-height: 18px; font-weight: 600; }
+.warn-list .n { flex: 1 1 0; font-size: 15px; line-height: 18px; }
+.warn-list .st { font-size: 13px; line-height: 16px; font-weight: 500; }
+.after { display: flex; flex-direction: column; gap: 6px; }
+.after p { font-size: 15px; line-height: 26px; color: var(--muted); }

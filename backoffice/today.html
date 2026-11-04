@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>วันนี้ หลังบ้าน Silamani (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bo.css">
+  <link rel="stylesheet" href="today.css">
+</head>
+<body data-page="today">
+<div class="bo">
+  <aside class="side" data-side></aside>
+
+  <section class="pane todo" aria-labelledby="todo-h">
+    <div class="pane-head">
+      <div>
+        <h1 class="h-sm" id="todo-h">ต้องทำตอนนี้</h1>
+        <p class="ui muted">พุธ 4 พฤศจิกายน 2569 เรียงจากด่วนที่สุด</p>
+      </div>
+      <a class="btn" href="#" data-todo="หน้าเพิ่มออเดอร์จากแชทยังไม่ได้ออกแบบ">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" fill="none" stroke="#111827" stroke-width="1.6" stroke-linecap="round"/></svg>
+        เพิ่มออเดอร์จากแชท
+      </a>
+    </div>
+
+    <div class="todo-list">
+      <div class="group" data-group="slip">
+        <div class="group-head"><h2 class="h-group">สลิปรอตรวจ</h2><span class="ui-tight muted" data-count>2</span></div>
+        <button class="row is-sel" type="button" data-slip="SL-0412" aria-current="true">
+          <span class="who"><span class="ui w6">SL-0412 <span class="w4">คุณแพร</span></span><span class="cap muted">ดูดวง 60 นาที เสาร์ 7 พ.ย. 10:00</span></span>
+          <span class="amt ui-tight w5 num">990 ฿</span>
+          <span class="when"><span class="pill pill-sand">รอมา 12 นาที</span></span>
+        </button>
+        <button class="row" type="button" data-slip="SL-0421">
+          <span class="who"><span class="ui w6">SL-0421 <span class="w4">คุณมายด์</span></span><span class="cap muted">กำไล 2 เส้น สำเร็จรูปและร้อยเอง</span></span>
+          <span class="amt ui-tight w5 num">1,780 ฿</span>
+          <span class="when"><span class="pill pill-sand">รอมา 3 นาที</span></span>
+        </button>
+      </div>
+
+      <div class="group">
+        <div class="group-head"><h2 class="h-group">ร้อยเองรอเช็กของ</h2><span class="ui-tight muted">1</span></div>
+        <a class="row" href="custom-check.html">
+          <span class="who"><span class="ui w6">SL-0418 <span class="w4">คุณต้นข้าว</span></span><span class="cap muted">ร้อยเอง 1 เส้น 21 เม็ด หิน 3 ชนิด</span></span>
+          <span class="amt ui-tight w5 num">1,190 ฿</span>
+          <span class="when"><span class="pill pill-sand">ตอบใน 18 ชม.</span></span>
+        </a>
+      </div>
+
+      <div class="group">
+        <div class="group-head"><h2 class="h-group">ต้องแพ็กและส่ง</h2><span class="ui-tight muted">2</span></div>
+        <a class="row" href="pack.html">
+          <span class="who"><span class="ui w6">SL-0409 <span class="w4">คุณเบล</span></span><span class="cap muted">กำไลสำเร็จรูป ไหมทอง 1 เส้น</span></span>
+          <span class="amt ui-tight w5 num">690 ฿</span>
+          <span class="when cap muted">ชำระเมื่อวาน</span>
+        </a>
+        <a class="row" href="pack.html">
+          <span class="who"><span class="ui w6">SL-0410 <span class="w4">คุณโอ๊ต</span></span><span class="cap muted">กำไล 2 เส้น แพ็กแล้ว รอเลขพัสดุ</span></span>
+          <span class="amt ui-tight w5 num">1,380 ฿</span>
+          <span class="when cap muted">ชำระ 2 พ.ย.</span>
+        </a>
+      </div>
+
+      <div class="group">
+        <div class="group-head"><h2 class="h-group">อาจเป็นคนเดียวกัน</h2><span class="ui-tight muted">1</span></div>
+        <a class="row" href="#" data-todo="หน้าเทียบลูกค้ายังไม่ได้ออกแบบ">
+          <span class="who"><span class="ui w6">คุณนุ่น <span class="w4 muted">กับ</span> Noon.p</span><span class="cap muted">เบอร์โทรเดียวกัน ระบบไม่รวมให้เอง</span></span>
+          <span class="wide ui-tight w5">เทียบแล้วรวม</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pane-fill" aria-labelledby="slip-h" data-detail>
+    <div>
+      <div class="detail-head">
+        <div>
+          <h2 class="h-sm" id="slip-h">ตรวจสลิป <span data-f="code">SL-0412</span></h2>
+          <p class="ui muted" data-f="sub">คุณแพร ดูดวง 60 นาที เสาร์ 7 พ.ย. 10:00 – 11:00</p>
+        </div>
+        <a class="link ui-tight" href="customer.html" style="height:40px">ประวัติลูกค้า
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+      <div class="detail-body">
+        <div class="slip-col">
+          <div class="slip" aria-label="รูปสลิปที่ลูกค้าแนบ">
+            <div class="ok"><span class="dot"></span><span><span class="cap w6" style="display:block;color:#1B7F4B;line-height:16px">โอนเงินสำเร็จ</span><span class="tiny muted" data-f="slipTime">4 พ.ย. 69 14:08 น.</span></span></div>
+            <div class="f"><span class="tiny muted">จาก</span><span class="cap w5" data-f="payer">น.ส. แพรวา ว.</span><span class="tiny muted" data-f="acct">xxx-x-x4821-x</span></div>
+            <div class="f"><span class="tiny muted">ไปยัง</span><span class="cap w5">ร้าน Silamani</span><span class="tiny muted">พร้อมเพย์ xxx-xxx-7720</span></div>
+            <div class="f money"><span class="tiny muted">จำนวนเงิน</span><span class="big num" data-f="slipAmt">990.00</span></div>
+            <div class="f"><span class="tiny muted">เลขที่รายการ</span><span style="font-size:12px;line-height:16px" data-f="ref">016308140821BPM04412</span></div>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span class="cap muted" data-f="attached">ลูกค้าแนบ 14:11 น.</span>
+            <a class="cap w5 ink" href="#" data-todo="ในของจริงจะเปิดรูปสลิปเต็มจอ">ดูรูปเต็ม</a>
+          </div>
+        </div>
+
+        <div class="check">
+          <div>
+            <div class="kv"><span class="ui muted">ยอดที่ต้องได้</span><span class="h-title num" data-f="due">990 บาท</span></div>
+            <div class="kv"><span class="ui muted">ยอดในสลิป</span>
+              <span class="match">
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="#2E6A5C"/><path d="M4.6 8.2l2.2 2.2 4.6-4.8" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="ui-tight w5 num" data-f="slipMatch">990.00 ตรงกัน</span>
+              </span>
+            </div>
+            <div class="kv"><span class="ui muted">เวลาโอน</span><span class="ui-tight" data-f="paidAt">4 พ.ย. 14:08 น.</span></div>
+            <div class="kv"><span class="ui muted">ผู้โอน</span><span class="ui-tight" data-f="payer2">น.ส. แพรวา ว.</span></div>
+            <div class="kv"><span class="ui muted">สลิปนี้เคยใช้ไหม</span><span class="ui-tight">ไม่เคย</span></div>
+          </div>
+          <div class="card bank">
+            <p class="ui" style="line-height:24px">สลิปปลอมได้ ยอดในแอปธนาคารปลอมไม่ได้ เปิด <b class="w6">K SHOP</b> แล้วหารายการ <b class="w6" data-f="bankHint">990 บาท เวลา 14:08</b></p>
+            <label class="tick">
+              <input type="checkbox" checked data-seen>
+              <span class="box"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.2 2.2 4.8-5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <span class="ui-tight w5">เห็นเงินเข้าในแอปแล้ว</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-foot">
+      <p class="note cap muted" style="line-height:20px">ลูกค้าได้ข้อความยืนยันทาง LINE ระบบบันทึกว่าใครกดและกดเมื่อไร</p>
+      <div class="acts">
+        <button class="btn btn-lg err" type="button" data-reject>สลิปไม่ผ่าน</button>
+        <button class="btn-primary num" type="button" data-confirm>ยืนยันรับเงิน 990 บาท</button>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="bo.js"></script>
+<script src="today.js"></script>
+</body>
+</html>

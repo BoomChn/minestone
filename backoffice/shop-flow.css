@@ -1,0 +1,58 @@
+/* ร้อยเองรอเช็กของ + แพ็กและส่ง: detail panes. Uses the list and detail shell from today.css. */
+.head-text { display: flex; flex-direction: column; gap: 4px; }
+.flow-body { display: flex; flex-direction: column; gap: 32px; padding: 32px 40px; }
+.pack-body { gap: 30px; }
+.grow { min-width: 0; flex: 1 1 0; }
+
+/* Bead order */
+.beads-block { display: flex; flex-direction: column; gap: 14px; }
+.sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.beads { display: flex; align-items: center; gap: 6px; padding: 22px 24px; }
+.bead { width: 34px; height: 34px; border-radius: 999px; flex-shrink: 0; }
+.b-am { background: radial-gradient(circle farthest-corner at 35% 30%, #C9B3E0 0%, #7E5AA6 100%); }
+.b-rq { background: radial-gradient(circle farthest-corner at 35% 30%, #F6DCDF 0%, #D99AA3 100%); }
+.b-gd { background: radial-gradient(circle farthest-corner at 35% 30%, #F3E6C2 0%, #BFA36A 100%); }
+.beads-note { min-width: 0; flex: 1 1 0; text-align: right; }
+
+/* Stone table */
+.stones { display: flex; flex-direction: column; }
+.st-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.st-row:last-child { border-bottom: 0; }
+.st-row.st-head { padding: 0 0 10px; }
+.st-name { min-width: 0; flex: 1 1 0; display: flex; flex-direction: column; }
+.st-use { width: 56px; flex-shrink: 0; text-align: right; }
+.st-have { width: 150px; flex-shrink: 0; display: flex; justify-content: flex-end; }
+.sw { width: 14px; height: 14px; border-radius: 999px; flex-shrink: 0; }
+.sw-ring { border: 1.5px solid #C9C6BF; }
+.tick.rev { flex-direction: row-reverse; gap: 8px; }
+.tick.rev input:not(:checked) ~ [data-label] { color: var(--error); }
+
+/* Pack */
+.sect { padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+.ship-to { display: flex; align-items: flex-start; gap: 24px; }
+.addr { min-width: 0; flex: 1 1 0; display: flex; flex-direction: column; gap: 4px; }
+.addr-name { font-size: 17px; line-height: 26px; }
+.addr-line { line-height: 24px; }
+.box-items { display: flex; flex-direction: column; gap: 12px; }
+.box-items ul { display: flex; flex-direction: column; gap: 12px; }
+.item { display: flex; align-items: center; gap: 14px; }
+.item .cap { line-height: 16px; }
+
+.track { display: flex; flex-direction: column; gap: 14px; }
+.track-row { display: flex; gap: 12px; }
+.carriers { display: flex; gap: 6px; flex-shrink: 0; }
+.carrier {
+  height: 48px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--rule);
+  font-size: 15px; line-height: 18px; color: var(--action);
+  transition: background-color 150ms var(--ease-out), border-color 150ms var(--ease-out);
+}
+.carrier:hover { background: #FBFAF8; }
+.carrier.is-on { background: var(--sel); border-color: var(--ink); font-weight: 500; }
+.track-in {
+  min-width: 0; flex: 1 1 0; height: 48px; padding: 0 16px;
+  border: 1px solid var(--field); border-radius: 10px; background: var(--paper);
+  font-family: var(--body); font-size: 16px; line-height: 20px; letter-spacing: 0.04em; color: var(--action);
+  transition: border-color 150ms var(--ease-out);
+}
+.track-in::placeholder { color: var(--muted); letter-spacing: 0; }
+.track-in:focus { outline: none; border-color: var(--ink); }
