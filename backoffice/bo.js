@@ -14,7 +14,7 @@
       { id: "orders", label: "ออเดอร์", count: 14 },
       { id: "customers", label: "ลูกค้า", href: "customers.html" },
       { id: "stock", label: "สต็อกและหิน" },
-      { id: "settings", label: "ตั้งค่า" }
+      { id: "settings", label: "ตั้งค่า", href: "settings.html" }
     ],
     reader: [
       { id: "queue", label: "คิวของฉัน", href: "my-queue.html", count: 3 },
@@ -22,7 +22,7 @@
       { id: "orders", label: "ออเดอร์", count: 14 },
       { id: "customers", label: "ลูกค้า", href: "customers.html" },
       { id: "stock", label: "สต็อกและหิน" },
-      { id: "settings", label: "ตั้งค่า" }
+      { id: "settings", label: "ตั้งค่า", href: "settings.html" }
     ]
   };
   var ACCOUNT = {

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ตั้งค่า หลังบ้าน Silamani (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bo.css">
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body data-page="settings">
+<div class="bo">
+  <aside class="side" data-side></aside>
+
+  <main class="st-main" aria-labelledby="st-h">
+    <header class="st-head">
+      <h1 class="h-sm ink" id="st-h">ตั้งค่า</h1>
+      <p class="ui muted">เปลี่ยนแล้วมีผลทันที ทั้งสองบัญชีเห็นค่าเดียวกัน</p>
+    </header>
+
+    <!-- บัญชีของฉัน -->
+    <section class="st-sec" aria-labelledby="s-me">
+      <div class="st-intro">
+        <h2 class="h-title ink" id="s-me">บัญชีของฉัน</h2>
+        <p class="small muted">อีเมลกับรหัสผ่านที่ใช้เข้าหลังบ้าน และเครื่องที่ยังเข้าระบบค้างไว้</p>
+      </div>
+      <div class="st-body">
+        <div class="kv">
+          <span class="k">อีเมล</span>
+          <span class="v ink" data-my-email>shop@silamani.co</span>
+          <button class="act" type="button" data-todo="ต้นแบบ: ของจริงจะส่งลิงก์ยืนยันไปที่อีเมลใหม่ก่อนเปลี่ยน">เปลี่ยนอีเมล</button>
+        </div>
+        <div class="kv">
+          <span class="k">รหัสผ่าน</span>
+          <span class="v ink">เปลี่ยนล่าสุด 4 พ.ย. 2569</span>
+          <a class="act" href="reset.html">เปลี่ยนรหัสผ่าน</a>
+        </div>
+        <div class="kv top">
+          <span class="k">เครื่องที่เข้าระบบอยู่</span>
+          <div class="v devices" data-devices>
+            <div>
+              <p class="ink">MacBook, Chrome <span class="pill pill-sage">เครื่องนี้</span></p>
+              <p class="small muted">จำเครื่องไว้ถึง 4 ธ.ค. 2569</p>
+            </div>
+            <div data-other-device>
+              <p class="ink">iPhone, Safari</p>
+              <p class="small muted">ใช้ล่าสุดเมื่อวาน 22:10 ออกเองถ้าไม่ได้ใช้ 12 ชั่วโมง</p>
+            </div>
+          </div>
+          <button class="act" type="button" data-signout-others>ออกจากเครื่องอื่น</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- บัญชีหลังบ้าน -->
+    <section class="st-sec" aria-labelledby="s-acc">
+      <div class="st-intro">
+        <h2 class="h-title ink" id="s-acc">บัญชีหลังบ้าน</h2>
+        <p class="small muted">หลังบ้านมีแค่บัญชีฝั่งร้านกับฝั่งผู้อ่าน ไม่มีหน้าสมัคร ถ้าอีกบัญชีเข้าอีเมลของตัวเองไม่ได้ เปลี่ยนอีเมลให้ได้ที่นี่</p>
+      </div>
+      <div class="st-body">
+        <div class="acc" data-acc="shop">
+          <span class="avatar lg">ร</span>
+          <div class="who"><p class="ink w5">ฝั่งร้าน <span class="cap muted" data-this>บัญชีนี้</span></p><p class="small muted">shop@silamani.co</p></div>
+          <div class="meta"><p class="small ink">หน้าแรก: วันนี้</p><p class="small muted">เข้าล่าสุดวันนี้ 08:02</p></div>
+          <div class="acts" data-acts></div>
+        </div>
+        <div class="acc" data-acc="reader">
+          <span class="avatar lg reader">อ</span>
+          <div class="who"><p class="ink w5">ฝั่งผู้อ่าน <span class="cap muted" data-this>บัญชีนี้</span></p><p class="small muted">reader@silamani.co</p></div>
+          <div class="meta"><p class="small ink">หน้าแรก: คิวของฉัน</p><p class="small muted">เข้าล่าสุดเมื่อวาน 21:40</p></div>
+          <div class="acts" data-acts></div>
+        </div>
+        <p class="small muted note">เปลี่ยนอีเมล เปลี่ยนรหัส หรือบัญชีถูกพักเพราะใส่รหัสผิด 5 ครั้ง LINE แจ้งเตือนส่งบอกทั้งสองบัญชี</p>
+      </div>
+    </section>
+
+    <!-- รับจองดูดวง -->
+    <section class="st-sec" aria-labelledby="s-book">
+      <div class="st-intro">
+        <h2 class="h-title ink" id="s-book">รับจองดูดวง</h2>
+        <p class="small muted">เวลาว่างประจำสัปดาห์ที่ลูกค้าเห็นบนเว็บ ถ้าไม่ว่างเป็นบางวัน ผู้อ่านปิดเองได้ที่หน้าคิวของฉัน</p>
+      </div>
+      <div class="st-body">
+        <div class="kv">
+          <div class="grow"><p class="ink w5">รับจองบนเว็บ</p><p class="small muted">ปิดไว้ก่อนได้ถ้าระบบมีปัญหาตอนเราติดงาน คิวที่ยืนยันแล้วยังอยู่ครบ</p></div>
+          <span class="small sage" data-book-state>เปิดอยู่</span>
+          <button class="sw" type="button" role="switch" aria-checked="true" aria-label="รับจองบนเว็บ" data-book-switch></button>
+        </div>
+        <div class="week">
+          <div class="week-head">
+            <p class="ink w5">เวลาว่างประจำสัปดาห์</p>
+            <p class="small muted" data-week-sum>คิวละ 60 นาที 6 คิวต่อสัปดาห์</p>
+          </div>
+          <ul data-week></ul>
+        </div>
+        <div class="kv">
+          <div class="grow"><p class="ink w5">จองล่วงหน้าได้</p><p class="small muted">เวลาที่ใกล้หรือไกลกว่านี้ ลูกค้าจะไม่เห็นในปฏิทิน</p></div>
+          <span class="pairs">
+            <label class="small muted" for="lead-min">อย่างน้อย</label>
+            <span class="num-field"><input id="lead-min" type="number" min="1" max="72" value="24" inputmode="numeric"><span class="small muted">ชม.</span></span>
+            <label class="small muted gap" for="lead-max">ไกลสุด</label>
+            <span class="num-field"><input id="lead-max" type="number" min="1" max="60" value="14" inputmode="numeric"><span class="small muted">วัน</span></span>
+          </span>
+        </div>
+        <div class="kv">
+          <div class="grow"><p class="ink w5">เวลาจ่ายเงิน</p><p class="small muted">ล็อกคิวหรือจองกำไลไว้ให้นานเท่านี้ ไม่แนบสลิปในเวลา ระบบปล่อยคืนเอง</p></div>
+          <span class="num-field"><input id="pay" type="number" min="1" max="24" value="2" inputmode="numeric" aria-label="เวลาจ่ายเงิน (ชั่วโมง)"><span class="small muted">ชม.</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- หินสำหรับร้อยเอง -->
+    <section class="st-sec" aria-labelledby="s-stone">
+      <div class="st-intro">
+        <h2 class="h-title ink" id="s-stone">หินสำหรับร้อยเอง</h2>
+        <p class="small muted">ปิดหินที่หมดเกลี้ยง ลูกค้าจะไม่เห็นในหน้าร้อยเอง ส่วนหินที่ยังเหลือน้อย เช็กตอนออเดอร์ขึ้นรอเช็กของตามเดิม</p>
+      </div>
+      <div class="st-body">
+        <div class="stone-head">
+          <p class="ink" data-stone-sum>เปิดอยู่ 7 จาก 8 ชนิด</p>
+          <p class="small muted">เพิ่มหินชนิดใหม่ได้ที่หน้าสต็อกและหิน</p>
+        </div>
+        <ul class="stones" data-stones></ul>
+      </div>
+    </section>
+
+    <!-- บัญชีที่เชื่อมไว้ -->
+    <section class="st-sec" aria-labelledby="s-conn">
+      <div class="st-intro">
+        <h2 class="h-title ink" id="s-conn">บัญชีที่เชื่อมไว้</h2>
+        <p class="small muted">ช่องทางที่ระบบใช้ส่งข้อความ สร้างลิงก์ Meet และส่งอีเมล ถ้าอันไหนหลุด งานที่ใช้อันนั้นจะหยุด</p>
+      </div>
+      <div class="st-body">
+        <div class="conn">
+          <div class="grow"><p class="ink w5">LINE OA ร้าน @silamani</p><p class="small muted">ส่งยืนยันคิว ลิงก์ Meet สรุปหลังดูดวง และเลขพัสดุให้ลูกค้า</p></div>
+          <span class="state ok small"><span class="dot"></span>เชื่อมแล้ว</span>
+          <button class="act" type="button" data-test="ส่งข้อความทดสอบเข้า LINE OA ร้านแล้ว">ส่งข้อความทดสอบ</button>
+        </div>
+        <div class="conn">
+          <div class="grow"><p class="ink w5">LINE แจ้งเตือนของเรา</p><p class="small muted">OA บัญชีที่ 2 ค้นหาไม่เจอ แจ้งสลิปเข้า คิวใหม่ และเรื่องบัญชี</p></div>
+          <span class="state ok small"><span class="dot"></span>เชื่อมแล้ว</span>
+          <button class="act" type="button" data-test="ส่งข้อความทดสอบเข้า LINE แจ้งเตือนแล้ว">ส่งข้อความทดสอบ</button>
+        </div>
+        <div class="conn">
+          <div class="grow"><p class="ink w5">Google ของร้าน</p><p class="small muted">สร้างลิงก์ Meet ให้ทุกคิวที่ยืนยันแล้ว และลงปฏิทินของร้าน</p></div>
+          <span class="state ok small"><span class="dot"></span>เชื่อมแล้ว</span>
+          <button class="act" type="button" data-test="สร้างลิงก์ Meet ทดสอบแล้ว meet.google.com/abc-defg-hij">สร้างลิงก์ทดสอบ</button>
+        </div>
+        <div class="conn">
+          <div class="grow"><p class="ink w5">อีเมลลืมรหัสผ่าน</p><p class="small muted">ยังไม่ได้เลือกบริการส่งอีเมล ระหว่างนี้ปุ่มลืมรหัสผ่านใช้ไม่ได้</p></div>
+          <span class="state warn small"><span class="dot"></span>ยังไม่ได้ตั้ง</span>
+          <button class="act" type="button" data-todo="ต้นแบบ: ยังไม่ได้เลือกบริการส่งอีเมล">ตั้งค่า</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ข้อมูลและความปลอดภัย -->
+    <section class="st-sec last" aria-labelledby="s-data">
+      <div class="st-intro">
+        <h2 class="h-title ink" id="s-data">ข้อมูลและความปลอดภัย</h2>
+        <p class="small muted">ดึงข้อมูลไปเปิดใน Sheet ดูว่าใครเข้าระบบเมื่อไร และระบบลบข้อมูลลูกค้าเมื่อไร</p>
+      </div>
+      <div class="st-body">
+        <div class="kv">
+          <div class="grow"><p class="ink w5">ดาวน์โหลดเป็น CSV</p><p class="small muted">ไม่มีวันเกิด เรื่องที่เล่า และโน้ตการดูดวงในไฟล์</p></div>
+          <div class="btns">
+            <button class="btn" type="button" data-csv="orders">ออเดอร์</button>
+            <button class="btn" type="button" data-csv="bookings">คิวดูดวง</button>
+            <button class="btn" type="button" data-csv="payments">รายการรับเงิน</button>
+          </div>
+        </div>
+        <div class="kv">
+          <div class="grow"><p class="ink w5">สำรองข้อมูลทุกสัปดาห์</p><p class="small muted">ครั้งล่าสุดอาทิตย์ 1 พ.ย. 03:00 ครั้งถัดไปอาทิตย์ 8 พ.ย.</p></div>
+          <span class="state ok small"><span class="dot"></span>สำเร็จ</span>
+        </div>
+        <div class="block">
+          <div class="block-head">
+            <p class="ink w5">ประวัติการเข้าระบบ</p>
+            <button class="act" type="button" data-todo="ต้นแบบ: ของจริงแสดงย้อนหลัง 90 วัน">ดูย้อนหลัง 90 วัน</button>
+          </div>
+          <ul class="log">
+            <li><span class="t muted num">วันนี้ 08:02</span><span class="who">ฝั่งร้าน</span><span>เข้าระบบ MacBook, Chrome</span></li>
+            <li><span class="t muted num">เมื่อวาน 21:40</span><span class="who">ฝั่งผู้อ่าน</span><span>เข้าระบบ iPad, Safari</span></li>
+            <li><span class="t muted num">2 พ.ย. 23:15</span><span class="who">ฝั่งร้าน</span><span class="sand-ink">ใส่รหัสผิด 2 ครั้ง จากเครื่องที่ไม่รู้จัก</span></li>
+          </ul>
+        </div>
+        <div class="block plain">
+          <div class="block-head">
+            <p class="ink w5">ระบบลบข้อมูลเองเมื่อครบกำหนด</p>
+            <p class="small muted">ตามนโยบายข้อมูลส่วนบุคคลของร้าน</p>
+          </div>
+          <ul class="retain">
+            <li><span>ข้อความถอดเสียงจากการคุย</span><span class="muted">30 วันหลังส่งสรุป</span></li>
+            <li><span>รูปสลิป</span><span class="muted">90 วัน</span></li>
+            <li><span>ข้อมูลดวงของคิวที่หมดเวลาชำระ</span><span class="muted">7 วัน</span></li>
+            <li><span>วันเกิด เรื่องที่เล่า โน้ต ที่อยู่</span><span class="muted">ไม่มีการจองหรือซื้อ 2 ปี</span></li>
+            <li><span>รายการรับเงิน (ไม่มีชื่อลูกค้า)</span><span class="muted">5 ปี</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="bo.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>
