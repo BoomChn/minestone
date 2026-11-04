@@ -159,3 +159,7 @@ a.row:hover, button.row:hover { background: #FBFAF8; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0ms !important; }
 }
+
+/* Small underlined text action */
+.u-act { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--ink); text-decoration: underline 1px; text-underline-offset: 3px; }
+.u-act:hover { text-decoration-thickness: 2px; }

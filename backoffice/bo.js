@@ -10,7 +10,7 @@
   var NAV = {
     shop: [
       { id: "today", label: "วันนี้", href: "today.html", count: 6 },
-      { id: "queue", label: "คิวดูดวง", count: 9 },
+      { id: "queue", label: "คิวดูดวง", href: "queue.html", count: 9 },
       { id: "orders", label: "ออเดอร์", count: 14 },
       { id: "customers", label: "ลูกค้า", href: "customers.html" },
       { id: "stock", label: "สต็อกและหิน" },

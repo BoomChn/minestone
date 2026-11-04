@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>คิวดูดวง หลังบ้าน Silamani (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bo.css">
+  <link rel="stylesheet" href="reader.css">
+  <link rel="stylesheet" href="queue.css">
+</head>
+<body data-page="queue">
+<div class="bo">
+  <aside class="side" data-side></aside>
+
+  <section class="pane qlist" aria-labelledby="queue-h">
+    <div class="qhead">
+      <div>
+        <h1 class="h-sm" id="queue-h" data-title>คิวดูดวง</h1>
+        <p class="ui muted" data-range>14 วันข้างหน้า เปิดให้จองถึงพุธ 18 พ.ย.</p>
+      </div>
+      <nav class="seg" aria-label="ช่วงเวลา">
+        <a href="queue.html" data-tab="next">ข้างหน้า</a>
+        <a href="queue.html?tab=past" data-tab="past">ที่ผ่านมา</a>
+      </nav>
+    </div>
+    <div class="fchips" data-chips></div>
+    <div class="qdays" data-list></div>
+  </section>
+
+  <section class="pane-fill" aria-labelledby="detail-h" data-detail></section>
+</div>
+<script src="bo.js"></script>
+<script src="queue.js"></script>
+</body>
+</html>

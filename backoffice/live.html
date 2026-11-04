@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ดูดวงอยู่ หลังบ้าน Silamani (prototype)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600&family=Noto+Sans+Thai:wght@500;600&family=Source+Serif+4:opsz@8..60&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bo.css">
+  <link rel="stylesheet" href="reader.css">
+  <link rel="stylesheet" href="queue.css">
+</head>
+<body data-page="queue" data-role="reader">
+<div class="bo">
+  <aside class="side" data-side></aside>
+
+  <section class="pane live-list" aria-labelledby="queue-h">
+    <div class="pane-head">
+      <div>
+        <h1 class="h-sm" id="queue-h">คิวของฉัน</h1>
+        <p class="ui muted">7 วันข้างหน้า ยืนยันแล้ว 3 คิว</p>
+      </div>
+      <a class="btn" href="block-day.html">ปิดวันที่ไม่ว่าง</a>
+    </div>
+    <div class="queue-list">
+      <div class="day">
+        <div class="day-label"><span class="wd soon">วันนี้</span><span class="dn">พฤ 5</span></div>
+        <div class="slots">
+          <div class="slot is-sel" aria-current="true"><span class="t w6">20:00</span><span class="who"><span class="ui w6">คุณจูน <span class="muted w4">SL-0405</span></span><span class="cap muted">ครั้งที่ 2 เรื่องงานและความรัก</span></span><span class="st sage">กำลังคุย</span></div>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-label"><span class="wd">ศุกร์</span><span class="dn off">ศ 6</span></div>
+        <div class="slots"><div class="slot"><span class="txt">ไม่มีรอบ</span></div></div>
+      </div>
+      <div class="day">
+        <div class="day-label"><span class="wd">เสาร์</span><span class="dn">ส 7</span></div>
+        <div class="slots">
+          <a class="slot" href="my-queue.html"><span class="t w6">10:00</span><span class="who"><span class="ui w6">คุณแพร <span class="muted w4">SL-0412</span></span><span class="cap muted">ครั้งแรก เรื่องการเงิน</span></span><span class="st sand-ink">ร้านกำลังตรวจเงิน</span></a>
+          <a class="slot" href="my-queue.html"><span class="t w6">14:00</span><span class="who"><span class="ui w6">คุณกาย <span class="muted w4">SL-0415</span></span><span class="cap muted">ครั้งแรก เรื่องครอบครัว</span></span><span class="st sage">ยืนยันแล้ว</span></a>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-label"><span class="wd">อาทิตย์</span><span class="dn">อา 8</span></div>
+        <div class="slots">
+          <div class="slot"><span class="t muted">10:00</span><span class="txt">ยังว่าง เปิดให้จองอยู่</span></div>
+          <a class="slot" href="my-queue.html"><span class="t w6">14:00</span><span class="who"><span class="ui w6">คุณฟ้า <span class="muted w4">SL-0420</span></span><span class="cap muted">ครั้งที่ 3 เรื่องงาน</span></span><span class="st sage">ยืนยันแล้ว</span></a>
+        </div>
+      </div>
+      <div class="day">
+        <div class="day-label"><span class="wd">อังคาร</span><span class="dn off">อ 10</span></div>
+        <div class="slots"><div class="slot"><span class="t strike">20:00</span><span class="txt">ปิดไว้แล้ว ลูกค้าไม่เห็นรอบนี้</span><button class="reopen" type="button" data-todo="เปิดคืนได้จากหน้าคิวของฉัน">เปิดคืน</button></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pane-fill" aria-labelledby="detail-h">
+    <div>
+      <div class="detail-head">
+        <div><h2 class="h-sm" id="detail-h">คุณจูน</h2><p class="ui muted sub">SL-0405 พฤหัส 5 พ.ย. 20:00 – 21:00 ทาง Google Meet</p></div>
+        <a class="link ui-tight" href="customer.html" style="height:40px">ประวัติลูกค้า <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="live-body">
+        <div class="live-bar">
+          <div class="l">
+            <span class="live-dot" data-elapsed>กำลังคุย 18 นาที</span>
+            <span class="ok-tag"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2L5 8.5 9.5 3.5" fill="none" stroke="#2E6A5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>ยินยอมให้ถอดเสียง เปิด Wispr ได้</span>
+          </div>
+          <button class="u-act" type="button" data-todo="ในของจริงจะสลับไปแท็บ Google Meet">กลับไปแท็บ Meet</button>
+        </div>
+        <div class="facts">
+          <div><span class="cap muted">วันเกิด</span><span class="v num">12 มี.ค. 2538</span></div>
+          <div><span class="cap muted">เวลาเกิด</span><span class="v num">06:40 น.</span></div>
+          <div><span class="cap muted">เกิดวัน</span><span class="v">อาทิตย์</span></div>
+        </div>
+        <div class="ask"><h3 class="h-group">เรื่องที่อยากถาม</h3><p>กำลังคิดจะย้ายงานช่วงต้นปีหน้า อยากรู้ว่าจังหวะไหนดี แล้วก็อยากถามเรื่องความรักช่วงนี้ด้วยค่ะ</p></div>
+        <div>
+          <div class="hrow" style="display:flex;justify-content:space-between;align-items:baseline"><h3 class="h-group">ข้อเสนอสำหรับคุณจูน</h3><span class="cap muted" data-offer-count>2 รายการ ยังไม่ได้ส่ง</span></div>
+          <div class="offer-list" data-offers>
+            <div class="offer">
+              <span class="thumb"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="13" fill="none" stroke="#C9A24A" stroke-width="5" stroke-dasharray="4 2.4"/></svg></span>
+              <div class="body">
+                <div class="top"><b>กำไลไหมทอง 8 มม. <span>สำเร็จรูป เหลือ 2</span></b><b>890 บาท</b></div>
+                <input class="why" value="เรื่องงาน ย้ายงานต้นปี" aria-label="เหตุผลที่เลือกกำไลไหมทอง">
+                <div class="meta"><span>เหตุผลจดสั้นๆ พอ AI เรียบเรียงให้ตอนจบ</span><span>ตัวเลือกสำรอง: ไม่มี <button class="rm" type="button" data-rm style="margin-left:10px">เอาออก</button></span></div>
+              </div>
+            </div>
+            <div class="offer">
+              <span class="thumb"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="9" r="4.5" fill="#E7B6C2"/><circle cx="30" cy="16" r="4.5" fill="#8FB9A8"/><circle cx="28" cy="28" r="4.5" fill="#E7B6C2"/><circle cx="14" cy="30" r="4.5" fill="#C9A24A"/><circle cx="9" cy="18" r="4.5" fill="#8FB9A8"/></svg></span>
+              <div class="body">
+                <div class="top"><b>สูตรหินสำหรับร้อยเอง <span>3 ชนิด</span></b><span class="muted small">ราคาตามที่ลูกค้าเลือก</span></div>
+                <div class="stone-chips"><span>โรสควอตซ์</span><span>อเวนจูรีน</span><span class="out">ซิทริน หมด</span></div>
+                <input class="why" value="ความรัก ค่อยเป็นค่อยไป" aria-label="เหตุผลที่เลือกสูตรหิน">
+                <div class="meta"><span>หินที่หมดไม่ส่งไปในข้อเสนอ</span><button class="rm" type="button" data-rm>เอาออก</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="add-row">
+            <button class="btn" type="button" data-todo="หน้าเลือกกำไลสำเร็จรูปยังไม่ได้ออกแบบ"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1.5v9M1.5 6h9" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round"/></svg>กำไลสำเร็จรูป</button>
+            <button class="btn" type="button" data-todo="หน้าเลือกสูตรหินยังไม่ได้ออกแบบ"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1.5v9M1.5 6h9" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round"/></svg>สูตรหินร้อยเอง</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-foot">
+      <p class="note-foot" style="max-width:220px">ข้อเสนอส่งพร้อมสรุปหลังกดจบ ถ้าลูกค้าขอดูเลย ส่งก่อนได้</p>
+      <div class="acts">
+        <button class="btn btn-lg" type="button" data-send-now>ส่งข้อเสนอตอนนี้</button>
+        <button class="btn-primary" type="button" data-end>จบการดูดวง</button>
+      </div>
+    </div>
+  </section>
+</div>
+<script src="bo.js"></script>
+<script>
+(function () {
+  var mins = 18, el = document.querySelector("[data-elapsed]");
+  setInterval(function () { mins++; el.textContent = "กำลังคุย " + mins + " นาที"; }, 60000);
+
+  var list = document.querySelector("[data-offers]");
+  var count = document.querySelector("[data-offer-count]");
+  var sentNow = false;
+  function n() { return list.querySelectorAll(".offer").length; }
+  function sync() {
+    count.textContent = n() ? n() + " รายการ " + (sentNow ? "ส่งแล้ว" : "ยังไม่ได้ส่ง") : "ยังไม่มีข้อเสนอ";
+    document.querySelector("[data-send-now]").disabled = !n() || sentNow;
+  }
+  list.addEventListener("click", function (e) {
+    var rm = e.target.closest("[data-rm]");
+    if (!rm) return;
+    rm.closest(".offer").remove();
+    sync();
+  });
+  document.querySelector("[data-send-now]").addEventListener("click", function () {
+    sentNow = true; sync();
+    window.boToast("ส่งข้อเสนอ " + n() + " รายการให้คุณจูนทาง LINE แล้ว");
+  });
+  document.querySelector("[data-end]").addEventListener("click", function () {
+    sessionStorage.setItem("bo-queue-flash", "จบการดูดวงแล้ว AI เรียบเรียงสรุปจากข้อความการคุยให้แล้ว ตรวจแล้วกดส่ง");
+    location.href = "queue.html?tab=past";
+  });
+})();
+</script>
+</body>
+</html>

@@ -184,7 +184,8 @@
         "</div>" +
       "</div>" +
       '<div class="detail-foot">' +
-        '<p class="note-foot">ปุ่มด้านขวาใช้ได้เมื่อถึงเวลานัด ถ้ารอ 15 นาทีแล้ว<br>ลูกค้าไม่เข้า กด "ไม่มา"</p>' +
+        '<p class="note-foot">ปุ่มด้านขวาใช้ได้เมื่อถึงเวลานัด ถ้ารอ 15 นาทีแล้ว<br>ลูกค้าไม่เข้า กด "ไม่มา"' +
+          (code === "SL-0405" ? '<br><a class="u-act" href="live.html">ดูหน้าจอตอนถึงเวลานัด (ต้นแบบ)</a>' : "") + "</p>" +
         '<div class="acts">' +
           '<button class="btn btn-lg" type="button" disabled title="ใช้ได้เมื่อถึงเวลานัด">ไม่มา</button>' +
           '<button class="btn-primary" type="button" disabled title="ใช้ได้เมื่อถึงเวลานัด">ดูดวงแล้ว</button>' +
