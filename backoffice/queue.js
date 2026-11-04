@@ -322,7 +322,7 @@
       var txt = S.draft[code] != null ? S.draft[code] : b.draft;
       pane.innerHTML = "<div>" + head(b.name, sub) + timeline(code) +
         '<div class="qd-sec tight">' +
-          '<div class="src">' + DOC + '<div class="m"><b>ข้อความจากการคุย <span>วางจาก Wispr เมื่อ 21:12 ยาว 58 นาที</span></b><span>เห็นแค่เราสองคน ระบบลบเองใน 30 วันหลังส่งสรุป</span></div>' +
+          '<div class="src">' + DOC + '<div class="m"><b>ข้อความจากการคุย <span>วางจาก Wispr เมื่อ 21:12 ยาว 58 นาที</span></b><span>เห็นเฉพาะหลังบ้าน ระบบลบเองใน 30 วันหลังส่งสรุป</span></div>' +
             '<button class="u-act" type="button" data-todo="ในของจริงจะเปิดข้อความเต็มจากการคุย">เปิดดู</button></div>' +
           '<div class="hrow" style="padding-top:22px"><h3>สรุปที่จะส่งให้' + b.name + '</h3><button class="u-act" type="button" data-redo>เรียบเรียงใหม่</button></div>' +
           '<div class="draft"><textarea data-draft="' + code + '" aria-label="สรุปที่จะส่ง">' + esc(txt) + "</textarea>" +
