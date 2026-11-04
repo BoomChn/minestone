@@ -61,7 +61,7 @@
       offers: [["กำไลไหมทอง 8 มม.", "ตามความเชื่อ ไหมทองเกี่ยวกับงานและโอกาสใหม่", "890 บาท"], ["สูตรหินร้อยเอง 3 ชนิด", "โรสควอตซ์ อเวนจูรีน เรื่องความรัก", ""]],
       next: [["พฤ 5 พ.ย.", "ขอรีวิวทาง LINE", true], ["ภายใน 3 ธ.ค.", "เครดิต 300 บาท ใช้กับกำไลตามดวง เตือนอีกครั้ง 28 พ.ย."]] },
     "SL-0398": { name: "คุณนิว", st: "sent", visit: "ครั้งที่ 2", day: "อาทิตย์ 1 พ.ย.", t: "10:00", end: "11:00", via: "LINE", sentAt: "2 พ.ย. 18:20", sentBy: "ฝั่งร้าน",
-      times: ["28 ต.ค. 15:02", "28 ต.ค. 15:20", "28 ต.ค. 15:41", "1 พ.ย. 11:00"], voice: ["3:05", "1 พ.ย. 11:30"],
+      times: ["28 ต.ค. 15:02", "28 ต.ค. 15:20", "28 ต.ค. 15:41", "1 พ.ย. 11:00"],
       draft: "สวัสดีค่ะคุณนิว สรุปจากที่คุยกันวันอาทิตย์นะคะ\n\nเรื่องเรียนต่อ ไพ่ Page of Pentacles ตามความเชื่อเป็นช่วงลงมือเก็บพื้นฐาน ลองเตรียมเอกสารให้เสร็จก่อนสิ้นปี\n\nถ้ามีอะไรอยากถามเพิ่ม ทักเราทาง LINE ได้เลยค่ะ",
       next: [["3 พ.ย.", "ขอรีวิวทาง LINE ลูกค้ารีวิวแล้ว"], ["ภายใน 1 ธ.ค.", "เครดิต 300 บาท ใช้กับกำไลตามดวง เตือนอีกครั้ง 26 พ.ย."]] },
     "SL-0400": { name: "คุณแอน", st: "noshow", visit: "ครั้งแรก", day: "อาทิตย์ 1 พ.ย.", t: "14:00", end: "15:00", via: "LINE",
@@ -71,7 +71,7 @@
       draft: "สวัสดีค่ะคุณต้า สรุปจากที่คุยกันเมื่อวานนะคะ\n\nเรื่องบ้าน ไพ่ Four of Wands ตามความเชื่อเป็นช่วงที่ครอบครัวกลับมาลงตัว ลองชวนคุยเรื่องแผนปีหน้าด้วยกัน\n\nถ้ามีอะไรอยากถามเพิ่ม ทักเราทาง LINE ได้เลยค่ะ",
       next: [["2 พ.ย.", "ขอรีวิวทาง LINE ส่งแล้ว ยังไม่ตอบ"], ["ภายใน 30 พ.ย.", "เครดิต 300 บาท ใช้กับกำไลตามดวง เตือนอีกครั้ง 25 พ.ย."]] },
     "SL-0391": { name: "คุณเฟิร์น", st: "sent", visit: "ครั้งที่ 4", day: "พฤหัส 29 ต.ค.", t: "20:00", end: "21:00", via: "Google Meet", sentAt: "30 ต.ค. 21:40", sentBy: "ฝั่งร้าน",
-      times: ["25 ต.ค. 12:00", "25 ต.ค. 12:18", "25 ต.ค. 12:30", "29 ต.ค. 21:00"], voice: ["5:40", "29 ต.ค. 21:20"],
+      times: ["25 ต.ค. 12:00", "25 ต.ค. 12:18", "25 ต.ค. 12:30", "29 ต.ค. 21:00"],
       draft: "สวัสดีค่ะคุณเฟิร์น สรุปจากที่คุยกันเมื่อคืนนะคะ\n\nเรื่องงาน ไพ่ The Star ตามความเชื่อเป็นช่วงที่ความหวังกลับมา โปรเจกต์ใหม่ที่เล่าให้ฟังไปต่อได้ ค่อยๆ ทำไปค่ะ\n\nถ้ามีอะไรอยากถามเพิ่ม ทักเราทาง LINE ได้เลยค่ะ",
       next: [["31 ต.ค.", "ขอรีวิวทาง LINE ลูกค้ารีวิวแล้ว"], ["ภายใน 28 พ.ย.", "เครดิต 300 บาท ใช้กับกำไลตามดวง เตือนอีกครั้ง 23 พ.ย."]] }
   };
@@ -97,7 +97,6 @@
   var LOCK = '<svg width="12" height="13" viewBox="0 0 12 13" aria-hidden="true"><rect x="1.5" y="5.5" width="9" height="6.5" rx="1.5" fill="none" stroke="#6B7280" stroke-width="1.3"/><path d="M3.8 5.5V3.8a2.2 2.2 0 0 1 4.4 0v1.7" fill="none" stroke="#6B7280" stroke-width="1.3"/></svg>';
   var DOC = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="2" width="12" height="14" rx="2" fill="none" stroke="#111827" stroke-width="1.4"/><path d="M6 6.5h6M6 9.5h6M6 12.5h3.5" fill="none" stroke="#111827" stroke-width="1.4" stroke-linecap="round"/></svg>';
   var SPARK = '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1l1.2 3.3L10.5 5.5 7.2 6.7 6 10 4.8 6.7 1.5 5.5 4.8 4.3z" fill="#8A5A2E"/></svg>';
-  var PLAY = '<svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true"><path d="M1 1l8 5-8 5z" fill="#FFFFFF"/></svg>';
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function toast(m) { window.boToast(m); }
@@ -247,7 +246,7 @@
         head(b.name, code + " " + at.day.full + " " + at.slot.t + " – " + b.end + " " + (b.via === "LINE" ? "โทรทาง LINE" : "ทาง Google Meet")) +
         timeline(code, at) +
         '<div class="qd-sec"><h3>เรื่องที่อยากถาม</h3><p class="ask-txt">' + b.ask + "</p></div>" +
-        '<div class="qd-sec" style="padding-top:28px"><div class="hrow"><h3>บันทึกการดูดวง</h3><span class="lock">' + LOCK + "ลูกค้าไม่เห็น เห็นแค่เราสองคน</span></div>" +
+        '<div class="qd-sec" style="padding-top:28px"><div class="hrow"><h3>บันทึกการดูดวง</h3><span class="lock">' + LOCK + "ลูกค้าจะไม่เห็นบันทึกนี้</span></div>" +
           '<label class="memo"><textarea data-memo="' + code + '" aria-label="บันทึกการดูดวง" placeholder="จดสิ่งที่อยากจำไว้ก่อนหรือหลังดูดวง">' + esc(memo) + "</textarea>" +
           '<span class="foot"><span>จดได้ทั้งก่อนและหลังดูดวง</span><span>ผูกกับ ' + code + "</span></span></label></div>" +
         past +
@@ -337,8 +336,6 @@
 
     var shown = b.sentText || (S.draft[code] != null ? S.draft[code] : b.draft);
     if (code === "SL-0402" && S.sent[code]) shown = S.sent[code];
-    var voice = b.voice ? '<button class="voice" type="button" data-todo="ต้นแบบนี้ไม่มีไฟล์เสียงจริง"><span class="play">' + PLAY + '</span><span><b>เสียงสรุป ' + b.voice[0] + ' นาที</b><span>อัดเมื่อ ' + b.voice[1] + "</span></span></button>"
-      : (code === "SL-0402" ? '<button class="voice" type="button" data-todo="ต้นแบบนี้ไม่มีไฟล์เสียงจริง"><span class="play">' + PLAY + '</span><span><b>เสียงสรุป 4:12 นาที</b><span>อัดเมื่อ 3 พ.ย. 21:20</span></span></button>' : "");
     var by = b.sentBy || (role === "reader" ? "ฝั่งผู้อ่าน" : "ฝั่งร้าน");
     var next = (b.next || []).map(function (n, i) {
       var c = n[2] ? (S.skip[code + i] ? '<span class="c done">ยกเลิกแล้ว</span>' : '<button class="c" type="button" data-skip="' + code + i + '">ยกเลิกได้</button>') : "";
@@ -346,7 +343,7 @@
     }).join("");
     pane.innerHTML = "<div>" + head(b.name, sub) + timeline(code) +
       '<div class="qd-sec"><div class="hrow"><h3>สรุปที่ส่งให้' + b.name + 'แล้ว</h3><span class="cap muted">ส่งทาง LINE ' + b.sentAt + " " + by + "กด</span></div>" +
-        '<div class="sent"><p>' + esc(shown) + "</p>" + voice + "</div></div>" +
+        '<div class="sent"><p>' + esc(shown) + "</p></div></div>" +
       (next ? '<div class="next"><h3 class="h-group">ต่อจากนี้ระบบทำให้เอง</h3>' + next + "</div>" : "") +
       "</div>" +
       '<div class="qd-foot"><p class="note-foot">อยากบอกอะไรเพิ่ม ส่งต่อท้ายได้<br>ลูกค้าเห็นเป็นข้อความใหม่ใน LINE</p><div class="acts">' +

@@ -141,10 +141,6 @@ button.qslot:hover { background: #FBFAF8; }
 .ai-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px; background: var(--sand-wash); color: var(--sand-ink); font-size: 13px; line-height: 16px; font-weight: 500; }
 .sent { margin-top: 12px; display: flex; flex-direction: column; gap: 14px; padding: 16px 18px 14px; border: 1px solid var(--rule); border-radius: 10px; background: #FAFAF8; }
 .sent p { font-size: 15px; line-height: 25px; white-space: pre-wrap; }
-.voice { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); text-align: left; width: 100%; }
-.voice .play { width: 30px; height: 30px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--ink); }
-.voice b { display: block; font-size: 14px; line-height: 20px; font-weight: 500; }
-.voice span { display: block; font-size: 12px; line-height: 16px; color: var(--muted); }
 .offers { margin-top: 8px; display: flex; flex-direction: column; border-top: 1px solid var(--rule); }
 .offers > div { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 14px; line-height: 20px; }
 .offers .n { width: 190px; flex-shrink: 0; font-weight: 500; color: var(--ink); }
