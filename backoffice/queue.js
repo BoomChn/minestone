@@ -13,7 +13,8 @@
     { id: "10", wd: "อังคาร", dn: "อ 10", full: "อังคาร 10 พ.ย.", slots: [{ t: "20:00", closed: true }] },
     { id: "12", wd: "พฤหัส", dn: "พฤ 12", full: "พฤหัส 12 พ.ย.", slots: [{ t: "20:00", code: "SL-0423" }] },
     { id: "14", wd: "เสาร์", dn: "ส 14", full: "เสาร์ 14 พ.ย.", slots: [{ t: "10:00", code: "SL-0417" }, { t: "14:00" }] },
-    { id: "15", wd: "อาทิตย์", dn: "อา 15", full: "อาทิตย์ 15 พ.ย.", slots: [{ t: "10:00", code: "SL-0419" }, { t: "14:00", code: "SL-0424" }] }
+    { id: "15", wd: "อาทิตย์", dn: "อา 15", full: "อาทิตย์ 15 พ.ย.", slots: [{ t: "10:00", code: "SL-0419" }, { t: "14:00", code: "SL-0424" }] },
+    { id: "17", wd: "อังคาร", dn: "อ 17", full: "อังคาร 17 พ.ย.", slots: [{ t: "20:00" }] }
   ];
   var PAST = [
     { id: "3", wd: "เมื่อวาน", dn: "อ 3", slots: [{ t: "20:00", code: "SL-0402" }] },
@@ -83,6 +84,7 @@
   if (!S) S = { sel: { next: "SL-0420", past: "SL-0402" }, moved: {}, memo: {}, sent: {}, cancelled: {}, filter: { next: "all", past: "all" }, draft: {}, skip: {} };
   if (!S.notes) S.notes = {};
   if (!S.past) S.past = {};
+  if (!S.sc) S.sc = {}; // shop cancellations: { code: { st: cxl|refund|refunded|moved, reason, reopen, from, at, log, acct, slip, msg, refundAt } }
   var pastEdit = null, pastDel = null; // { code, i, text? }
   function save() { sessionStorage.setItem(KEY, JSON.stringify(S)); }
   // Note being written: { code, i } where i is a saved note's index or "new"; askDel = index waiting for delete confirm.
@@ -97,6 +99,87 @@
     }); });
   });
   if (S.sent["SL-0402"]) B["SL-0402"].st = "sent";
+  var CXL = { cxl: 1, refund: 1, refunded: 1 };
+  applyCancels();
+
+  /* ---------- shop cancels a booking (Paper row "Flow — แถวร้านยกเลิกคิว") ----------
+     cxl = ร้านยกเลิก รอลูกค้าเลือก, refund = รอโอนคืน, refunded = คืนเงินแล้ว, moved = rescheduled after a shop cancel.
+     SL-0420 also talks to the customer page (status.html?k=cancel) through localStorage "ms-shopcancel". */
+  function applyCancels() {
+    Object.keys(S.sc).forEach(function (code) {
+      var x = S.sc[code];
+      B[code].st = x.st === "moved" ? "ok" : x.st;
+      if (x.st === "moved" && !x.reopen) {
+        var k = x.from.split("|");
+        NEXT.forEach(function (d) { if (d.id === k[0]) d.slots.forEach(function (s) {
+          if (s.t === k[1] && !s.code) { s.closed = true; s.note = "ปิดไว้หลังร้านยกเลิก " + code + " ลูกค้าไม่เห็นรอบนี้"; }
+        }); });
+      }
+    });
+  }
+  var CUST = "ms-shopcancel", LINKED = "SL-0420";
+  function custRead() { try { return JSON.parse(localStorage.getItem(CUST)); } catch (e) { return null; } }
+  function custWrite(code, o) { if (code !== LINKED) return; try { localStorage.setItem(CUST, JSON.stringify(Object.assign({ code: code }, o))); } catch (e) {} }
+  function nowStamp() {
+    var d = new Date();
+    return "พฤ 5 พ.ย. " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+  var BY = "โดยฝั่งร้าน shop@silamani.co";
+  function logAdd(code, html) { S.sc[code].log.unshift([nowStamp(), html]); }
+  function mask(no) {
+    var d = String(no).replace(/\D/g, "");
+    if (d.length === 10 && d[0] === "0") return d.slice(0, 3) + "-xxx-" + d.slice(6);
+    return "xxx-x-x" + d.slice(-4);
+  }
+  function sampleAcct(code) {
+    return code === LINKED ? { via: "พร้อมเพย์", no: "081-234-5678", name: "ฟ้าใส มีสุข" }
+      : { via: "พร้อมเพย์", no: "089-555-0142", name: B[code].name.replace("คุณ", "") + " ใจดี" };
+  }
+  function cancelMsg(code) {
+    var b = B[code], at = where(code);
+    return b.name + " ขอโทษจริงๆ ค่ะ เราต้องขอยกเลิกคิวดูดวงวัน" + at.day.full + " " + at.slot.t + " (" + code + ") เพราะมีเหตุจำเป็นฝั่งร้าน\n\n" +
+      b.name + "เลือกได้ 2 ทาง เลื่อนไปเวลาใหม่โดยเลือกรอบได้ก่อนคนอื่น หรือรับเงินคืนเต็มจำนวน 990 บาท กดเลือกข้างล่างหรือพิมพ์บอกเราในแชทนี้ได้เลยค่ะ";
+  }
+  function refundMsg(code) {
+    var b = B[code], a = S.sc[code].acct;
+    return b.name + " เราโอนเงินคืน 990 บาท เข้า" + a.via + " " + mask(a.no) + " แล้วนะคะ สลิปอยู่ด้านล่างนี้\n\n" +
+      "ขอโทษอีกครั้งที่ต้องยกเลิกคิวกะทันหัน ทำให้" + b.name + "ต้องเสียเวลารอ วันไหนอยากกลับมาดูดวงอีก เราจด" +
+      (b.past.length ? "เรื่องที่" + b.name + "เคยถามไว้แล้ว ไม่ต้องเล่าใหม่ตั้งแต่ต้น" : "เรื่องที่" + b.name + "อยากถามไว้แล้ว ไม่ต้องเล่าใหม่ตั้งแต่ต้น") +
+      " ทักมาหรือจองรอบใหม่ได้เลยค่ะ";
+  }
+  // Customer chose on their own page (another tab, same browser).
+  function syncCustomer() {
+    if (tab !== "next") return false;
+    var r = custRead(), x = S.sc[LINKED];
+    if (!r || r.code !== LINKED || !x || x.st !== "cxl") return false;
+    if (r.step === "moved" && r.to) {
+      doMove(LINKED, r.to, "shop", "ลูกค้าเลือกเวลาใหม่เองในหน้าคิวของคุณ");
+      return true;
+    }
+    if (r.step === "refund" && r.acct) {
+      x.st = "refund"; x.acct = r.acct; B[LINKED].st = "refund";
+      logAdd(LINKED, "ลูกค้าขอเงินคืน กรอก" + r.acct.via + "แล้ว สถานะเป็นรอโอนคืน");
+      save();
+      return true;
+    }
+    return false;
+  }
+  function doMove(code, toKey, who, logText) {
+    var at = where(code), k = toKey.split("|");
+    var nd = NEXT.filter(function (d) { return d.id === k[0]; })[0];
+    var prev = S.moved[code], x = S.sc[code];
+    S.moved[code] = { from: prev ? prev.from : at.day.id + "|" + at.slot.t, to: toKey, byCustomer: who === "customer" || !!(prev && prev.byCustomer) };
+    delete at.slot.code;
+    nd.slots.forEach(function (s) { if (s.t === k[1]) s.code = code; });
+    if (x && CXL[x.st]) {
+      x.st = "moved"; B[code].st = "ok";
+      logAdd(code, (logText || "ร้านย้ายให้ตามที่ลูกค้าบอกในแชท") + " ไป" + nd.full + " " + k[1] + (who === "shop" ? " ไม่นับสิทธิ์เลื่อนของลูกค้า" : ""));
+      custWrite(code, { step: "moved", to: toKey, day: nd.full, t: k[1] });
+      applyCancels();
+    }
+    save();
+    return nd;
+  }
 
   var CHEV = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var LOCK = '<svg width="12" height="13" viewBox="0 0 12 13" aria-hidden="true"><rect x="1.5" y="5.5" width="9" height="6.5" rx="1.5" fill="none" stroke="#6B7280" stroke-width="1.3"/><path d="M3.8 5.5V3.8a2.2 2.2 0 0 1 4.4 0v1.7" fill="none" stroke="#6B7280" stroke-width="1.3"/></svg>';
@@ -116,7 +199,7 @@
   }
 
   var FILTERS = tab === "next"
-    ? [["all", "ทั้งหมด"], ["unpaid", "รอชำระ"], ["slip", "สลิปรอตรวจ", true], ["ok", "ยืนยันแล้ว"]]
+    ? [["all", "ทั้งหมด"], ["unpaid", "รอชำระ"], ["slip", "สลิปรอตรวจ", true], ["refund", "รอโอนคืน", true], ["ok", "ยืนยันแล้ว"]]
     : [["all", "ทั้งหมด"], ["due", "รอส่งสรุป", true], ["sent", "ส่งสรุปแล้ว"], ["noshow", "ไม่มา"]];
 
   var list = document.querySelector("[data-list]");
@@ -151,6 +234,9 @@
   }
 
   function stHtml(b) {
+    if (b.st === "cxl") return '<span class="st sand-ink">รอลูกค้าเลือก</span>';
+    if (b.st === "refund") return '<span class="st"><span class="pill pill-sand">รอโอนคืน</span></span>';
+    if (b.st === "refunded") return '<span class="st muted w4">คืนเงินแล้ว</span>';
     if (b.st === "ok") return '<span class="st sage">ยืนยันแล้ว</span>';
     if (b.st === "slip") return '<span class="st"><span class="pill pill-sand">สลิปรอตรวจ</span></span>';
     if (b.st === "unpaid") return '<span class="st"><span class="ttl">รอชำระ</span><span class="cd">ปล่อยคิวใน ' + b.hold + " ชม.</span></span>";
@@ -159,6 +245,9 @@
     return '<span class="st muted w4">ไม่มา</span>';
   }
   function subLine(b) {
+    if (b.st === "cxl") return "ร้านยกเลิก จ่ายแล้ว 990 บาท";
+    if (b.st === "refund") return "ร้านยกเลิก ลูกค้ากรอกบัญชีแล้ว";
+    if (b.st === "refunded") return "ร้านยกเลิก โอนคืน 990 บาทแล้ว";
     if (b.st === "ok") return b.visit + " จ่ายแล้ว 990 บาท";
     if (b.st === "slip") return b.visit + " แนบสลิป 990 บาทแล้ว";
     if (b.st === "unpaid") return b.visit + " ล็อกเวลาไว้ให้แล้ว";
@@ -177,12 +266,12 @@
       if (!rows.length) return "";
       var any = d.slots.some(function (s) { return !s.closed; });
       var body = rows.map(function (s) {
-        if (s.closed) return '<div class="qslot"><span class="t strike">' + s.t + '</span><span class="txt">ผู้อ่านปิดวันนี้ไว้ ลูกค้าไม่เห็นรอบนี้</span><span class="st"></span></div>';
+        if (s.closed) return '<div class="qslot"><span class="t strike">' + s.t + '</span><span class="txt">' + (s.note || "ผู้อ่านปิดวันนี้ไว้ ลูกค้าไม่เห็นรอบนี้") + '</span><span class="st"></span></div>';
         if (s.none) return '<div class="qslot"><span class="t muted">' + s.t + '</span><span class="txt">ไม่มีคนจอง</span><span class="st"></span></div>';
         if (!live(s.code)) return '<div class="qslot"><span class="t muted">' + s.t + '</span><span class="txt">ยังว่าง เปิดให้จองอยู่</span><span class="st"></span></div>';
         var b = B[s.code], sel = S.sel[tab] === s.code;
         return '<button class="qslot' + (sel ? " is-sel" : "") + '" type="button" data-code="' + s.code + '"' + (sel ? ' aria-current="true"' : "") + ">" +
-          '<span class="t b">' + s.t + '</span>' +
+          '<span class="t ' + (CXL[b.st] ? "strike" : "b") + '">' + s.t + '</span>' +
           '<span class="who"><span class="nm">' + b.name + " <span>" + s.code + '</span></span><span class="sub">' + subLine(b) + "</span></span>" +
           stHtml(b) + "</button>";
       }).join("");
@@ -302,6 +391,11 @@
   }
 
   function renderNext(code) {
+    if (mode === "cancel") return renderCancel(code);
+    var st = B[code].st;
+    if (st === "cxl") return renderCxlWait(code);
+    if (st === "refund") return renderRefund(code);
+    if (st === "refunded") return renderRefunded(code);
     var b = B[code], at = where(code);
     var memo = S.memo[code] != null ? S.memo[code] : (b.memo || "");
     var past = pastBlock(code);
@@ -325,16 +419,130 @@
         "</div></div>";
   }
 
+  /* ---------- shop-cancel panes ---------- */
+  var REASONS = ["ผู้อ่านไม่สบาย", "ผู้อ่านติดธุระ", "ระบบหรืออินเทอร์เน็ตมีปัญหา", "อื่นๆ"];
+  var cx = null;      // cancel form being filled: { code, reason, other, reopen, msg, editing }
+  var msgEdit = false; // refund message open for editing
+  var CLOCK = '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4.2l2.6 1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  var CHECK = '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.8 10.2l2.2 2.2 4.2-4.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var CHIP_R = '<svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" fill="none" stroke="#111827" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var SLIPDOC = '<span class="cx-slipimg" aria-hidden="true"><i></i><i></i><i></i><i></i></span>';
+
+  function lineMsg(body, btns, editable, key, from) {
+    return '<div class="cx-line">' +
+      (!from ? "" : '<div class="cx-from"><span class="av">S</span>Silamani</div>') +
+      (editable ? '<textarea class="cx-bubble edit" data-msg="' + key + '" aria-label="ข้อความที่จะส่ง" rows="7">' + esc(body) + "</textarea>"
+        : '<p class="cx-bubble">' + esc(body) + "</p>") +
+      '<div class="cx-btns">' + btns.map(function (t) { return "<span>" + t + "</span>"; }).join("") + "</div></div>";
+  }
+  function logBlock(code) {
+    return '<div class="qd-sec"><div class="cx-cap">ประวัติคิวนี้</div><div class="cx-log">' + S.sc[code].log.map(function (l) {
+      return '<div><span class="d">' + l[0] + '</span><span class="x">' + l[1] + "</span></div>";
+    }).join("") + "</div></div>";
+  }
+  function box(kind, icon, title, lines) {
+    return '<div class="qd-sec"><div class="cx-box ' + kind + '">' + icon + "<div><b>" + title + "</b><p>" + lines + "</p></div></div></div>";
+  }
+
+  function renderCancel(code) {
+    var b = B[code], at = where(code);
+    if (!cx || cx.code !== code) cx = { code: code, reason: REASONS[0], other: "", reopen: false, msg: cancelMsg(code), editing: false };
+    var chipsHtml = REASONS.map(function (r) {
+      return '<button class="cx-chip" type="button" role="radio" aria-checked="' + (cx.reason === r) + '" data-reason="' + r + '">' + r + "</button>";
+    }).join("");
+    pane.innerHTML =
+      "<div>" +
+        head("ยกเลิกคิว" + b.name, code + " " + at.day.full + " " + at.slot.t + " จ่ายแล้ว 990 บาท") +
+        '<div class="qd-sec"><div class="hrow"><h3>ทำไมต้องยกเลิก</h3><span class="lock">' + LOCK + "ลูกค้าไม่เห็นเหตุผลนี้</span></div>" +
+          '<div class="cx-chips" role="radiogroup" aria-label="เหตุผลที่ยกเลิก">' + chipsHtml + "</div>" +
+          (cx.reason === "อื่นๆ" ? '<input class="cx-other" data-other type="text" placeholder="บอกสั้นๆ ว่าเกิดอะไรขึ้น เก็บไว้ดูในร้าน" value="' + esc(cx.other) + '">' : "") +
+        "</div>" +
+        '<div class="qd-sec" style="padding-top:28px"><div class="hrow"><h3>ลูกค้าจะได้ข้อความนี้ทาง LINE</h3><button class="u-act" type="button" data-cx-edit>' + (cx.editing ? "เสร็จแล้ว" : "แก้ข้อความ") + "</button></div>" +
+          lineMsg(cx.msg, ["ขอเลื่อนเวลา", "ขอเงินคืน 990 บาท"], cx.editing, "cancel", true) +
+        "</div>" +
+        '<div class="qd-sec" style="padding-top:28px"><div class="cx-switch"><div><b>เปิดรอบ' + at.day.full + " " + at.slot.t + ' ให้คนอื่นจอง</b>' +
+          "<span>" + (cx.reopen ? "เปิดให้คนอื่นจองทันทีที่กดยกเลิก" : "ปิดไว้ก่อน เพราะผู้อ่านไม่ว่างรอบนี้ เปิดคืนทีหลังได้ในหน้าคิวของฉัน") + "</span></div>" +
+          '<button class="cx-toggle" type="button" role="switch" aria-checked="' + cx.reopen + '" aria-label="เปิดรอบนี้ให้คนอื่นจอง" data-reopen></button></div></div>' +
+      "</div>" +
+      '<div class="qd-foot"><p class="note-foot">ระบบบันทึกว่าใครกดและกดเมื่อไร<br>ผู้อ่านได้แจ้งเตือนทันที</p>' +
+        '<div class="acts"><button class="btn btn-lg" type="button" data-cx-back>ไม่ยกเลิกแล้ว</button>' +
+        '<button class="btn-red" type="button" data-cx-ok>ยกเลิกคิว และส่งข้อความ</button></div></div>';
+  }
+
+  function renderCxlWait(code) {
+    var b = B[code], at = where(code), x = S.sc[code];
+    pane.innerHTML =
+      "<div>" +
+        head(b.name, code + " " + at.day.full + " " + at.slot.t + " จ่ายแล้ว 990 บาท") +
+        box("sand", CLOCK, "ร้านยกเลิกแล้ว รอลูกค้าเลือก", "ส่งข้อความทาง LINE เมื่อ " + x.at + " ลูกค้ายังไม่ตอบ<br>รอบ" + at.day.full + " " + at.slot.t +
+          (x.reopen ? " เปิดให้คนอื่นจองแล้ว" : " ปิดไว้ ไม่เปิดให้คนอื่นจอง")) +
+        '<div class="qd-sec" style="padding-top:28px"><div class="hrow"><h3>ลูกค้าเลือกทางไหน</h3>' +
+          (code === LINKED ? '<a class="u-act" href="../status.html?k=cancel" target="_blank" rel="noopener">ดูหน้าที่ลูกค้าเห็น</a>' : "") + "</div>" +
+          '<div class="cx-choices">' +
+            '<button class="cx-choice" type="button" data-cx-move><span><b>ขอเลื่อนเวลา</b><span>เลือกรอบใหม่ให้ ไม่นับสิทธิ์เลื่อนของลูกค้า</span></span>' + CHIP_R + "</button>" +
+            '<button class="cx-choice" type="button" data-cx-refund><span><b>ขอเงินคืน 990 บาท</b><span>ลูกค้ากรอกบัญชีเองได้ ร้านแนบสลิปโอนคืน</span></span>' + CHIP_R + "</button>" +
+          "</div>" +
+          '<p class="times-note">ถ้าลูกค้ากดปุ่มในข้อความ LINE ระบบเปลี่ยนให้เอง ถ้าลูกค้าพิมพ์บอกในแชท ให้กดเลือกที่นี่แทน</p>' +
+        "</div>" +
+        logBlock(code) +
+      "</div>" +
+      '<div class="qd-foot"><p class="note-foot">คิวนี้ค้างอยู่ในหน้าวันนี้<br>จนกว่าลูกค้าจะเลือก</p>' +
+        '<div class="acts"><button class="btn btn-lg" type="button" data-todo="ในของจริงจะเปิดแชท LINE กับลูกค้าคนนี้">ทักลูกค้าทาง LINE</button></div></div>';
+  }
+
+  function renderRefund(code) {
+    var b = B[code], at = where(code), x = S.sc[code], a = x.acct;
+    var msg = x.msg != null ? x.msg : refundMsg(code);
+    var slip = x.slip
+      ? '<div class="cx-slip">' + SLIPDOC + '<div class="m"><b>' + esc(x.slip.name) + "</b><span>แนบเมื่อ " + x.slip.at + "</span></div>" +
+          '<label class="u-act cx-file">เปลี่ยนรูป<input type="file" accept="image/*" data-slip hidden></label></div>'
+      : '<label class="cx-attach">' + PLUS + 'แนบสลิปโอนคืน<input type="file" accept="image/*" data-slip hidden></label>' +
+        '<button class="u-act cx-sample" type="button" data-slip-sample>ต้นแบบ: ใช้รูปตัวอย่าง</button>';
+    pane.innerHTML =
+      "<div>" +
+        head("คืนเงิน" + b.name + " 990 บาท", code + " รอบ" + at.day.full + " " + at.slot.t + " ลูกค้ากรอกบัญชีแล้ว") +
+        '<div class="qd-sec"><div class="hrow"><h3>โอนเข้าบัญชีลูกค้า</h3><span class="cap muted">' + (x.byShop ? "ร้านกรอกแทนจากแชท" : "ลูกค้ากรอกมาจากหน้าคิวของคุณ") + "</span></div>" +
+          '<div class="cx-acct">' +
+            '<label><span>ชื่อบัญชี</span><input data-acct="name" value="' + esc(a.name) + '"></label>' +
+            '<label class="via"><span>ช่องทาง</span><select data-acct="via"><option' + (a.via === "พร้อมเพย์" ? " selected" : "") + ">พร้อมเพย์</option><option" + (a.via !== "พร้อมเพย์" ? " selected" : "") + ">บัญชีธนาคาร</option></select></label>" +
+            '<label><span>เบอร์หรือเลขบัญชี</span><input data-acct="no" inputmode="numeric" value="' + esc(a.no) + '"></label>' +
+          "</div>" +
+          '<p class="times-note">ลูกค้าจ่ายมา 990 บาท เมื่อ ' + b.times[1] + ' <button class="u-act" type="button" data-todo="ในของจริงจะเปิดสลิปที่ลูกค้าจ่ายมา">ดูสลิปที่ลูกค้าจ่าย</button></p>' +
+        "</div>" +
+        '<div class="qd-sec" style="padding-top:28px"><h3>สลิปโอนคืน</h3><div class="cx-slipwrap">' + slip + "</div>" +
+          '<p class="times-note">โอนจากแอปร้านค้าของธนาคารแล้วแคปหน้าจอมาแนบ</p></div>' +
+        '<div class="qd-sec" style="padding-top:28px;padding-bottom:28px"><div class="hrow"><h3>ลูกค้าจะได้สลิปพร้อมข้อความนี้ทาง LINE</h3><button class="u-act" type="button" data-refund-edit>' + (msgEdit ? "เสร็จแล้ว" : "แก้ข้อความ") + "</button></div>" +
+          lineMsg(msg, ["+ รูปสลิปโอนคืน", "ดูรอบที่ว่าง"], msgEdit, "refund", false) +
+        "</div>" +
+      "</div>" +
+      '<div class="qd-foot"><p class="note-foot">กดแล้วส่งสลิปกับข้อความนี้ทันที<br>ระบบบันทึกว่าใครกดและกดเมื่อไร</p>' +
+        '<div class="acts"><button class="btn btn-lg" type="button" data-refund-back>ย้อนกลับ</button>' +
+        '<button class="btn-primary" type="button" data-refund-ok' + (x.slip ? "" : ' aria-disabled="true"') + ">โอนคืนแล้ว 990 บาท</button></div></div>";
+  }
+
+  function renderRefunded(code) {
+    var b = B[code], at = where(code), x = S.sc[code], a = x.acct;
+    pane.innerHTML =
+      "<div>" +
+        head(b.name, code + " " + at.day.full + " " + at.slot.t + " ร้านยกเลิก") +
+        box("sage", CHECK, "คืนเงินแล้ว 990 บาท", "โอนเข้า" + a.via + " " + esc(a.no) + " ชื่อ " + esc(a.name) + " เมื่อ " + x.refundAt + "<br>ลูกค้าได้สลิปและข้อความทาง LINE แล้ว") +
+        logBlock(code) +
+      "</div>" +
+      '<div class="qd-foot"><p class="note-foot">คิวนี้จบแล้ว<br>ย้ายไปอยู่แท็บที่ผ่านมา</p>' +
+        '<div class="acts"><button class="btn btn-lg" type="button" data-todo="ในของจริงจะเปิดรูปสลิปโอนคืนเต็มจอ">ดูสลิปโอนคืน</button></div></div>';
+  }
+
   /* Reschedule: every open slot is a choice; closed days are shown but can't be picked. */
   function renderMove(code) {
     var b = B[code], at = where(code);
-    if (!move || move.code !== code) move = { code: code, who: "customer", to: null };
+    var shopCxl = b.st === "cxl";
+    if (!move || move.code !== code) move = { code: code, who: shopCxl ? "shop" : "customer", to: null };
     var rows = [];
     NEXT.forEach(function (d) {
       d.slots.forEach(function (s) {
         if (s.code) return;
         var k = d.id + "|" + s.t;
-        var hint = s.closed ? "ผู้อ่านปิดวันนี้ไว้" : (d.id === at.day.id ? "วันเดิม " + (s.t < at.slot.t ? "เช้ากว่าเดิม" : "ช้ากว่าเดิม") : "");
+        var hint = s.closed ? (s.note ? "ปิดไว้หลังร้านยกเลิก" : "ผู้อ่านปิดวันนี้ไว้") : (d.id === at.day.id ? "วันเดิม " + (s.t < at.slot.t ? "เช้ากว่าเดิม" : "ช้ากว่าเดิม") : "");
         rows.push({ k: k, d: d, s: s, hint: hint });
       });
     });
@@ -350,21 +558,22 @@
     var left = S.moved[code] && S.moved[code].byCustomer ? 0 : b.moves;
     pane.innerHTML =
       "<div>" +
-        head("เลื่อนคิว" + b.name, code + " เดิม" + at.day.full + " " + at.slot.t + " เลือกเวลาใหม่ที่ยังว่าง") +
+        head("เลื่อนคิว" + b.name, shopCxl ? code + " ร้านยกเลิกรอบ" + at.day.full + " " + at.slot.t + " ลูกค้าขอเลื่อน" : code + " เดิม" + at.day.full + " " + at.slot.t + " เลือกเวลาใหม่ที่ยังว่าง") +
         '<div class="qd-sec"><h3>ใครขอเลื่อน</h3><div class="who-pick" role="radiogroup" aria-label="ใครขอเลื่อน">' +
-          radio("customer", "ลูกค้าขอ", left ? "ใช้สิทธิ์เลื่อน " + left + " ครั้งของลูกค้า" : "ลูกค้าใช้สิทธิ์ไปแล้ว") +
-          radio("shop", "ร้านขอเลื่อนเอง", "ไม่นับสิทธิ์ของลูกค้า") +
+          (shopCxl
+            ? radio("shop", "ร้านยกเลิกเอง", "ไม่นับสิทธิ์เลื่อนของลูกค้า") + radio("customer", "ลูกค้าขอเอง", left ? "ใช้สิทธิ์เลื่อน " + left + " ครั้งของลูกค้า" : "ลูกค้าใช้สิทธิ์ไปแล้ว")
+            : radio("customer", "ลูกค้าขอ", left ? "ใช้สิทธิ์เลื่อน " + left + " ครั้งของลูกค้า" : "ลูกค้าใช้สิทธิ์ไปแล้ว") + radio("shop", "ร้านขอเลื่อนเอง", "ไม่นับสิทธิ์ของลูกค้า")) +
         "</div></div>" +
         '<div class="qd-sec" style="padding-top:28px"><div class="hrow"><h3>เวลาที่ว่าง</h3><span class="cap muted">ตั้งแต่พรุ่งนี้ถึงพุธ 18 พ.ย.</span></div>' +
           '<div class="times" role="radiogroup" aria-label="เวลาที่ว่าง">' + rows.map(function (r) {
             return '<button class="time-row" type="button" role="radio" data-to="' + r.k + '" aria-checked="' + (r.k === move.to) + '"' + (r.s.closed ? " disabled" : "") + ">" +
               '<span class="rdot"></span><span class="dd">' + r.d.full + '</span><span class="tt">' + r.s.t + '</span><span class="hint">' + r.hint + "</span></button>";
           }).join("") + "</div>" +
-          '<p class="times-note">เวลาที่มีคนจองหรือรอชำระอยู่ไม่ขึ้นที่นี่ ถ้าไม่มีเวลาที่ลูกค้าสะดวก ให้ถามผู้อ่านว่าเปิดรอบเพิ่มได้ไหม</p>' +
+          '<p class="times-note">เวลาที่มีคนจองหรือรอชำระอยู่ไม่ขึ้นที่นี่ ถ้าไม่มีเวลาที่ลูกค้าสะดวก ให้ถามผู้อ่านว่าเปิดรอบเพิ่มได้ไหม' + (shopCxl ? " หรือเปลี่ยนเป็นคืนเงิน" : "") + "</p>" +
         "</div>" +
       "</div>" +
-      '<div class="qd-foot"><p class="note-foot">ลูกค้าได้ข้อความทาง LINE<br>ผู้อ่านเห็นเวลาใหม่ทันที</p>' +
-        '<div class="acts"><button class="btn btn-lg" type="button" data-move-cancel>ไม่เลื่อนแล้ว</button>' +
+      '<div class="qd-foot"><p class="note-foot">ลูกค้าได้ข้อความทาง LINE<br>' + (shopCxl ? (move.who === "shop" ? "สิทธิ์เลื่อน 1 ครั้งยังอยู่ครบ" : "ใช้สิทธิ์เลื่อนของลูกค้า 1 ครั้ง") : "ผู้อ่านเห็นเวลาใหม่ทันที") + "</p>" +
+        '<div class="acts">' + (shopCxl ? '<button class="btn btn-lg" type="button" data-cx-refund>เปลี่ยนเป็นคืนเงิน</button>' : '<button class="btn btn-lg" type="button" data-move-cancel>ไม่เลื่อนแล้ว</button>') +
         '<button class="btn-primary" type="button" data-move-ok' + (pick && !(move.who === "customer" && !left) ? "" : " disabled") + ">" +
           (pick ? "ย้ายไป" + pick.d.full + " " + pick.s.t : "เลือกเวลาใหม่") + "</button></div></div>";
   }
@@ -418,12 +627,29 @@
 
   /* ---------- actions ---------- */
   pane.addEventListener("input", function (e) {
+    var el = e.target;
+    if (el.matches("[data-other]") && cx) cx.other = el.value;
+    if (el.matches('[data-msg="cancel"]') && cx) cx.msg = el.value;
+    if (el.matches('[data-msg="refund"]')) { S.sc[S.sel[tab]].msg = el.value; S.sc[S.sel[tab]].msgTouched = true; save(); }
+    if (el.matches("[data-acct]")) {
+      var ax = S.sc[S.sel[tab]];
+      ax.acct[el.dataset.acct] = el.value;
+      if (!ax.msgTouched) delete ax.msg; // the message follows the account until it is edited by hand
+      save();
+      var pv = pane.querySelector("p.cx-bubble");
+      if (pv && !ax.msgTouched) pv.textContent = refundMsg(S.sel[tab]);
+    }
     if (e.target.matches("[data-past-text]") && pastEdit) pastEdit.text = e.target.value;
     if (e.target.matches("[data-draft]")) {
       S.draft[e.target.dataset.draft] = e.target.value; save();
       var s = pane.querySelector("[data-saved]");
       if (s) s.textContent = "แก้แล้ว เก็บร่างไว้ให้";
     }
+  });
+  pane.addEventListener("change", function (e) {
+    if (!e.target.matches("[data-slip]") || !e.target.files.length) return;
+    S.sc[S.sel[tab]].slip = { name: e.target.files[0].name, at: nowStamp() };
+    save(); renderDetail();
   });
   pane.addEventListener("click", function (e) {
     var t = e.target;
@@ -495,8 +721,66 @@
       toast("ลบบันทึกแล้ว");
       return;
     }
-    if (t.closest("[data-cancel]")) {
-      toast("หน้าร้านยกเลิกคิวยังไม่ได้ออกแบบ ในของจริงลูกค้าเลือกได้ว่าจะเลื่อนหรือรับเงินคืนเต็มจำนวน");
+    if (t.closest("[data-cancel]")) { keepMemo(); mode = "cancel"; cx = null; renderDetail(); return; }
+    var rs = t.closest("[data-reason]");
+    if (rs) { cx.reason = rs.dataset.reason; renderDetail(); if (cx.reason === "อื่นๆ") pane.querySelector("[data-other]").focus(); return; }
+    if (t.closest("[data-cx-edit]")) { cx.editing = !cx.editing; renderDetail(); if (cx.editing) pane.querySelector("[data-msg]").focus(); return; }
+    if (t.closest("[data-reopen]")) { cx.reopen = !cx.reopen; renderDetail(); return; }
+    if (t.closest("[data-cx-back]")) { mode = "detail"; cx = null; renderDetail(); return; }
+    if (t.closest("[data-cx-ok]")) {
+      var cc = cx.code, cat = where(cc), cb = B[cc];
+      if (cx.reason === "อื่นๆ" && !cx.other.trim()) { pane.querySelector("[data-other]").focus(); toast("บอกเหตุผลสั้นๆ ก่อน เก็บไว้ดูในร้าน ลูกค้าไม่เห็น"); return; }
+      if (!cx.msg.trim()) { toast("ข้อความถึงลูกค้าว่างอยู่"); return; }
+      var why = cx.reason === "อื่นๆ" ? cx.other.trim() : cx.reason;
+      S.sc[cc] = { st: "cxl", reason: why, reopen: cx.reopen, from: cat.day.id + "|" + cat.slot.t, at: nowStamp(), sentMsg: cx.msg, log: [
+        [nowStamp(), '<b class="err">ร้านยกเลิก</b> ' + BY + " เหตุผล " + esc(why) + (cx.reopen ? " เปิดรอบให้คนอื่นจอง" : "")],
+        [cb.times[2] || cb.times[0], "ยืนยันสลิป 990 บาท โดยฝั่งร้าน"],
+        [cb.times[0], "ลูกค้าจองผ่านเว็บ"]
+      ] };
+      cb.st = "cxl"; cx = null; mode = "detail";
+      custWrite(cc, { step: "choose" });
+      save(); renderChips(); renderList(); renderDetail();
+      toast("ยกเลิกคิว" + cb.name + "แล้ว ส่งข้อความให้ลูกค้าทาง LINE แล้ว");
+      return;
+    }
+    if (t.closest("[data-cx-move]")) { mode = "move"; move = null; renderDetail(); return; }
+    if (t.closest("[data-cx-refund]")) {
+      var rc = S.sel[tab], rx = S.sc[rc];
+      rx.st = "refund"; rx.acct = sampleAcct(rc); rx.byShop = true; B[rc].st = "refund"; mode = "detail";
+      logAdd(rc, "ร้านเลือกเงินคืนแทนลูกค้าตามที่บอกในแชท กรอกบัญชีแล้ว สถานะเป็นรอโอนคืน");
+      save(); renderChips(); renderList(); renderDetail();
+      toast("ต้นแบบ: ใส่บัญชีตัวอย่างไว้ให้ ในของจริงลูกค้ากรอกเองหรือร้านกรอกจากแชท");
+      return;
+    }
+    if (t.closest("[data-slip-sample]")) {
+      S.sc[S.sel[tab]].slip = { name: "สลิป-คืนเงิน-" + S.sel[tab].replace("-", "") + ".jpg", at: nowStamp() };
+      save(); renderDetail(); return;
+    }
+    if (t.closest("[data-refund-edit]")) {
+      var ex = S.sc[S.sel[tab]];
+      if (!msgEdit && ex.msg == null) ex.msg = refundMsg(S.sel[tab]);
+      msgEdit = !msgEdit; save(); renderDetail();
+      if (msgEdit) pane.querySelector("[data-msg]").focus();
+      return;
+    }
+    if (t.closest("[data-refund-back]")) {
+      var bc = S.sel[tab], bx = S.sc[bc];
+      bx.st = "cxl"; delete bx.acct; delete bx.slip; delete bx.msg; delete bx.byShop; B[bc].st = "cxl"; msgEdit = false;
+      logAdd(bc, "ร้านย้อนกลับไปรอลูกค้าเลือก");
+      if (bc === LINKED) custWrite(bc, { step: "choose" });
+      save(); renderChips(); renderList(); renderDetail();
+      return;
+    }
+    if (t.closest("[data-refund-ok]")) {
+      var oc = S.sel[tab], ox = S.sc[oc];
+      if (!ox.slip) { toast("แนบสลิปโอนคืนก่อน ลูกค้าจะได้สลิปพร้อมข้อความ"); return; }
+      if (!/\d{4}/.test(ox.acct.no) || !ox.acct.name.trim()) { toast("ตรวจชื่อบัญชีและเลขบัญชีก่อน"); return; }
+      ox.st = "refunded"; ox.refundAt = nowStamp(); B[oc].st = "refunded"; msgEdit = false;
+      if (ox.msg == null) ox.msg = refundMsg(oc);
+      logAdd(oc, '<b class="sage">โอนคืน 990 บาท</b> ' + BY + " แนบสลิปแล้ว");
+      custWrite(oc, { step: "refunded", acct: ox.acct, at: ox.refundAt, msg: ox.msg });
+      save(); renderChips(); renderList(); renderDetail();
+      toast("ส่งสลิปและข้อความให้" + B[oc].name + "ทาง LINE แล้ว");
       return;
     }
     if (t.closest("[data-move]")) { keepMemo(); mode = "move"; move = null; renderDetail(); return; }
@@ -506,13 +790,9 @@
     var to = t.closest("[data-to]");
     if (to && !to.disabled) { move.to = to.dataset.to; renderDetail(); return; }
     if (t.closest("[data-move-ok]")) {
-      var code = move.code, at = where(code), k = move.to.split("|");
-      var nd = NEXT.filter(function (d) { return d.id === k[0]; })[0];
-      var prev = S.moved[code];
-      S.moved[code] = { from: prev ? prev.from : at.day.id + "|" + at.slot.t, to: move.to, byCustomer: move.who === "customer" || !!(prev && prev.byCustomer) };
-      delete at.slot.code;
-      nd.slots.forEach(function (s) { if (s.t === k[1]) s.code = code; });
-      save(); mode = "detail";
+      var code = move.code, k = move.to.split("|");
+      var nd = doMove(code, move.to, move.who);
+      mode = "detail";
       renderChips(); renderList(); renderDetail();
       toast("ย้ายคิว" + B[code].name + "ไป" + nd.full + " " + k[1] + " แล้ว ลูกค้าได้ข้อความทาง LINE");
       return;
@@ -536,7 +816,11 @@
     if (sk) { S.skip[sk.dataset.skip] = true; save(); renderDetail(); toast("ยกเลิกการขอรีวิวคิวนี้แล้ว"); }
   });
 
+  syncCustomer();
   renderChips(); renderList(); renderDetail();
+  window.addEventListener("storage", function (e) {
+    if (e.key === CUST && syncCustomer()) { renderChips(); renderList(); renderDetail(); toast(B[LINKED].name + "เลือกในหน้าคิวของคุณแล้ว"); }
+  });
   var flash = sessionStorage.getItem("bo-queue-flash");
   if (flash) { sessionStorage.removeItem("bo-queue-flash"); toast(flash); }
 })();
