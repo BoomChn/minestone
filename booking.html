@@ -33,7 +33,7 @@
     <form class="bk-form" id="form" novalidate>
       <div class="bk-intro">
         <h1 id="bk-title">จองดูดวง 60 นาที</h1>
-        <p class="lede-l">เราดูไพ่ทาโรต์และเลขศาสตร์จากวันเกิดของคุณ โทรคุยกันทาง LINE ถามได้ทุกเรื่องที่ค้างใจ<br class="wide-only"> เลือกวันเวลาตรงนี้ แล้วกดจองด้วย LINE เราเก็บคิวไว้ให้คุณทันที</p>
+        <p class="lede-l">เราดูไพ่ทาโรต์และเลขศาสตร์จากวันเกิดของคุณ คุยกันทาง Google Meet ถามได้ทุกเรื่องที่ค้างใจ<br class="wide-only"> เลือกวันเวลาตรงนี้ แล้วกดจองด้วย LINE เราเก็บคิวไว้ให้คุณทันที</p>
       </div>
 
       <fieldset class="step" id="step-day">
@@ -127,6 +127,11 @@
           <i class="box" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>
           <span>ถ้าเล่าเรื่องสุขภาพหรือความเชื่อไว้ ยินยอมให้เราใช้เรื่องนั้นเพื่อดูดวงให้คุณเท่านั้น</span>
         </label>
+        <label class="consent consent-ai">
+          <input type="checkbox" id="consent-ai">
+          <i class="box" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>
+          <span><b>ให้ AI ช่วยจดตอนคุย คุณจะได้สรุปครบทุกเรื่อง</b> เก็บเป็นความลับ เราตรวจก่อนส่ง ลบใน 30&nbsp;วัน <button type="button" class="more-link" data-ai-more aria-haspopup="dialog">อ่านเพิ่ม</button></span>
+        </label>
       </fieldset>
     </form>
 
@@ -139,7 +144,7 @@
           <span class="when-time" id="s-time">ทางซ้ายมือ</span>
         </div>
         <dl class="slip-rows">
-          <div><dt>ช่องทาง</dt><dd id="s-channel">โทรคุยทาง LINE</dd></div>
+          <div><dt>ช่องทาง</dt><dd id="s-channel">Google Meet</dd></div>
           <div><dt>วันเกิด</dt><dd id="s-birth" class="empty">ยังไม่ได้ใส่</dd></div>
           <div><dt>เรื่องที่ถาม</dt><dd id="s-topics" class="empty">ยังไม่ได้เลือก</dd></div>
           <div><dt>ชื่อเรียก</dt><dd id="s-nick" class="empty">ยังไม่ได้ใส่</dd></div>
@@ -163,6 +168,24 @@
       </ul>
     </aside>
   </main>
+
+  <dialog class="ai-sheet" id="ai-sheet" aria-labelledby="ai-sheet-h">
+    <div class="ai-in" tabindex="-1" autofocus>
+      <i class="grab" aria-hidden="true"></i>
+      <button type="button" class="ai-x" data-ai-close aria-label="ปิด"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="#6B7280" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <div class="ai-head">
+        <h2 id="ai-sheet-h">AI ช่วยจดยังไง</h2>
+        <p>ถ้าคุณติ๊กไว้ ระหว่างที่คุยกัน AI จะถอดเสียงเป็นข้อความ แล้วช่วยร่างสรุปให้เรา คุณจะได้สรุปครบทุกเรื่องที่ถาม</p>
+      </div>
+      <ul class="ai-list">
+        <li><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.3l3 3 6-6.6" fill="none" stroke="#2E6A5C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i><div><b>เราตรวจทุกครั้ง</b><p>เราอ่านและแก้สรุปเองก่อนส่ง AI ไม่ได้ดูดวงและไม่เติมคำทำนาย</p></div></li>
+        <li><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="none" stroke="#2E6A5C" stroke-width="1.5"/><path d="M5.5 7V5.2a2.5 2.5 0 015 0V7" fill="none" stroke="#2E6A5C" stroke-width="1.5"/></svg></i><div><b>เก็บเป็นความลับ</b><p>อ่านได้เฉพาะร้าน ข้อความผ่านระบบถอดเสียง Wispr Flow และ AI ที่ช่วยเรียบเรียง ซึ่งทำงานบนเซิร์ฟเวอร์ต่างประเทศ และไม่นำไปใช้ฝึก AI</p></div></li>
+        <li><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="#2E6A5C" stroke-width="1.5"/><path d="M8 5v3.2l2 1.3" fill="none" stroke="#2E6A5C" stroke-width="1.5" stroke-linecap="round"/></svg></i><div><b>ลบใน 30&nbsp;วัน</b><p>ข้อความที่ถอดไว้ลบภายใน 30&nbsp;วันหลังส่งสรุป ที่เก็บต่อมีแค่สรุปที่ส่งให้คุณ</p></div></li>
+        <li><i><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M12.5 6.5A4.8 4.8 0 004 5.2M3.5 9.5A4.8 4.8 0 0012 10.8" fill="none" stroke="#2E6A5C" stroke-width="1.5" stroke-linecap="round"/><path d="M3.5 2.8v2.7h2.7M12.5 13.2v-2.7H9.8" fill="none" stroke="#2E6A5C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></i><div><b>เปลี่ยนใจได้</b><p>ทักเราทาง LINE ได้ทุกเมื่อ จะขอไม่ให้ AI จด หรือขอให้ลบที่จดไว้ก็ได้ ถ้าไม่ติ๊ก เราจดเองให้เหมือนเดิม</p></div></li>
+      </ul>
+      <button type="button" class="ai-ok" data-ai-close>เข้าใจแล้ว</button>
+    </div>
+  </dialog>
 
   <div class="buybar" id="buybar">
     <div><b>990 บาท</b><span id="bb-meta">ยังไม่ได้เลือกวัน</span></div>

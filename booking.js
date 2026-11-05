@@ -293,7 +293,8 @@ function place() {
     `คิวของคุณ ${code}`,
     `สถานะ: รอชำระ เก็บคิวไว้ให้ถึง ${holdText}`,
     `วันนัด: ${when}`,
-    "ช่องทาง: โทรคุยทาง LINE",
+    "ช่องทาง: Google Meet เราส่งลิงก์ให้ทาง LINE ก่อนถึงนัด",
+    $("consent-ai").checked ? "ให้ AI ช่วยจด: ยินยอม" : null,
     `วันเกิด: ${b.d} ${MONTHS[b.m - 1]} ${b.y + 543}${birthTime() ? ` เวลา ${birthTime()} น.` : ""} (เกิดวัน${b.day.name})`,
     state.topics.length ? `เรื่องที่อยากถาม: ${state.topics.join(", ")}` : null,
     `ชื่อเรียก: ${$("nick").value.trim()}`,
@@ -321,3 +322,12 @@ function place() {
 narrow.addEventListener("change", render);
 renderTimes();
 render();
+
+/* ---------- "อ่านเพิ่ม" for the optional AI note-taking consent ---------- */
+const aiSheet = $("ai-sheet");
+document.querySelector("[data-ai-more]").addEventListener("click", (e) => {
+  e.preventDefault(); // the link sits inside the checkbox label; reading more must not tick it
+  aiSheet.showModal();
+});
+aiSheet.querySelectorAll("[data-ai-close]").forEach((b) => b.addEventListener("click", () => aiSheet.close()));
+aiSheet.addEventListener("click", (e) => { if (e.target === aiSheet) aiSheet.close(); });

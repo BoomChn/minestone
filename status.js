@@ -61,10 +61,10 @@ function renderBooking() {
     <div class="st-block appt">
       <span class="when-day"><i class="dot" style="background:${rec.dot}"></i>${rec.weekday} ดูดวง 60 นาที</span>
       <b>${rec.date}</b>
-      <div class="row"><span>${rec.time}</span><span>โทรคุยทาง LINE</span></div>
+      <div class="row"><span>${rec.time}</span><span>Google Meet</span></div>
     </div>
     ${payBlock(rec.price)}
-    <div class="st-block">${steps(["จองคิวแล้ว", "โอนเงินและแนบสลิป", "เรายืนยันคิวทาง LINE", "วันนัด เราโทรหาคุณทาง LINE"], waiting ? 1 : 2)}</div>
+    <div class="st-block">${steps(["จองคิวแล้ว", "โอนเงินและแนบสลิป", "เรายืนยันคิวทาง LINE", "วันนัด เข้าห้อง Google Meet จากลิงก์ที่เราส่งให้"], waiting ? 1 : 2)}</div>
     <div class="st-help"><span>ขอเลื่อนวันได้ 1 ครั้ง ก่อนนัด 24 ชม.</span><a href="#">คุยกับเราทาง LINE</a></div>
     <p class="proto-note">ต้นแบบ: หน้านี้ยังไม่ได้ต่อระบบจริง QR เป็นภาพตัวอย่าง และสลิปที่แนบไม่ได้ส่งไปไหน</p>`;
 }
