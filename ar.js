@@ -7,10 +7,21 @@ const MODEL = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/h
 const $ = (id) => document.getElementById(id);
 const root = $("ar"), video = $("ar-video"), canvas = $("ar-canvas"), ctx = canvas.getContext("2d");
 const statusEl = $("ar-status"), aim = $("ar-aim"), shot = $("ar-shot");
+const hand = $("ar-hand"), prog = $("ar-prog"), tip = $("ar-tip"), tipTitle = $("ar-tip-title"), tipHint = $("ar-tip-hint");
 
-let landmarkerP = null, landmarker = null;
+let landmarkerP = null, landmarker = null, modelFailed = false;
 let stream = null, opts = null, raf = 0, running = false, lastTime = -1;
 let mirror = false, pose = null, lostAt = 0, rot = 0, dpr = 1;
+
+// The person lays their hand on the outline and holds still; only then does the bracelet lock on
+// and follow the hand. If that doesn't happen within a few seconds (or the hand finder can't load),
+// the bracelet is drawn at the outline's ring instead, and the finder keeps trying underneath.
+// mode: "search" (outline, waiting), "locked" (following the hand), "fallback" (fixed at the ring).
+let mode = "search", fbTimer = 0, hold = null, guide = null;
+const HOLD_MS = 500, FALLBACK_MS = 6000, TIP_MIN_MS = 700;
+const SCALE_TOL = 0.35, POS_TOL = 0.15, STILL_TOL = 0.035;
+let side = "left";
+try { if (localStorage.getItem("ms-ar-side") === "right") side = "right"; } catch {}
 
 /* ---------- Small vector helpers (x, y in canvas pixels, z in the same scale) ---------- */
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -70,11 +81,81 @@ function status(text, kind = "") {
   statusEl.className = `ar-status ${kind}`;
   statusEl.querySelector("span").textContent = text;
 }
-function setFound(found) {
-  aim.classList.toggle("off", found);
-  shot.disabled = !found;
-  if (found) status("เจอข้อมือแล้ว ขยับดูได้เลย", "ok");
-  else status("กำลังหาข้อมือ");
+
+/* ---------- The hand outline and what the person is told ---------- */
+const TIPS = {
+  none: "ให้เห็นถึงปลายนิ้ว",
+  small: "ขยับกล้องเข้าใกล้อีกนิด",
+  big: "ถอยกล้องออกอีกนิด",
+  pos: "เลื่อนข้อมือมาที่วง",
+  hold: "ค้างไว้แป๊บนึง",
+};
+let tipKey = "", tipAt = 0;
+// One reason at a time, and each stays up long enough to read before the next replaces it.
+function setTip(key, force = false) {
+  if (key === tipKey) return;
+  const now = performance.now();
+  if (!force && now - tipAt < TIP_MIN_MS) return;
+  tipKey = key; tipAt = now;
+  tipHint.textContent = TIPS[key];
+}
+function setProgress(p) { prog.style.strokeDashoffset = String(100 * (1 - Math.min(1, Math.max(0, p)))); }
+
+// Outline geometry in its own 200 × 360 box: wrist ring centre at (100, 252), middle knuckle
+// about 105 units above it, standing for the 90 mm of a real adult hand.
+const WRIST = [100, 252], KNUCKLE_UNITS = 105;
+function layoutGuide() {
+  const W = innerWidth, H = innerHeight;
+  const bottom = root.querySelector(".ar-bottom")?.offsetHeight || 200;
+  const top = 168;                                          // below the close bar, side switch and status
+  const wy = Math.min(H * 0.6, H - bottom - 92);            // leave room for the tip under the ring
+  const s = Math.max(0.6, Math.min((W * 0.62) / 200, (wy - top) / (WRIST[1] - 34), 1.5));
+  const tilt = (side === "left" ? 1 : -1) * 17;             // fingers lean away from the arm's way in
+  hand.style.width = `${200 * s}px`;
+  hand.style.height = `${360 * s}px`;
+  hand.style.translate = `${W / 2 - WRIST[0] * s}px ${wy - WRIST[1] * s}px`;
+  hand.style.transform = `rotate(${tilt}deg) scaleX(${side === "left" ? 1 : -1})`;
+  tip.style.top = `${wy + 30 * s}px`;
+  const t = (tilt * Math.PI) / 180;
+  guide = { x: (W / 2) * dpr, y: wy * dpr, pxmm: ((KNUCKLE_UNITS * s) / 90) * dpr, ax: [Math.sin(t), -Math.cos(t), 0] };
+}
+
+function setSide(next) {
+  side = next;
+  try { localStorage.setItem("ms-ar-side", side); } catch {}
+  root.querySelectorAll(".ar-side button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.side === side)));
+  layoutGuide();
+  hold = null; setProgress(0);
+}
+
+function enterSearch() {
+  mode = "search"; pose = null; hold = null; lostAt = 0;
+  aim.classList.remove("off");
+  shot.disabled = true;
+  tipTitle.textContent = "วางมือให้ตรงเส้น";
+  setTip("none", true); setProgress(0);
+  if (landmarker) status("กำลังหาข้อมือ");
+  clearTimeout(fbTimer);
+  fbTimer = setTimeout(enterFallback, FALLBACK_MS);
+}
+function enterFallback() {
+  clearTimeout(fbTimer);
+  if (!running || mode === "locked") return;
+  mode = "fallback"; pose = null; hold = null;
+  aim.classList.remove("off");
+  shot.disabled = false;
+  tipTitle.textContent = "จัดข้อมือให้ตรงวง";
+  tipKey = ""; setProgress(0);
+  tipHint.textContent = modelFailed ? "กำไลจะอยู่ที่วงนี้ ขยับแขนเข้าหาวงได้เลย" : "ถ้ากล้องเห็นทั้งมือ กำไลจะเกาะตามมือเอง";
+  if (modelFailed) status("เครื่องนี้หาข้อมือเองไม่ได้ ขนาดเป็นค่าประมาณ แตะเพื่อลองใหม่", "err");
+  else status("ขนาดที่เห็นเป็นค่าประมาณ");
+}
+function lockOn(next) {
+  clearTimeout(fbTimer);
+  mode = "locked"; pose = next; hold = null;
+  aim.classList.add("off");
+  shot.disabled = false;
+  status("เจอข้อมือแล้ว ขยับดูได้เลย", "ok");
 }
 
 /* ---------- Camera ---------- */
@@ -102,14 +183,18 @@ export async function start(o) {
   useStream(s, o.facing);
   show();
   try { await video.play(); } catch { /* autoplay with muted + playsinline normally succeeds */ }
-  if (!landmarker) {
-    status("กำลังเตรียมตัวหาข้อมือ ครั้งแรกอาจใช้เวลาสักครู่");
-    try { landmarker = await loadLandmarker(); }
-    catch { status("โหลดตัวหาข้อมือไม่สำเร็จ แตะตรงนี้เพื่อลองใหม่", "err"); return; }
-    if (!running) return; // closed while loading
-  }
-  setFound(false);
-  loop();
+  enterSearch();
+  loop(); // draws the fallback bracelet even while the hand finder is still loading
+  if (!landmarker) await loadModel();
+}
+
+async function loadModel() {
+  status("กำลังเตรียมตัวหาข้อมือ ครั้งแรกอาจใช้เวลาสักครู่");
+  try { landmarker = await loadLandmarker(); modelFailed = false; }
+  catch { modelFailed = true; if (running) enterFallback(); return; }
+  if (!running) return; // closed while loading
+  if (mode === "search") status("กำลังหาข้อมือ");
+  else if (mode === "fallback") status("ขนาดที่เห็นเป็นค่าประมาณ");
 }
 
 function show() {
@@ -120,6 +205,7 @@ function show() {
   shot.disabled = true;
   status("กำลังเปิดกล้อง");
   pill();
+  setSide(side);
   resize();
   root.focus({ preventScroll: true }); // the overlay itself, so the first Tab lands on Close
 }
@@ -127,6 +213,7 @@ function show() {
 export function stop() {
   if (root.hidden) return;
   running = false;
+  clearTimeout(fbTimer);
   cancelAnimationFrame(raf);
   stream?.getTracks().forEach((t) => t.stop());
   stream = null;
@@ -152,9 +239,9 @@ function pill() {
 function loop() {
   if (!running) return;
   raf = requestAnimationFrame(loop);
-  if (video.readyState < 2 || !landmarker) return;
+  if (video.readyState < 2) return;
   const now = performance.now();
-  if (video.currentTime !== lastTime) {
+  if (landmarker && video.currentTime !== lastTime) {
     lastTime = video.currentTime;
     track(landmarker.detectForVideo(video, now), now);
   }
@@ -165,6 +252,7 @@ function resize() {
   dpr = Math.min(devicePixelRatio || 1, 2);
   canvas.width = Math.round(innerWidth * dpr);
   canvas.height = Math.round(innerHeight * dpr);
+  layoutGuide();
 }
 
 // Landmarks come in the video's own 0..1 space; the video is shown "cover", so map through that crop.
@@ -181,9 +269,10 @@ function mapper() {
 function track(r, now) {
   const lm = r?.landmarks?.[0];
   if (!lm) {
+    if (mode !== "locked") { hold = null; setProgress(0); if (mode === "search") setTip("none"); return; }
     if (!lostAt) lostAt = now;
     // Keep the last pose briefly so a dropped frame doesn't blink the bracelet away.
-    if (pose && now - lostAt > 400) { pose = null; setFound(false); }
+    if (now - lostAt > 400) enterSearch();
     return;
   }
   lostAt = 0;
@@ -197,12 +286,28 @@ function track(r, now) {
   const pxmm = Math.max(len(sub(middle, wrist)) / 90, len(sub(pinky, index)) / 58);
   // The bracelet sits just above the wrist crease, towards the arm.
   const next = { c: sub(wrist, mul(ax, 9 * pxmm)), ax, ac, pxmm };
-  if (!pose) { pose = next; setFound(true); return; }
+  if (mode !== "locked") { approach(wrist, pxmm, next, now); return; }
   const t = 0.5;
   const nax = unit(lerp(pose.ax, next.ax, t));
   let nac = lerp(pose.ac, next.ac, t);
   nac = unit(sub(nac, mul(nax, dot(nac, nax))));
   pose = { c: lerp(pose.c, next.c, t), ax: nax, ac: nac, pxmm: pose.pxmm + (next.pxmm - pose.pxmm) * t };
+}
+
+// Before the lock: is the hand the right size, on the ring, and still? Tell the person the first
+// thing that's off, in that order; once all three hold for HOLD_MS, lock on.
+function approach(wrist, pxmm, next, now) {
+  const W = canvas.width, ratio = pxmm / guide.pxmm;
+  let why = "";
+  if (ratio < 1 - SCALE_TOL) why = "small";
+  else if (ratio > 1 + SCALE_TOL) why = "big";
+  else if (Math.hypot(wrist[0] - guide.x, wrist[1] - guide.y) > POS_TOL * W) why = "pos";
+  if (why) { hold = null; setProgress(0); if (mode === "search") setTip(why); return; }
+  if (!hold || Math.hypot(wrist[0] - hold.x, wrist[1] - hold.y) > STILL_TOL * W) hold = { t: now, x: wrist[0], y: wrist[1] };
+  const p = (now - hold.t) / HOLD_MS;
+  setProgress(p);
+  if (mode === "search") setTip("hold");
+  if (p >= 1) lockOn(next);
 }
 
 // Ramanujan's perimeter of an ellipse with semi-axes a and k·a, solved for a.
@@ -211,9 +316,13 @@ const semiAxis = (perimeter, k) => perimeter / (Math.PI * (3 * (1 + k) - Math.sq
 function draw() {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
-  if (!pose) return;
+  // Fallback: the bracelet sits on the outline's ring, scaled as if the hand matched the outline.
+  const at = mode === "locked" ? pose
+    : mode === "fallback" && guide ? { c: [guide.x, guide.y, 0], ax: guide.ax, ac: [guide.ax[1], -guide.ax[0], 0], pxmm: guide.pxmm }
+    : null;
+  if (!at) return;
   const d = opts.design(), n = d.beads.length;
-  const { c, ax, ac, pxmm } = pose;
+  const { c, ax, ac, pxmm } = at;
   const nm = cross(ax, ac);                                // out of the back of the hand
   // The loop of bead centres is n × bead size long; a loose bracelet sits a little flatter than round.
   const A = semiAxis(n * d.size, 0.8), B = A * 0.8;
@@ -251,10 +360,9 @@ addEventListener("keydown", (e) => { if (e.key === "Escape" && !root.hidden) sto
 addEventListener("resize", () => { if (!root.hidden) resize(); });
 statusEl.addEventListener("click", async () => {
   if (!statusEl.classList.contains("err") || !running) return;
-  status("กำลังเตรียมตัวหาข้อมือ ครั้งแรกอาจใช้เวลาสักครู่");
-  try { landmarker = await loadLandmarker(); if (running) { setFound(false); loop(); } }
-  catch { status("โหลดตัวหาข้อมือไม่สำเร็จ แตะตรงนี้เพื่อลองใหม่", "err"); }
+  await loadModel(); // stays on the fixed bracelet either way; on success the finder starts looking
 });
+root.querySelectorAll(".ar-side button").forEach((b) => b.addEventListener("click", () => setSide(b.dataset.side)));
 
 $("ar-flip").addEventListener("click", async () => {
   const face = opts.facing === "user" ? "environment" : "user";
@@ -262,7 +370,7 @@ $("ar-flip").addEventListener("click", async () => {
     stream?.getTracks().forEach((t) => t.stop());
     useStream(await openStream(face), face);
     await video.play().catch(() => {});
-    pose = null; setFound(false);
+    enterSearch();
   } catch {
     // The other camera isn't there (most laptops); go back to the one that worked.
     try { useStream(await openStream(opts.facing), opts.facing); await video.play().catch(() => {}); } catch { stop(); }
@@ -272,7 +380,7 @@ $("ar-flip").addEventListener("click", async () => {
 // Drag sideways anywhere on the picture to turn the bracelet round the wrist.
 let drag = null;
 root.addEventListener("pointerdown", (e) => {
-  if (e.target.closest("button, .ar-bottom, .ar-top")) return;
+  if (e.target.closest("button, .ar-bottom, .ar-top, .ar-side")) return;
   drag = { x: e.clientX, rot };
   root.setPointerCapture(e.pointerId);
 });

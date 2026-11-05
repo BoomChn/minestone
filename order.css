@@ -456,7 +456,7 @@ html.ar-on, html.ar-on body { overflow: hidden; }
 .ar-pill .dots i + i { margin-left: -6px; }
 .ar-pill > span:last-child { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .ar-status {
-  position: absolute; left: 50%; top: calc(72px + env(safe-area-inset-top)); translate: -50% 0; max-width: calc(100% - 32px);
+  position: absolute; left: 50%; top: calc(120px + env(safe-area-inset-top)); translate: -50% 0; max-width: calc(100% - 32px);
   display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 6px 14px 6px 12px; border-radius: 16px;
   background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(17, 24, 39, 0.12); font-size: 13px; font-weight: 500; line-height: 18px;
 }
@@ -464,11 +464,19 @@ html.ar-on, html.ar-on body { overflow: hidden; }
 .ar-status.ok i { background: var(--sage); }
 .ar-status.err { cursor: pointer; }
 .ar-status.err i { background: #B23A3A; }
-.ar-aim { position: absolute; left: 0; right: 0; top: 24%; display: flex; flex-direction: column; align-items: center; gap: 16px; pointer-events: none; transition: opacity 240ms ease; }
+/* The hand outline is placed by ar.js (it needs the same numbers to judge where the real hand is). */
+.ar-aim { position: absolute; inset: 0; pointer-events: none; transition: opacity 240ms ease; }
 .ar-aim.off { opacity: 0; }
-.ar-aim p { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 16px; border-radius: 14px; background: rgba(17, 24, 39, 0.55); text-align: center; }
-.ar-aim b { font-size: 15px; font-weight: 600; line-height: 22px; }
-.ar-aim span { font-size: 13px; line-height: 18px; opacity: 0.88; }
+.ar-hand { position: absolute; left: 0; top: 0; overflow: visible; transform-origin: 50% 70%; filter: drop-shadow(0 0 3px rgba(17, 24, 39, 0.35)); }
+.ar-prog { stroke-dasharray: 100; stroke-dashoffset: 100; }
+.ar-tip { position: absolute; left: 50%; translate: -50% 0; width: max-content; max-width: calc(100% - 32px); display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 16px; border-radius: 14px; background: rgba(17, 24, 39, 0.55); text-align: center; }
+.ar-tip b { font-size: 15px; font-weight: 600; line-height: 22px; }
+.ar-tip span { font-size: 13px; line-height: 18px; opacity: 0.88; }
+.ar-side { position: absolute; left: 50%; top: calc(68px + env(safe-area-inset-top)); translate: -50% 0; display: flex; align-items: center; gap: 2px; height: 42px; padding: 3px 3px 3px 14px; border-radius: 999px; background: rgba(17, 24, 39, 0.55); font-size: 13px; line-height: 18px; }
+.ar-side span { padding-right: 8px; opacity: 0.88; }
+.ar-side button { height: 36px; min-width: 56px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: #fff; font: inherit; font-weight: 500; cursor: pointer; }
+.ar-side button[aria-pressed="true"] { background: #fff; color: var(--ink); }
+.ar-side button:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
 .ar-bottom {
   position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; gap: 14px;
   padding: 16px 20px calc(20px + env(safe-area-inset-bottom)); border-radius: 18px 18px 0 0; background: #fff; color: var(--ink);

@@ -290,8 +290,19 @@
     <video id="ar-video" playsinline muted autoplay></video>
     <canvas id="ar-canvas" aria-hidden="true"></canvas>
     <div class="ar-aim" id="ar-aim" aria-hidden="true">
-      <svg width="120" height="240" viewBox="0 0 120 240"><ellipse cx="60" cy="120" rx="44" ry="108" fill="none" stroke="#fff" stroke-width="2.4" stroke-dasharray="8 8" stroke-linecap="round"/></svg>
-      <p><b>วางข้อมือให้ตรงกรอบ</b><span>หันหลังมือเข้าหากล้อง ห่างราวหนึ่งศอก</span></p>
+      <svg class="ar-hand" id="ar-hand" viewBox="0 0 200 360" fill="none">
+        <defs><linearGradient id="ar-fade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="360"><stop offset="0.74" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+        <path d="M64 360L66 252C60 230 52 206 52 180V110C52 62 74 34 100 34C128 34 150 60 150 110V160C160 150 170 138 178 130C186 122 198 130 192 142C182 166 164 194 146 214C140 226 136 240 134 252L136 360" stroke="url(#ar-fade)" stroke-width="2.4" stroke-dasharray="8 8" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M76.5 58V120M101 40V118M125.5 56V120" stroke="#fff" stroke-opacity="0.55" stroke-width="2" stroke-linecap="round"/>
+        <ellipse cx="100" cy="252" rx="42" ry="11" stroke="#fff" stroke-width="2.4" stroke-dasharray="6 6"/>
+        <ellipse class="ar-prog" id="ar-prog" cx="100" cy="252" rx="42" ry="11" stroke="#fff" stroke-width="4.4" stroke-linecap="round" pathLength="100"/>
+      </svg>
+      <p class="ar-tip" id="ar-tip"><b id="ar-tip-title">วางมือให้ตรงเส้น</b><span id="ar-tip-hint">ให้เห็นถึงปลายนิ้ว</span></p>
+    </div>
+    <div class="ar-side" role="group" aria-label="ข้อมือที่จะลองใส่">
+      <span>ข้อมือ</span>
+      <button type="button" data-side="left" aria-pressed="true">ซ้าย</button>
+      <button type="button" data-side="right" aria-pressed="false">ขวา</button>
     </div>
     <div class="ar-top">
       <button type="button" class="ar-round" id="ar-close" aria-label="ปิดกล้อง">
