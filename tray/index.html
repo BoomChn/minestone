@@ -16,7 +16,7 @@
 	}
 	html, body { margin: 0; height: 100%; color: var(--ink); overflow: hidden;
 		/* โต๊ะไม้อ่อนในห้องที่แดดส่องจากซ้ายบน: สว่างฝั่งแสงเข้า มืดลงนิดๆ ที่ขอบ */
-		background: radial-gradient(120% 90% at 38% 42%, #f8f1e6 0%, #efe4d3 55%, #ddcdb6 100%) fixed, var(--bg);
+		background: radial-gradient(120% 90% at 38% 42%, #fcf8f1 0%, #f5ede1 55%, #e9dcc8 100%) fixed, var(--bg);
 		font-family: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
 	canvas { display: block; touch-action: none; }
 	.hint { position: fixed; top: max(16px, env(safe-area-inset-top)); left: 16px; right: 16px; font-size: 14px; line-height: 1.5;
@@ -87,9 +87,9 @@ const P = {
 const STONES = ['rose-quartz-bead', 'stone-amethyst', 'stone-aquamarine', 'stone-citrine', 'stone-jade', 'stone-moonstone', 'stone-ruby'];
 const BEAD_COUNT = 20;
 const LIGHT = {
-	trayEnv: 0.28,  // แสงสตูดิโอบนถาด น้อยไว้ให้แดดเป็นแสงหลัก เงาและลายแสงหน้าต่างจะชัด
-	beadEnv: 0.7,   // แสงสตูดิโอบนหิน (1 = เท่าหน้าแรกของเว็บ) มากกว่านี้แสงสะท้อนเคลือบทั้งเม็ดจนขุ่น
-	sun: 3.0,       // แดดจากหน้าต่าง
+	trayEnv: 0.42,  // แสงสตูดิโอบนถาด น้อยไว้ให้แดดเป็นแสงหลัก เงาและลายแสงหน้าต่างจะชัด
+	beadEnv: 0.8,   // แสงสตูดิโอบนหิน (1 = เท่าหน้าแรกของเว็บ) มากกว่านี้แสงสะท้อนเคลือบทั้งเม็ดจนขุ่น
+	sun: 3.4,       // แดดจากหน้าต่าง
 };
 const BEAD_DIAMETER = 0.8; // หินกำไล 8 มม. ทุกเม็ด
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -132,14 +132,14 @@ function windowLightPattern() {
 	// เงาใบไม้นอกหน้าต่าง: วงรีจางๆ หลายขนาด ไม่บังจนมืด
 	let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 	for (let i = 0; i < 26; i++) {
-		g.fillStyle = `rgba(40,30,20,${0.18 + rnd() * 0.22})`;
+		g.fillStyle = `rgba(40,30,20,${0.1 + rnd() * 0.14})`;
 		g.beginPath();
 		g.ellipse(rnd() * s, rnd() * s * 0.55, 14 + rnd() * 34, 7 + rnd() * 14, rnd() * Math.PI, 0, Math.PI * 2);
 		g.fill();
 	}
 	// กรอบหน้าต่าง: แนวตั้งหนึ่งเส้น แนวนอนหนึ่งเส้น
 	g.filter = 'blur(5px)';
-	g.fillStyle = 'rgba(20,15,10,0.85)';
+	g.fillStyle = 'rgba(20,15,10,0.6)';
 	g.fillRect(s * 0.62, 0, s * 0.035, s);
 	g.fillRect(0, s * 0.3, s, s * 0.03);
 	const t = new THREE.CanvasTexture(c);
@@ -158,7 +158,7 @@ sun.shadow.bias = -0.0002;
 sun.shadow.normalBias = 0.02;
 scene.add(sun, sun.target);
 
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.22, color: 0x3a2a1c }));
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.18, color: 0x3a2a1c }));
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -1.5;
 ground.receiveShadow = true;
@@ -177,7 +177,7 @@ const [_, env, trayGltf, colliderGltf, ...stoneGltfs] = await Promise.all([
 env.mapping = THREE.EquirectangularReflectionMapping;
 // ผูกแสงสตูดิโอกับวัสดุทีละชิ้น (material.envMap) ไม่ตั้งทั้งฉาก เพราะ three.js ไม่สน envMapIntensity
 // ของวัสดุเมื่อใช้ scene.environment ทำให้ปรับแสงถาดกับหินแยกกันไม่ได้
-renderer.toneMappingExposure = 1.0;
+renderer.toneMappingExposure = 1.12; // สว่างขึ้นแบบห้องที่แดดเข้าเต็มที่
 
 // ---------- โลกฟิสิกส์ ----------
 const world = new RAPIER.World({ x: 0, y: P.gravity, z: 0 });
