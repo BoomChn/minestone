@@ -142,7 +142,7 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
 // กรอบเงาครอบแค่ถาด ความละเอียดเงาจะสูง
 Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 10, far: 60 });
-sun.shadow.radius = 3;        // ขอบเงานุ่มพอดี มากกว่านี้เงาหินเล็กๆ ละลายหาย
+sun.shadow.radius = 5;        // ขอบเงานุ่ม มากกว่านี้เงาหินเล็กๆ ละลายหาย
 sun.shadow.intensity = 0.85;  // เงาไม่ดำสนิท แสงรอบห้องยังส่องเข้าไปได้
 sun.shadow.bias = -0.0003;
 sun.shadow.normalBias = 0.02;
@@ -527,8 +527,22 @@ function frame(now) {
 	controls.update();
 	// วาดใหม่เฉพาะเมื่อมีอะไรเปลี่ยน หินนิ่งหมดและกล้องไม่ขยับก็ไม่ต้องวาดซ้ำ ประหยัดแบตมือถือ
 	if (changed) settle = SETTLE_FRAMES;
-	if (settle > 0) { settle--; post.render(); }
+	if (settle > 0) { settle--; post.render(); watchSpeed(now); } else lastDraw = 0;
 	requestAnimationFrame(frame);
+}
+// เครื่องที่วาดเงาไม่ทัน (เช่นมือถือรุ่นเก่า) ลดความละเอียดภาพลงทีละขั้นเอง ให้ยังลื่นไม่กระตุก
+let lastDraw = 0, slowSum = 0, slowN = 0;
+function watchSpeed(now) {
+	// ช่วงห่างเกิน 100 ms คือแท็บถูกพักหรือสะดุดครั้งเดียว ไม่ใช่เครื่องช้า ไม่นับ
+	if (lastDraw && now - lastDraw < 100) { slowSum += now - lastDraw; slowN++; }
+	lastDraw = now;
+	if (slowN < 40) return;
+	const avg = slowSum / slowN; slowSum = slowN = 0;
+	const ratio = renderer.getPixelRatio();
+	if (avg > 22 && ratio > 1) { // ต่ำกว่า ~45 เฟรมต่อวินาที
+		renderer.setPixelRatio(Math.max(1, ratio - 0.25));
+		renderer.setSize(innerWidth, innerHeight);
+	}
 }
 let needsRender = true;
 controls.addEventListener('change', () => { needsRender = true; });
