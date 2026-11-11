@@ -14,7 +14,9 @@
 		--chip-on: #2b2620;
 		--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 	}
-	html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden;
+	html, body { margin: 0; height: 100%; color: var(--ink); overflow: hidden;
+		/* โต๊ะไม้อ่อนในห้องที่แดดส่องจากซ้ายบน: สว่างฝั่งแสงเข้า มืดลงนิดๆ ที่ขอบ */
+		background: radial-gradient(120% 90% at 38% 42%, #f8f1e6 0%, #efe4d3 55%, #ddcdb6 100%) fixed, var(--bg);
 		font-family: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
 	canvas { display: block; touch-action: none; }
 	.hint { position: fixed; top: max(16px, env(safe-area-inset-top)); left: 16px; right: 16px; font-size: 14px; line-height: 1.5;
@@ -44,7 +46,7 @@
 </script>
 </head>
 <body>
-<div class="hint"><b>ลากหิน</b> จากกล่องมาวางในถาด สะบัดได้ <b>ลากที่ว่าง</b> เพื่อหมุนดู</div>
+<div class="hint"><b>ลากหิน</b> เพื่อหยิบแล้วปล่อย สะบัดได้ <b>ลากที่ว่าง</b> เพื่อหมุนดู</div>
 <div class="bar">
 	<button id="shake" type="button">เขย่า</button>
 	<button id="tilt" type="button" aria-pressed="false">เอียงถาด</button>
@@ -74,7 +76,7 @@ const P = {
 	trayRestitution: 0.12,     // ไม้ดูดแรง เด้งน้อย
 	linearDamping: 0.12,
 	angularDamping: 0.9,       // แทนแรงต้านการกลิ้ง ไม่งั้นลูกกลิ้งวนในร่องไม่หยุด
-	holdHeight: 3.2,           // ความสูงที่ถือหินไว้ (ผิวถาดอยู่ที่ 0 ขอบกล่องอยู่ที่ 2.3) ให้ยกข้ามขอบกล่องได้
+	holdHeight: 0.9,           // ยกหินสูงจากผิวถาดตอนหยิบ ให้ข้ามขอบร่องได้
 	holdStiffness: 22,         // ความเร็ว = ระยะ × ค่านี้ ยิ่งมากยิ่งตามนิ้วติด
 	holdMaxSpeed: 90,
 	throwMaxSpeed: 70,         // จำกัดตอนสะบัด ไม่ให้หินปลิวออกนอกจอ
@@ -84,50 +86,79 @@ const P = {
 
 const STONES = ['rose-quartz-bead', 'stone-amethyst', 'stone-aquamarine', 'stone-citrine', 'stone-jade', 'stone-moonstone', 'stone-ruby'];
 const BEAD_COUNT = 20;
+const LIGHT = {
+	trayEnv: 0.28,  // แสงสตูดิโอบนถาด น้อยไว้ให้แดดเป็นแสงหลัก เงาและลายแสงหน้าต่างจะชัด
+	beadEnv: 0.7,   // แสงสตูดิโอบนหิน (1 = เท่าหน้าแรกของเว็บ) มากกว่านี้แสงสะท้อนเคลือบทั้งเม็ดจนขุ่น
+	sun: 3.0,       // แดดจากหน้าต่าง
+};
 const BEAD_DIAMETER = 0.8; // หินกำไล 8 มม. ทุกเม็ด
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- three ----------
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // โปร่งใส ให้พื้นหลังไล่สีจาก CSS แสดงผ่าน
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.NeutralToneMapping;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap; // ปรับความนุ่มของขอบเงาได้ด้วย radius (VSM นุ่มกว่าแต่ทำเฟรมตกเหลือ 6 fps)
 document.body.prepend(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#f4efe8');
 const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.5, 500);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target.set(0, 0, -7); // กลางระหว่างถาด (หน้า) กับกล่อง (หลัง)
+controls.target.set(0, -0.5, 0);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.minDistance = 12;
-controls.maxDistance = 110;
-// ถอยกล้องให้เห็นทั้งถาดและกล่องพอดีจอ ทั้งจอแนวนอนและมือถือแนวตั้ง
+controls.maxDistance = 60;
+// ถอยกล้องให้เห็นถาดพอดีจอ ทั้งจอแนวนอนและมือถือแนวตั้ง
 function fitCamera() {
 	const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-	const d = Math.max(15 / t, 13.5 / (t * camera.aspect));
-	camera.position.copy(controls.target).add(new THREE.Vector3(0, 0.78, 0.62).normalize().multiplyScalar(d));
+	const d = Math.max(9 / t, 7.5 / (t * camera.aspect));
+	camera.position.copy(controls.target).add(new THREE.Vector3(0, 0.74, 0.67).normalize().multiplyScalar(d));
 }
 fitCamera();
 controls.maxPolarAngle = THREE.MathUtils.degToRad(78);
 controls.enablePan = false;
 
-// แสงเฉียงต่ำ ให้เห็นความลึกของร่อง
-const sun = new THREE.DirectionalLight('#fff6ea', 2.4);
-sun.position.set(-22, 16, -1);
-sun.target.position.set(0, 0, -7);
-scene.add(sun.target);
+// ---------- แสงบรรยากาศ: แดดบ่ายลอดหน้าต่าง ----------
+// แสงสองชั้น: ภาพสตูดิโอ (studio.hdr ไฟล์เดียวกับหน้าแรก) ให้แสงสะท้อนบนผิวหิน สีหินจึงตรงกับเว็บ
+// และแดดสีอุ่นส่องเฉียงจากหน้าต่างด้านซ้าย ผ่านกรอบหน้าต่างกับใบไม้ (ภาพลวดลายแสง วาดเองด้านล่าง)
+function windowLightPattern() {
+	const s = 512, c = document.createElement('canvas'); c.width = c.height = s;
+	const g = c.getContext('2d');
+	g.fillStyle = '#fff'; g.fillRect(0, 0, s, s);
+	g.filter = 'blur(7px)';
+	// เงาใบไม้นอกหน้าต่าง: วงรีจางๆ หลายขนาด ไม่บังจนมืด
+	let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+	for (let i = 0; i < 26; i++) {
+		g.fillStyle = `rgba(40,30,20,${0.18 + rnd() * 0.22})`;
+		g.beginPath();
+		g.ellipse(rnd() * s, rnd() * s * 0.55, 14 + rnd() * 34, 7 + rnd() * 14, rnd() * Math.PI, 0, Math.PI * 2);
+		g.fill();
+	}
+	// กรอบหน้าต่าง: แนวตั้งหนึ่งเส้น แนวนอนหนึ่งเส้น
+	g.filter = 'blur(5px)';
+	g.fillStyle = 'rgba(20,15,10,0.85)';
+	g.fillRect(s * 0.62, 0, s * 0.035, s);
+	g.fillRect(0, s * 0.3, s, s * 0.03);
+	const t = new THREE.CanvasTexture(c);
+	t.colorSpace = THREE.SRGBColorSpace;
+	return t;
+}
+const sun = new THREE.SpotLight('#ffeedd', LIGHT.sun, 0, THREE.MathUtils.degToRad(24), 0.55, 0);
+sun.position.set(-26, 22, 16); // เฉียงราว 33° จากหน้าซ้าย เงาหินทอดไปหลังขวาพอเห็น และร่องมีมิติ
+sun.target.position.set(0.5, -0.5, -0.5);
+sun.map = windowLightPattern();
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
-Object.assign(sun.shadow.camera, { left: -20, right: 20, top: 20, bottom: -20, near: 1, far: 90 });
-sun.shadow.radius = 4;
-sun.shadow.bias = -0.0004;
-scene.add(sun);
+sun.shadow.camera.near = 20; sun.shadow.camera.far = 70; // ช่วงแคบ ความลึกเงาละเอียด
+sun.shadow.radius = 3;        // ขอบเงานุ่ม ไม่คมเป็นเส้น
+sun.shadow.bias = -0.0002;
+sun.shadow.normalBias = 0.02;
+scene.add(sun, sun.target);
 
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.12 }));
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.22, color: 0x3a2a1c }));
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -1.5;
 ground.receiveShadow = true;
@@ -136,18 +167,17 @@ scene.add(ground);
 // ---------- โหลด ----------
 const draco = new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
 const gltf = new GLTFLoader().setDRACOLoader(draco);
-const [_, env, trayGltf, colliderGltf, boxGltf, ...stoneGltfs] = await Promise.all([
+const [_, env, trayGltf, colliderGltf, ...stoneGltfs] = await Promise.all([
 	RAPIER.init(),
 	new RGBELoader().loadAsync('studio.hdr'),
 	gltf.loadAsync('bead-tray.glb'),
 	gltf.loadAsync('bead-tray-collider.glb'), // รูปทรงหยาบสำหรับฟิสิกส์ เบากว่าตัวที่เห็น 5 เท่า
-	gltf.loadAsync('box/jewelry-box.glb'),
 	...STONES.map((s) => gltf.loadAsync('beads/' + s + '.glb')), // หินเวอร์ชันเบา เม็ดละ ~3,300 สามเหลี่ยม
 ]);
 env.mapping = THREE.EquirectangularReflectionMapping;
-scene.environment = env;
-scene.environmentIntensity = 0.7;
-renderer.toneMappingExposure = 1.1; // ไม้สนในภาพจริงสว่างออกครีม
+// ผูกแสงสตูดิโอกับวัสดุทีละชิ้น (material.envMap) ไม่ตั้งทั้งฉาก เพราะ three.js ไม่สน envMapIntensity
+// ของวัสดุเมื่อใช้ scene.environment ทำให้ปรับแสงถาดกับหินแยกกันไม่ได้
+renderer.toneMappingExposure = 1.0;
 
 // ---------- โลกฟิสิกส์ ----------
 const world = new RAPIER.World({ x: 0, y: P.gravity, z: 0 });
@@ -160,7 +190,15 @@ const trayModel = trayGltf.scene;
 trayModel.scale.setScalar(100); // Blender ส่งออกเป็นเมตร
 tray.add(trayModel);
 scene.add(tray);
-trayModel.traverse((o) => { if (o.isMesh) o.castShadow = o.receiveShadow = true; });
+const maxAniso = renderer.capabilities.getMaxAnisotropy();
+trayModel.traverse((o) => {
+	if (!o.isMesh) return;
+	o.castShadow = o.receiveShadow = true;
+	// ไม้ดิบไม่สะท้อนแสงรอบตัวมาก ลดแสงสตูดิโอบนถาดให้ไฟส่องตรงเด่น เงาจะได้ชัด
+	o.material.envMap = env;
+	o.material.envMapIntensity = LIGHT.trayEnv;
+	if (o.material.map) o.material.map.anisotropy = maxAniso;
+});
 const colliderModel = colliderGltf.scene;
 colliderModel.scale.setScalar(100);
 colliderModel.updateMatrixWorld(true);
@@ -180,70 +218,24 @@ const trayCollider = world.createCollider(
 	trayBody,
 );
 
-// ---------- กล่องเก็บหิน (ปั้นใน Blender กว้าง 20 × ลึก 15 × สูง 3.8 ซม.) ----------
-// ตัวเลขทั้งหมดของกล่องเป็นพิกัด Blender หน่วยซม. (z ขึ้น) แล้วแปลงเป็นพิกัดเว็บ (y ขึ้น) ด้วย b2t
-const BOX = {
-	pos: new THREE.Vector3(0, -1.5, -14.5),  // วางหลังถาด ฐานกล่องแตะพื้นเดียวกับถาด
-	cellX: [-7.5, -4.5, -1.5, 1.5, 4.5, 7.5], // กลางช่อง 6 คอลัมน์ (ช่องกว้าง 2.6 ซม.)
-	cellY: [-4.875, -1.625, 1.625, 4.875],    // กลางช่อง 4 แถว (ช่องลึก 2.85 ซม.)
-	floorZ: 2.0, dividerTop: 3.4, wallTop: 3.8,
-	perCell: 6,
-	lid: { pivot: [0, 7.5, 3.8], angleDeg: -102, half: [10, 7.5, 1], local: [0, -7.5, 1] },
-};
-const b2t = (x, y, z) => new THREE.Vector3(x, z, -y).add(BOX.pos);
-const boxModel = boxGltf.scene;
-boxModel.scale.setScalar(100);
-boxModel.position.copy(BOX.pos);
-boxModel.traverse((o) => {
-	if (!o.isMesh) return;
-	o.castShadow = o.receiveShadow = true;
-	// กระจกฝา: ใช้ความโปร่งแบบธรรมดา ถูกกว่าการหักเหแสงจริง (transmission) ที่ต้องวาดฉากซ้ำอีกรอบ
-	if (/Glass/i.test(o.name)) {
-		o.material = new THREE.MeshPhysicalMaterial({ color: 0xf2f8f6, roughness: 0.04, metalness: 0, transparent: true, opacity: 0.14, envMapIntensity: 1.4, depthWrite: false });
-		o.castShadow = false;
-	}
-});
-scene.add(boxModel);
-const boxBody = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
-function boxCuboid(cx, cy, cz, hx, hy, hz, friction, rot) {
-	const c = b2t(cx, cy, cz);
-	const d = RAPIER.ColliderDesc.cuboid(hx, hz, hy).setTranslation(c.x, c.y, c.z)
-		.setFriction(friction).setRestitution(0.08).setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
-	if (rot) d.setRotation(rot);
-	world.createCollider(d, boxBody);
-}
-// พื้นช่องกำมะหยี่ (ฝืด เด้งน้อย) ผนังรอบกล่อง และไม้กั้นช่อง
-boxCuboid(0, 0, BOX.floorZ / 2, 10, 7.5, BOX.floorZ / 2, 0.85);
-boxCuboid(9.4, 0, BOX.wallTop / 2, 0.6, 7.5, BOX.wallTop / 2, 0.5);
-boxCuboid(-9.4, 0, BOX.wallTop / 2, 0.6, 7.5, BOX.wallTop / 2, 0.5);
-boxCuboid(0, 6.9, BOX.wallTop / 2, 10, 0.6, BOX.wallTop / 2, 0.5);
-boxCuboid(0, -6.9, BOX.wallTop / 2, 10, 0.6, BOX.wallTop / 2, 0.5);
-const divH = (BOX.dividerTop - BOX.floorZ) / 2, divZ = BOX.floorZ + divH;
-for (const x of [-6, -3, 0, 3, 6]) boxCuboid(x, 0, divZ, 0.2, 6.3, divH, 0.85);
-for (const y of [-3.25, 0, 3.25]) boxCuboid(0, y, divZ, 8.8, 0.2, divH, 0.85);
-{ // ฝากระจกที่เปิดเอนไปข้างหลัง หินที่โยนไปโดนจะเด้งกลับ
-	const L = BOX.lid, qb = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(L.angleDeg));
-	const c = new THREE.Vector3(...L.local).applyQuaternion(qb).add(new THREE.Vector3(...L.pivot));
-	boxCuboid(c.x, c.y, c.z, ...L.half, 0.3, { x: qb.x, y: qb.z, z: -qb.y, w: qb.w });
-}
-
 // ---------- หิน ----------
 // ชนเป็นทรงกลม (ไม่สนรูร้อย) เร็วและนิ่งกว่า convex hull
-// วาดแบบ instancing: หินชนิดเดียวกันทั้งหมดวาดรวดเดียว หินร้อยกว่าเม็ดก็ยังลื่น
+// วาดแบบ instancing: หินชนิดเดียวกันทั้งหมดวาดรวดเดียว เพิ่มจำนวนหินได้โดยไม่หน่วง
 const beads = [];
 const beadByHandle = new Map();
 const homes = [];
-for (let i = 0; i < BEAD_COUNT; i++) homes.push({ kind: i % STONES.length, place: 'tray', i });
-BOX.cellY.forEach((cy, row) => BOX.cellX.forEach((cx, col) => {
-	const kind = (row * BOX.cellX.length + col) % STONES.length; // แต่ละช่องเป็นหินชนิดเดียว
-	for (let k = 0; k < BOX.perCell; k++) homes.push({ kind, place: 'box', cx, cy, k });
-}));
+for (let i = 0; i < BEAD_COUNT; i++) homes.push({ kind: i % STONES.length, i });
 const kindCount = STONES.map((_, k) => homes.filter((h) => h.kind === k).length);
 const instanced = STONES.map((_, k) => {
 	let src = null;
 	stoneGltfs[k].scene.updateMatrixWorld(true);
 	stoneGltfs[k].scene.traverse((o) => { if (o.isMesh && !src) src = o; });
 	const geo = src.geometry.clone().applyMatrix4(src.matrixWorld);
+	// หินขัดเงาสะท้อนแสงสตูดิโอเต็มที่ ถ้ามากกว่านี้แสงสะท้อนจะเคลือบทั้งเม็ดจนดูขุ่น
+	src.material.envMap = env;
+	src.material.envMapIntensity = LIGHT.beadEnv;
+	// ภาพผิวหินคมแม้เม็ดเล็กหรือมองเฉียง ลายหินไม่เบลอหาย
+	if (src.material.map) src.material.map.anisotropy = maxAniso;
 	const im = new THREE.InstancedMesh(geo, src.material, kindCount[k]);
 	im.castShadow = im.receiveShadow = true;
 	im.frustumCulled = false; // หินกระจายทั้งฉาก ไม่ต้องให้ three คำนวณขอบเขตใหม่ทุกเฟรม
@@ -278,18 +270,11 @@ function syncBead(b) {
 const randomTurn = () => new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6));
 function placeHome(b) {
 	const h = b.home;
-	let p;
-	if (h.place === 'tray') {
-		// เทเป็นเกลียวลงตรงร่อง หินตกทีละเม็ดเพราะความสูงไม่เท่ากัน
-		// ปล่อยต่ำ (1.5–4 ซม.) เหมือนเทจากมือ ถ้าปล่อยสูงหินจะเด้งกันจนหลุดถาด
-		const a = (h.i / BEAD_COUNT) * Math.PI * 3, r = 2.5 + ((h.i % 3) - 1) * 0.3;
-		const y = reduceMotion ? 0.8 + (h.i % 2) * 0.9 : 1.5 + (h.i / BEAD_COUNT) * 2.5;
-		p = new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
-	} else {
-		// 6 เม็ดต่อช่อง วาง 3 × 2 เหลื่อมกันนิดหน่อย แล้วให้ตกลงพื้นกำมะหยี่เอง
-		const gx = (h.k % 3 - 1) * 0.82, gy = (Math.floor(h.k / 3) - 0.5) * 0.9;
-		p = b2t(h.cx + gx + (Math.random() - 0.5) * 0.1, h.cy + gy + (Math.random() - 0.5) * 0.1, BOX.floorZ + 0.45 + (h.k % 2) * 0.15);
-	}
+	// เทเป็นเกลียวลงตรงร่อง หินตกทีละเม็ดเพราะความสูงไม่เท่ากัน
+	// ปล่อยต่ำ (1.5–4 ซม.) เหมือนเทจากมือ ถ้าปล่อยสูงหินจะเด้งกันจนหลุดถาด
+	const a = (h.i / BEAD_COUNT) * Math.PI * 3, r = 2.5 + ((h.i % 3) - 1) * 0.3;
+	const y = reduceMotion ? 0.8 + (h.i % 2) * 0.9 : 1.5 + (h.i / BEAD_COUNT) * 2.5;
+	const p = new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
 	b.body.setTranslation(p, true);
 	b.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
 	b.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
