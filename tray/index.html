@@ -39,8 +39,10 @@
 </style>
 <script type="importmap">
 { "imports": {
-	"three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-	"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+	"three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.webgpu.js",
+	"three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.webgpu.js",
+	"three/tsl": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.tsl.js",
+	"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
 	"rapier": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.14.0/+esm"
 } }
 </script>
@@ -56,11 +58,14 @@
 <div class="loading" id="loading">กำลังโหลด…</div>
 
 <script type="module">
-import * as THREE from 'three';
+import * as THREE from 'three/webgpu';
+import { pass, mrt, output, normalView } from 'three/tsl';
+import { ao } from 'three/addons/tsl/display/GTAONode.js';
+import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 import RAPIER from 'rapier';
 
 // ---------- ค่าฟิสิกส์ (หน่วยโลก = เซนติเมตร, เวลา = วินาที) ----------
@@ -89,22 +94,28 @@ const BEAD_COUNT = 20;
 const LIGHT = {
 	trayEnv: 0.5,   // แสงสตูดิโอบนถาด น้อยไว้ให้ไฟหลักทำรูปทรงและเงา
 	beadEnv: 0.85,  // แสงสตูดิโอบนหิน (1 = เท่าหน้าแรกของเว็บ) มากกว่านี้แสงสะท้อนเคลือบทั้งเม็ดจนขุ่น
-	sun: 2.6,       // ไฟหลักจากบนซ้าย
-	beadShadow: 0.55, // ความเข้มเงาฟุ้งใต้หิน
+	sun: 2.1,       // ไฟหลักจากบนซ้าย
 };
+// เงาสัมผัส (หน่วย ซม.) รัศมีราวเม็ดเดียว เงาเกาะใต้หินและซอกระหว่างหิน exponent มากขึ้น เงาเข้มเฉพาะตรงที่ชิดจริง
+const AO = { radius: 0.45, strength: 1.2, exponent: 2, samples: 24 };
 const BEAD_DIAMETER = 0.8; // หินกำไล 8 มม. ทุกเม็ด
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- three ----------
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // โปร่งใส ให้พื้นหลังไล่สีจาก CSS แสดงผ่าน
+// WebGPU (เครื่องที่ไม่รองรับจะสลับไปใช้ WebGL2 เอง) วาดเงาสัมผัสจริงด้วย AO ได้
+const renderer = new THREE.WebGPURenderer({ antialias: false }); // ลบรอยหยักด้วย TRAA ข้างล่างแทน
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.NeutralToneMapping;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFShadowMap; // ปรับความนุ่มของขอบเงาได้ด้วย radius (VSM นุ่มกว่าแต่ทำเฟรมตกเหลือ 6 fps)
+renderer.shadowMap.type = THREE.PCFShadowMap; // ขอบเงานุ่มตาม shadow.radius
 document.body.prepend(renderer.domElement);
+await renderer.init();
 
+const BG = new THREE.Color('#e2ded8');
 const scene = new THREE.Scene();
+scene.background = BG;
+scene.fog = new THREE.Fog(BG, 70, 160); // ขอบโต๊ะไกลๆ จางเข้าพื้นหลัง ไม่เห็นเส้นขอบฟ้า
 const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.5, 500);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, -0.5, 0);
@@ -131,7 +142,8 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
 // กรอบเงาครอบแค่ถาด ความละเอียดเงาจะสูง
 Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 10, far: 60 });
-sun.shadow.radius = 5;        // ขอบเงานุ่ม
+sun.shadow.radius = 5;        // ขอบเงานุ่ม มากกว่านี้เงาหินเล็กๆ ละลายหาย
+sun.shadow.intensity = 0.85;  // เงาไม่ดำสนิท แสงรอบห้องยังส่องเข้าไปได้
 sun.shadow.bias = -0.0003;
 sun.shadow.normalBias = 0.02;
 scene.add(sun);
@@ -157,7 +169,8 @@ trayShadow.rotation.x = -Math.PI / 2;
 trayShadow.position.set(0.5, -1.49, 0.7); // เลื่อนมาทางหน้าขวานิดหน่อย ตามทิศไฟ
 scene.add(trayShadow);
 
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.ShadowMaterial({ opacity: 0.1, color: 0x2a2018 }));
+// โต๊ะจริงรับแสง เงา และ AO ได้ (สีปรับให้กลืนกับพื้นหลัง)
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ color: '#cfc9c1', roughness: 0.95 }));
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -1.5;
 ground.receiveShadow = true;
@@ -168,7 +181,7 @@ const draco = new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/ve
 const gltf = new GLTFLoader().setDRACOLoader(draco);
 const [_, env, trayGltf, colliderGltf, ...stoneGltfs] = await Promise.all([
 	RAPIER.init(),
-	new RGBELoader().loadAsync('studio.hdr'),
+	new HDRLoader().loadAsync('studio.hdr'),
 	gltf.loadAsync('bead-tray.glb'),
 	gltf.loadAsync('bead-tray-collider.glb'), // รูปทรงหยาบสำหรับฟิสิกส์ เบากว่าตัวที่เห็น 5 เท่า
 	...STONES.map((s) => gltf.loadAsync('beads/' + s + '.glb')), // หินเวอร์ชันเบา เม็ดละ ~3,300 สามเหลี่ยม
@@ -189,7 +202,8 @@ const trayModel = trayGltf.scene;
 trayModel.scale.setScalar(100); // Blender ส่งออกเป็นเมตร
 tray.add(trayModel);
 scene.add(tray);
-const maxAniso = renderer.capabilities.getMaxAnisotropy();
+const maxAniso = renderer.getMaxAnisotropy();
+ground.material.envMap = env; ground.material.envMapIntensity = LIGHT.trayEnv;
 trayModel.traverse((o) => {
 	if (!o.isMesh) return;
 	o.castShadow = o.receiveShadow = true;
@@ -260,32 +274,12 @@ for (const home of homes) {
 	beads.push(bead);
 	beadByHandle.set(collider.handle, bead);
 }
-// เงาฟุ้งใต้หินแต่ละเม็ด: ยิงเส้นลงหาผิวถาด วางวงเงาแนบผิวตรงนั้น ยิ่งยกหินสูง เงายิ่งกว้างและจางจนหาย
-const beadBlobs = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), blobMaterial(blobTexture(false), LIGHT.beadShadow), beads.length);
-beadBlobs.frustumCulled = false;
-scene.add(beadBlobs);
-const downRay = new RAPIER.Ray({ x: 0, y: 0, z: 0 }, { x: 0, y: -1, z: 0 });
-const blobPos = new THREE.Vector3(), blobNormal = new THREE.Vector3(), blobQuat = new THREE.Quaternion(), zAxis = new THREE.Vector3(0, 0, 1);
-const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
-function syncBlob(b) {
-	downRay.origin = { x: b.pos.x, y: b.pos.y, z: b.pos.z };
-	const hit = trayCollider.castRayAndGetNormal(downRay, 4, true);
-	const toi = hit ? (hit.timeOfImpact ?? hit.toi) : Infinity;
-	const gap = toi - b.diameter / 2; // ระยะจากใต้หินถึงผิวถาด
-	if (!hit || gap > 1.6) { beadBlobs.setMatrixAt(b.index, hidden); return; }
-	blobNormal.set(hit.normal.x, hit.normal.y, hit.normal.z);
-	blobPos.copy(b.pos).addScaledVector(downRay.dir, toi).addScaledVector(blobNormal, 0.012);
-	blobQuat.setFromUnitVectors(zAxis, blobNormal);
-	const size = b.diameter * (1.35 + Math.max(0, gap) * 1.6) * (gap > 0.9 ? Math.max(0, (1.6 - gap) / 0.7) : 1);
-	beadBlobs.setMatrixAt(b.index, tmpM.compose(blobPos, blobQuat, tmpS.set(size, size, 1)));
-}
+// เงาใต้หินมาจาก AO จริง (มุมที่หินแตะไม้แสงเข้าไม่ถึงจึงมืดเอง) ไม่ต้องวาดวงเงาปลอม
 function syncBead(b) {
 	const p = b.body.translation(), o = b.body.rotation();
 	b.pos.set(p.x, p.y, p.z); b.quat.set(o.x, o.y, o.z, o.w);
 	instanced[b.kind].setMatrixAt(b.slot, tmpM.compose(b.pos, b.quat, tmpS.setScalar(b.diameter)));
 	instanced[b.kind].instanceMatrix.needsUpdate = true;
-	syncBlob(b);
-	beadBlobs.instanceMatrix.needsUpdate = true;
 }
 const randomTurn = () => new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6));
 function placeHome(b) {
@@ -478,6 +472,24 @@ function stepHeld() {
 	held.body.setLinvel({ x: vx, y: vy, z: vz }, true);
 }
 
+// ---------- AO ----------
+// มืดลงเองตรงซอกที่แสงรอบตัวเข้าไม่ถึง ใต้หิน ระหว่างหินที่ชิดกัน และในร่อง
+// คำนวณเต็มความละเอียด ครึ่งเดียวขอบหินจะเป็นเม็ด และไม่ใช้ TRAA เพราะทำให้ขอบหินมีเม็ดสีตอนหินขยับ
+const post = new THREE.PostProcessing(renderer);
+const scenePass = pass(scene, camera, { samples: 4 }); // ลบรอยหยักขอบหิน
+scenePass.setMRT(mrt({ output, normal: normalView }));
+const aoPass = ao(scenePass.getTextureNode('depth'), scenePass.getTextureNode('normal'), camera);
+aoPass.resolutionScale = 1;
+aoPass.radius.value = AO.radius;
+aoPass.scale.value = AO.strength;
+aoPass.distanceExponent.value = AO.exponent;
+aoPass.samples.value = AO.samples;
+// เกลี่ย AO ให้เนียนตามความลึกและทิศผิว เงาไม่เป็นเม็ดและไม่ลามข้ามขอบหิน
+const aoClean = denoise(aoPass.getTextureNode(), scenePass.getTextureNode('depth'), scenePass.getTextureNode('normal'), camera);
+post.outputNode = aoClean.mul(scenePass.getTextureNode('output'));
+const SETTLE_FRAMES = 2;
+let settle = SETTLE_FRAMES;
+
 // ---------- ลูป ----------
 let acc = 0, last = performance.now();
 const impact = new THREE.Vector3();
@@ -514,8 +526,23 @@ function frame(now) {
 	}
 	controls.update();
 	// วาดใหม่เฉพาะเมื่อมีอะไรเปลี่ยน หินนิ่งหมดและกล้องไม่ขยับก็ไม่ต้องวาดซ้ำ ประหยัดแบตมือถือ
-	if (changed) renderer.render(scene, camera);
+	if (changed) settle = SETTLE_FRAMES;
+	if (settle > 0) { settle--; post.render(); watchSpeed(now); } else lastDraw = 0;
 	requestAnimationFrame(frame);
+}
+// เครื่องที่วาดเงาไม่ทัน (เช่นมือถือรุ่นเก่า) ลดความละเอียดภาพลงทีละขั้นเอง ให้ยังลื่นไม่กระตุก
+let lastDraw = 0, slowSum = 0, slowN = 0;
+function watchSpeed(now) {
+	// ช่วงห่างเกิน 100 ms คือแท็บถูกพักหรือสะดุดครั้งเดียว ไม่ใช่เครื่องช้า ไม่นับ
+	if (lastDraw && now - lastDraw < 100) { slowSum += now - lastDraw; slowN++; }
+	lastDraw = now;
+	if (slowN < 40) return;
+	const avg = slowSum / slowN; slowSum = slowN = 0;
+	const ratio = renderer.getPixelRatio();
+	if (avg > 22 && ratio > 1) { // ต่ำกว่า ~45 เฟรมต่อวินาที
+		renderer.setPixelRatio(Math.max(1, ratio - 0.25));
+		renderer.setSize(innerWidth, innerHeight);
+	}
 }
 let needsRender = true;
 controls.addEventListener('change', () => { needsRender = true; });
