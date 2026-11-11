@@ -61,6 +61,7 @@
 import * as THREE from 'three/webgpu';
 import { pass, mrt, output, normalView } from 'three/tsl';
 import { ao } from 'three/addons/tsl/display/GTAONode.js';
+import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -96,7 +97,7 @@ const LIGHT = {
 	sun: 2.1,       // ไฟหลักจากบนซ้าย
 };
 // เงาสัมผัส (หน่วย ซม.) รัศมีราวเม็ดเดียว เงาเกาะใต้หินและซอกระหว่างหิน exponent มากขึ้น เงาเข้มเฉพาะตรงที่ชิดจริง
-const AO = { radius: 1.0, strength: 1.6, exponent: 1.5 };
+const AO = { radius: 0.45, strength: 1.2, exponent: 2, samples: 24 };
 const BEAD_DIAMETER = 0.8; // หินกำไล 8 มม. ทุกเม็ด
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -141,8 +142,8 @@ sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
 // กรอบเงาครอบแค่ถาด ความละเอียดเงาจะสูง
 Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 10, far: 60 });
-sun.shadow.radius = 8;        // ขอบเงานุ่ม
-sun.shadow.intensity = 0.5;   // เงาไม่ดำสนิท แสงรอบห้องยังส่องเข้าไปได้
+sun.shadow.radius = 3;        // ขอบเงานุ่มพอดี มากกว่านี้เงาหินเล็กๆ ละลายหาย
+sun.shadow.intensity = 0.85;  // เงาไม่ดำสนิท แสงรอบห้องยังส่องเข้าไปได้
 sun.shadow.bias = -0.0003;
 sun.shadow.normalBias = 0.02;
 scene.add(sun);
@@ -482,7 +483,10 @@ aoPass.resolutionScale = 1;
 aoPass.radius.value = AO.radius;
 aoPass.scale.value = AO.strength;
 aoPass.distanceExponent.value = AO.exponent;
-post.outputNode = aoPass.getTextureNode().mul(scenePass.getTextureNode('output'));
+aoPass.samples.value = AO.samples;
+// เกลี่ย AO ให้เนียนตามความลึกและทิศผิว เงาไม่เป็นเม็ดและไม่ลามข้ามขอบหิน
+const aoClean = denoise(aoPass.getTextureNode(), scenePass.getTextureNode('depth'), scenePass.getTextureNode('normal'), camera);
+post.outputNode = aoClean.mul(scenePass.getTextureNode('output'));
 const SETTLE_FRAMES = 2;
 let settle = SETTLE_FRAMES;
 
