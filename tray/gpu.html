@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ถาดร้อยหิน</title>
+<meta name="robots" content="noindex">
+<style>
+	:root {
+		--bg: #e4e0da;
+		--ink: #2b2620;
+		--muted: #8a8076;
+		--chip: rgba(255, 255, 255, 0.78);
+		--chip-on: #2b2620;
+		--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+	}
+	html, body { margin: 0; height: 100%; color: var(--ink); overflow: hidden;
+		/* พื้นเทาอุ่นเรียบแบบโต๊ะถ่ายสินค้า สว่างกลางนิดเดียว */
+		background: radial-gradient(130% 100% at 45% 40%, #ebe8e3 0%, #e4e0da 60%, #dbd6cf 100%) fixed, var(--bg);
+		font-family: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+	canvas { display: block; touch-action: none; }
+	.hint { position: fixed; top: max(16px, env(safe-area-inset-top)); left: 16px; right: 16px; font-size: 14px; line-height: 1.5;
+		color: var(--muted); pointer-events: none; }
+	.hint b { color: var(--ink); font-weight: 600; }
+	.bar { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+		display: flex; gap: 8px; padding: 6px; border-radius: 999px; background: var(--chip);
+		backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(60,40,20,.08); }
+	.bar button { font: inherit; font-size: 14px; color: var(--ink); background: transparent; border: 0; border-radius: 999px;
+		padding: 10px 16px; cursor: pointer; user-select: none; -webkit-user-select: none;
+		transition: transform 160ms var(--ease-out), background-color 160ms ease, color 160ms ease; }
+	.bar button:active { transform: scale(0.97); }
+	.bar button[aria-pressed="true"] { background: var(--chip-on); color: #fff; }
+	@media (hover: hover) and (pointer: fine) {
+		.bar button:hover:not([aria-pressed="true"]) { background: rgba(43, 38, 32, 0.06); }
+	}
+	.loading { position: fixed; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px;
+		transition: opacity 300ms ease; }
+	.loading.done { opacity: 0; pointer-events: none; }
+</style>
+<script type="importmap">
+{ "imports": {
+	"three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.webgpu.js",
+	"three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.webgpu.js",
+	"three/tsl": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.tsl.js",
+	"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+	"rapier": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.14.0/+esm"
+} }
+</script>
+</head>
+<body>
+<div class="hint"><b>ลากหิน</b> เพื่อหยิบแล้วปล่อย สะบัดได้ <b>ลากที่ว่าง</b> เพื่อหมุนดู</div>
+<div class="bar">
+	<button id="shake" type="button">เขย่า</button>
+	<button id="tilt" type="button" aria-pressed="false">เอียงถาด</button>
+	<button id="pour" type="button">เทใหม่</button>
+	<button id="sound" type="button" aria-pressed="true">เสียง</button>
+</div>
+<div class="loading" id="loading">กำลังโหลด…</div>
+
+<script type="module">
+import * as THREE from 'three/webgpu';
+import { pass, mrt, output, normalView } from 'three/tsl';
+import { ao } from 'three/addons/tsl/display/GTAONode.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+import RAPIER from 'rapier';
+
+// ---------- ค่าฟิสิกส์ (หน่วยโลก = เซนติเมตร, เวลา = วินาที) ----------
+const P = {
+	gravity: -981,             // 9.81 m/s² เป็น cm/s²
+	step: 1 / 120,             // ก้าวคงที่ ลูกเล็ก 0.8 ซม. ที่ 60 ก้าวต่อวินาทีหินโดนทับแล้วจมผิวถาด
+	maxSubsteps: 4,
+	softCcd: 2.5,              // ซม. ระยะคาดจุดชนล่วงหน้า ต้องมากกว่าระยะที่หินวิ่งได้ใน 1 ก้าว (~1.5 ซม. ตอนตกจากที่เท)
+	beadDensity: 2.65,         // ควอตซ์ ~2.65 g/cm³
+	beadFriction: 0.45,        // หินขัดเงากับหิน
+	beadRestitution: 0.3,      // หินกระทบหิน เด้งนิดๆ
+	trayFriction: 0.6,         // ไม้สนดิบ ฝืดกว่า
+	trayRestitution: 0.12,     // ไม้ดูดแรง เด้งน้อย
+	linearDamping: 0.12,
+	angularDamping: 0.9,       // แทนแรงต้านการกลิ้ง ไม่งั้นลูกกลิ้งวนในร่องไม่หยุด
+	holdHeight: 0.9,           // ยกหินสูงจากผิวถาดตอนหยิบ ให้ข้ามขอบร่องได้
+	holdStiffness: 22,         // ความเร็ว = ระยะ × ค่านี้ ยิ่งมากยิ่งตามนิ้วติด
+	holdMaxSpeed: 90,
+	throwMaxSpeed: 70,         // จำกัดตอนสะบัด ไม่ให้หินปลิวออกนอกจอ
+	tiltMaxDeg: 14,
+	tiltSpring: { k: 140, zeta: 0.55 }, // ปล่อยแล้วถาดคืนตัวเด้งนิดเดียว
+};
+
+const STONES = ['rose-quartz-bead', 'stone-amethyst', 'stone-aquamarine', 'stone-citrine', 'stone-jade', 'stone-moonstone', 'stone-ruby'];
+const BEAD_COUNT = 20;
+const LIGHT = {
+	trayEnv: 0.5,   // แสงสตูดิโอบนถาด น้อยไว้ให้ไฟหลักทำรูปทรงและเงา
+	beadEnv: 0.85,  // แสงสตูดิโอบนหิน (1 = เท่าหน้าแรกของเว็บ) มากกว่านี้แสงสะท้อนเคลือบทั้งเม็ดจนขุ่น
+	sun: 2.1,       // ไฟหลักจากบนซ้าย
+};
+// เงาสัมผัส (หน่วย ซม.) รัศมีราวเม็ดเดียว เงาเกาะใต้หินและซอกระหว่างหิน exponent มากขึ้น เงาเข้มเฉพาะตรงที่ชิดจริง
+const AO = { radius: 1.0, strength: 1.6, exponent: 1.5 };
+const BEAD_DIAMETER = 0.8; // หินกำไล 8 มม. ทุกเม็ด
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- three ----------
+// WebGPU (เครื่องที่ไม่รองรับจะสลับไปใช้ WebGL2 เอง) วาดเงาสัมผัสจริงด้วย AO ได้
+const renderer = new THREE.WebGPURenderer({ antialias: false }); // ลบรอยหยักด้วย TRAA ข้างล่างแทน
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap; // ขอบเงานุ่มตาม shadow.radius
+document.body.prepend(renderer.domElement);
+await renderer.init();
+
+const BG = new THREE.Color('#e2ded8');
+const scene = new THREE.Scene();
+scene.background = BG;
+scene.fog = new THREE.Fog(BG, 70, 160); // ขอบโต๊ะไกลๆ จางเข้าพื้นหลัง ไม่เห็นเส้นขอบฟ้า
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.5, 500);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, -0.5, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 12;
+controls.maxDistance = 60;
+// ถอยกล้องให้เห็นถาดพอดีจอ ทั้งจอแนวนอนและมือถือแนวตั้ง
+function fitCamera() {
+	const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+	const d = Math.max(9 / t, 7.5 / (t * camera.aspect));
+	camera.position.copy(controls.target).add(new THREE.Vector3(0, 0.74, 0.67).normalize().multiplyScalar(d));
+}
+fitCamera();
+controls.maxPolarAngle = THREE.MathUtils.degToRad(78);
+controls.enablePan = false;
+
+// ---------- แสงแบบโต๊ะถ่ายสินค้า ----------
+// ภาพสตูดิโอ (studio.hdr ไฟล์เดียวกับหน้าแรก) ให้แสงสะท้อนบนผิวหิน สีหินจึงตรงกับเว็บ
+// ไฟหลักขาวอุ่นนิดๆ จากบนซ้ายค่อนหลัง บนถาดสว่าง ข้างถาดมืดลง เงาหินทอดมาทางหน้าขวาสั้นๆ
+const sun = new THREE.DirectionalLight('#fff6ec', LIGHT.sun);
+sun.position.set(-9, 26, -7); // บนซ้ายค่อนไปหลัง ด้านหน้าถาดจึงมืดกว่าด้านบน เห็นทรงชัด
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+// กรอบเงาครอบแค่ถาด ความละเอียดเงาจะสูง
+Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 10, far: 60 });
+sun.shadow.radius = 8;        // ขอบเงานุ่ม
+sun.shadow.intensity = 0.5;   // เงาไม่ดำสนิท แสงรอบห้องยังส่องเข้าไปได้
+sun.shadow.bias = -0.0003;
+sun.shadow.normalBias = 0.02;
+scene.add(sun);
+
+// เงาฟุ้ง: ภาพไล่สีจางวาดเอง วางใต้ถาดและใต้หิน แทนการคำนวณแสงสะท้อนรอบตัว (AO) ที่แพงกว่ามาก
+function blobTexture(rounded) {
+	const s = 256, c = document.createElement('canvas'); c.width = c.height = s;
+	const g = c.getContext('2d');
+	if (rounded) { // สี่เหลี่ยมมุมมนเบลอ สำหรับใต้ถาด
+		g.filter = 'blur(22px)'; g.fillStyle = 'rgba(0,0,0,1)';
+		g.beginPath(); g.roundRect(s * 0.2, s * 0.2, s * 0.6, s * 0.6, s * 0.08); g.fill();
+	} else { // วงกลมไล่จาง สำหรับใต้หิน เข้มตรงกลางที่หินแตะไม้
+		const r = g.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+		r.addColorStop(0, 'rgba(0,0,0,1)'); r.addColorStop(0.35, 'rgba(0,0,0,0.55)'); r.addColorStop(1, 'rgba(0,0,0,0)');
+		g.fillStyle = r; g.fillRect(0, 0, s, s);
+	}
+	const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const blobMaterial = (map, opacity) => new THREE.MeshBasicMaterial({ map, color: 0x2a2018, transparent: true, opacity,
+	depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, toneMapped: false });
+const trayShadow = new THREE.Mesh(new THREE.PlaneGeometry(17, 17), blobMaterial(blobTexture(true), 0.42));
+trayShadow.rotation.x = -Math.PI / 2;
+trayShadow.position.set(0.5, -1.49, 0.7); // เลื่อนมาทางหน้าขวานิดหน่อย ตามทิศไฟ
+scene.add(trayShadow);
+
+// โต๊ะจริงรับแสง เงา และ AO ได้ (สีปรับให้กลืนกับพื้นหลัง)
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ color: '#cfc9c1', roughness: 0.95 }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -1.5;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ---------- โหลด ----------
+const draco = new DRACOLoader().setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+const gltf = new GLTFLoader().setDRACOLoader(draco);
+const [_, env, trayGltf, colliderGltf, ...stoneGltfs] = await Promise.all([
+	RAPIER.init(),
+	new HDRLoader().loadAsync('studio.hdr'),
+	gltf.loadAsync('bead-tray.glb'),
+	gltf.loadAsync('bead-tray-collider.glb'), // รูปทรงหยาบสำหรับฟิสิกส์ เบากว่าตัวที่เห็น 5 เท่า
+	...STONES.map((s) => gltf.loadAsync('beads/' + s + '.glb')), // หินเวอร์ชันเบา เม็ดละ ~3,300 สามเหลี่ยม
+]);
+env.mapping = THREE.EquirectangularReflectionMapping;
+// ผูกแสงสตูดิโอกับวัสดุทีละชิ้น (material.envMap) ไม่ตั้งทั้งฉาก เพราะ three.js ไม่สน envMapIntensity
+// ของวัสดุเมื่อใช้ scene.environment ทำให้ปรับแสงถาดกับหินแยกกันไม่ได้
+renderer.toneMappingExposure = 1.05;
+
+// ---------- โลกฟิสิกส์ ----------
+const world = new RAPIER.World({ x: 0, y: P.gravity, z: 0 });
+world.timestep = P.step;
+const events = new RAPIER.EventQueue(true);
+
+// ถาด: kinematic เพื่อเอียงและเขย่าได้ โดยหินยังรับแรงจากผิวถาดถูกต้อง
+const tray = new THREE.Group();
+const trayModel = trayGltf.scene;
+trayModel.scale.setScalar(100); // Blender ส่งออกเป็นเมตร
+tray.add(trayModel);
+scene.add(tray);
+const maxAniso = renderer.getMaxAnisotropy();
+ground.material.envMap = env; ground.material.envMapIntensity = LIGHT.trayEnv;
+trayModel.traverse((o) => {
+	if (!o.isMesh) return;
+	o.castShadow = o.receiveShadow = true;
+	// ไม้ดิบไม่สะท้อนแสงรอบตัวมาก ลดแสงสตูดิโอบนถาดให้ไฟส่องตรงเด่น เงาจะได้ชัด
+	o.material.envMap = env;
+	o.material.envMapIntensity = LIGHT.trayEnv;
+	if (o.material.map) o.material.map.anisotropy = maxAniso;
+});
+const colliderModel = colliderGltf.scene;
+colliderModel.scale.setScalar(100);
+colliderModel.updateMatrixWorld(true);
+const verts = [], idx = [];
+colliderModel.traverse((o) => {
+	if (!o.isMesh) return;
+	const g = o.geometry, pos = g.attributes.position, base = verts.length / 3, v = new THREE.Vector3();
+	for (let i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld); verts.push(v.x, v.y, v.z); }
+	const ix = g.index ? g.index.array : [...Array(pos.count).keys()];
+	for (const i of ix) idx.push(base + i);
+});
+const trayBody = world.createRigidBody(RAPIER.RigidBodyDesc.fixed());
+const trayCollider = world.createCollider(
+	RAPIER.ColliderDesc.trimesh(new Float32Array(verts), new Uint32Array(idx))
+		.setFriction(P.trayFriction).setRestitution(P.trayRestitution)
+		.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS),
+	trayBody,
+);
+
+// ---------- หิน ----------
+// ชนเป็นทรงกลม (ไม่สนรูร้อย) เร็วและนิ่งกว่า convex hull
+// วาดแบบ instancing: หินชนิดเดียวกันทั้งหมดวาดรวดเดียว เพิ่มจำนวนหินได้โดยไม่หน่วง
+const beads = [];
+const beadByHandle = new Map();
+const homes = [];
+for (let i = 0; i < BEAD_COUNT; i++) homes.push({ kind: i % STONES.length, i });
+const kindCount = STONES.map((_, k) => homes.filter((h) => h.kind === k).length);
+const instanced = STONES.map((_, k) => {
+	let src = null;
+	stoneGltfs[k].scene.updateMatrixWorld(true);
+	stoneGltfs[k].scene.traverse((o) => { if (o.isMesh && !src) src = o; });
+	const geo = src.geometry.clone().applyMatrix4(src.matrixWorld);
+	// หินขัดเงาสะท้อนแสงสตูดิโอเต็มที่ ถ้ามากกว่านี้แสงสะท้อนจะเคลือบทั้งเม็ดจนดูขุ่น
+	src.material.envMap = env;
+	src.material.envMapIntensity = LIGHT.beadEnv;
+	// ภาพผิวหินคมแม้เม็ดเล็กหรือมองเฉียง ลายหินไม่เบลอหาย
+	if (src.material.map) src.material.map.anisotropy = maxAniso;
+	const im = new THREE.InstancedMesh(geo, src.material, kindCount[k]);
+	im.castShadow = im.receiveShadow = true;
+	im.frustumCulled = false; // หินกระจายทั้งฉาก ไม่ต้องให้ three คำนวณขอบเขตใหม่ทุกเฟรม
+	scene.add(im);
+	return im;
+});
+const used = STONES.map(() => 0);
+const tmpM = new THREE.Matrix4(), tmpS = new THREE.Vector3();
+for (const home of homes) {
+	const diameter = BEAD_DIAMETER;
+	// soft CCD เดาจุดชนล่วงหน้า กันหินทะลุผิวถาดได้พอ และเบากว่า CCD เต็มรูปแบบมาก (ตัวเต็มทำเฟรมสะดุดตอนเทหิน)
+	const desc = RAPIER.RigidBodyDesc.dynamic().setLinearDamping(P.linearDamping).setAngularDamping(P.angularDamping);
+	if (desc.setSoftCcdPrediction) desc.setSoftCcdPrediction(P.softCcd); else desc.setCcdEnabled(true);
+	const body = world.createRigidBody(desc);
+	const collider = world.createCollider(
+		RAPIER.ColliderDesc.ball(diameter / 2).setDensity(P.beadDensity)
+			.setFriction(P.beadFriction).setRestitution(P.beadRestitution)
+			.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS),
+		body,
+	);
+	const bead = { home, kind: home.kind, slot: used[home.kind]++, index: beads.length, body, collider, diameter,
+		pos: new THREE.Vector3(), quat: new THREE.Quaternion(), pre: new THREE.Vector3() };
+	beads.push(bead);
+	beadByHandle.set(collider.handle, bead);
+}
+// เงาใต้หินมาจาก AO จริง (มุมที่หินแตะไม้แสงเข้าไม่ถึงจึงมืดเอง) ไม่ต้องวาดวงเงาปลอม
+function syncBead(b) {
+	const p = b.body.translation(), o = b.body.rotation();
+	b.pos.set(p.x, p.y, p.z); b.quat.set(o.x, o.y, o.z, o.w);
+	instanced[b.kind].setMatrixAt(b.slot, tmpM.compose(b.pos, b.quat, tmpS.setScalar(b.diameter)));
+	instanced[b.kind].instanceMatrix.needsUpdate = true;
+}
+const randomTurn = () => new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6));
+function placeHome(b) {
+	const h = b.home;
+	// เทเป็นเกลียวลงตรงร่อง หินตกทีละเม็ดเพราะความสูงไม่เท่ากัน
+	// ปล่อยต่ำ (1.5–4 ซม.) เหมือนเทจากมือ ถ้าปล่อยสูงหินจะเด้งกันจนหลุดถาด
+	const a = (h.i / BEAD_COUNT) * Math.PI * 3, r = 2.5 + ((h.i % 3) - 1) * 0.3;
+	const y = reduceMotion ? 0.8 + (h.i % 2) * 0.9 : 1.5 + (h.i / BEAD_COUNT) * 2.5;
+	const p = new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r);
+	b.body.setTranslation(p, true);
+	b.body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+	b.body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+	b.body.setRotation(randomTurn(), true);
+	syncBead(b);
+}
+function pour() { for (const b of beads) placeHome(b); }
+pour();
+document.getElementById('loading').classList.add('done');
+
+// ---------- เสียงกระทบ ----------
+// ดังเฉพาะตอนเริ่มกระทบ ตามความเร็วที่ชน ไม่ใช้แรงกด เพราะหินที่วางนิ่งก็กดผิวด้วยน้ำหนักตัวตลอดเวลา
+const SOUND = { minSpeed: 4, fullSpeed: 70, maxGain: 0.32, gapMs: 15 };
+let audio = null, soundOn = true, lastClickMs = 0;
+function ensureAudio() { if (!audio) audio = new AudioContext(); if (audio.state === 'suspended') audio.resume(); }
+// สร้างเสียงต้นแบบไว้ครั้งเดียวต่อความยาว ไม่สร้างใหม่ทุกครั้งที่หินชน
+const noiseCache = new Map();
+function noiseBuffer(len) {
+	if (!noiseCache.has(len)) {
+		const buf = audio.createBuffer(1, Math.ceil(audio.sampleRate * len), audio.sampleRate);
+		const d = buf.getChannelData(0);
+		for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+		noiseCache.set(len, buf);
+	}
+	return noiseCache.get(len);
+}
+function click(speed, stoneOnStone) {
+	if (!soundOn || !audio || audio.state !== 'running') return;
+	if (speed < SOUND.minSpeed) return; // ขยับนิดเดียวไม่ต้องมีเสียง
+	const ms = performance.now();
+	if (ms - lastClickMs < SOUND.gapMs) return; // กันเสียงซ้อนเป็นหึ่งตอนหินชนพร้อมกันหลายเม็ด
+	lastClickMs = ms;
+	const now = audio.currentTime;
+	const t = Math.min(1, (speed - SOUND.minSpeed) / (SOUND.fullSpeed - SOUND.minSpeed));
+	const gain = SOUND.maxGain * Math.pow(t, 1.3) + 0.015;
+	const src = audio.createBufferSource(); src.buffer = noiseBuffer(stoneOnStone ? 0.03 : 0.05);
+	src.playbackRate.value = 0.9 + Math.random() * 0.2; // ใช้เสียงต้นแบบซ้ำได้โดยไม่ฟังเหมือนกันทุกครั้ง
+	const bp = audio.createBiquadFilter(); bp.type = 'bandpass';
+	bp.frequency.value = (stoneOnStone ? 3200 : 1100) * (0.85 + Math.random() * 0.3); // หินกับหินแหลม หินกับไม้ทุ้ม
+	bp.Q.value = stoneOnStone ? 8 : 3;
+	const g = audio.createGain(); g.gain.value = gain;
+	src.connect(bp).connect(g).connect(audio.destination);
+	src.start(now);
+}
+
+// ---------- หยิบหิน ----------
+const ray = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+const holdPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const holdTarget = new THREE.Vector3();
+let held = null, heldPointer = null;
+let tiltMode = false, tiltDrag = null;
+
+function setNdc(e) {
+	const r = renderer.domElement.getBoundingClientRect();
+	ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+	ray.setFromCamera(ndc, camera);
+}
+// เช็กว่าชี้โดนหินด้วยทรงกลมตรงๆ ไม่ไล่ทุกสามเหลี่ยมของโมเดล และขยายรัศมีนิดหน่อยให้นิ้วจับง่าย
+const pickSphere = new THREE.Sphere(), pickHit = new THREE.Vector3();
+function pickBead(e) {
+	setNdc(e);
+	let best = null, bestDist = Infinity;
+	for (const b of beads) {
+		pickSphere.set(b.pos, (b.diameter / 2) * 1.3);
+		if (ray.ray.intersectSphere(pickSphere, pickHit)) {
+			const d = pickHit.distanceToSquared(ray.ray.origin);
+			if (d < bestDist) { bestDist = d; best = b; }
+		}
+	}
+	return best;
+}
+
+const canvas = renderer.domElement;
+canvas.addEventListener('pointerdown', (e) => {
+	ensureAudio();
+	if (heldPointer !== null || tiltDrag) return; // นิ้วที่สองไม่แย่งการลาก
+	if (tiltMode) {
+		tiltDrag = { id: e.pointerId, x: e.clientX, y: e.clientY };
+		controls.enabled = false;
+		canvas.setPointerCapture(e.pointerId);
+		return;
+	}
+	const b = pickBead(e);
+	if (!b) return;
+	held = b; heldPointer = e.pointerId;
+	controls.enabled = false;
+	canvas.setPointerCapture(e.pointerId);
+	b.body.setGravityScale(0, true);
+	b.body.setAngularDamping(6);
+	holdPlane.constant = -P.holdHeight;
+	if (ray.ray.intersectPlane(holdPlane, holdTarget) === null) holdTarget.copy(b.body.translation());
+	canvas.style.cursor = 'grabbing';
+});
+canvas.addEventListener('pointermove', (e) => {
+	if (tiltDrag && e.pointerId === tiltDrag.id) {
+		const s = Math.min(innerWidth, innerHeight);
+		const max = THREE.MathUtils.degToRad(P.tiltMaxDeg);
+		tilt.target.z = THREE.MathUtils.clamp(-((e.clientX - tiltDrag.x) / s) * max * 3, -max, max);
+		tilt.target.x = THREE.MathUtils.clamp(((e.clientY - tiltDrag.y) / s) * max * 3, -max, max);
+		return;
+	}
+	if (held && e.pointerId === heldPointer) {
+		setNdc(e);
+		ray.ray.intersectPlane(holdPlane, holdTarget);
+		return;
+	}
+	if (e.pointerType === 'mouse' && !tiltMode) canvas.style.cursor = pickBead(e) ? 'grab' : '';
+});
+function release(e) {
+	if (tiltDrag && e.pointerId === tiltDrag.id) {
+		tiltDrag = null; tilt.target.x = tilt.target.z = 0; controls.enabled = true; return;
+	}
+	if (!held || e.pointerId !== heldPointer) return;
+	const v = held.body.linvel();
+	const speed = Math.hypot(v.x, v.y, v.z);
+	if (speed > P.throwMaxSpeed) { const k = P.throwMaxSpeed / speed; held.body.setLinvel({ x: v.x * k, y: v.y * k, z: v.z * k }, true); }
+	held.body.setGravityScale(1, true);
+	held.body.setAngularDamping(P.angularDamping);
+	held = null; heldPointer = null;
+	controls.enabled = true;
+	canvas.style.cursor = '';
+}
+canvas.addEventListener('pointerup', release);
+canvas.addEventListener('pointercancel', release);
+
+// ---------- เอียงและเขย่าถาด ----------
+const tilt = { x: 0, z: 0, vx: 0, vz: 0, target: { x: 0, z: 0 } };
+let shakeT = -1;
+const btnTilt = document.getElementById('tilt');
+btnTilt.addEventListener('click', () => {
+	tiltMode = !tiltMode;
+	btnTilt.setAttribute('aria-pressed', tiltMode);
+	canvas.style.cursor = tiltMode ? 'move' : '';
+});
+document.getElementById('shake').addEventListener('click', () => { ensureAudio(); shakeT = 0; });
+document.getElementById('pour').addEventListener('click', () => { ensureAudio(); pour(); });
+const btnSound = document.getElementById('sound');
+btnSound.addEventListener('click', () => { soundOn = !soundOn; btnSound.setAttribute('aria-pressed', soundOn); });
+
+const q = new THREE.Quaternion(), eul = new THREE.Euler();
+function stepTray(dt) {
+	const { k, zeta } = P.tiltSpring, c = 2 * zeta * Math.sqrt(k);
+	tilt.vx += (k * (tilt.target.x - tilt.x) - c * tilt.vx) * dt; tilt.x += tilt.vx * dt;
+	tilt.vz += (k * (tilt.target.z - tilt.z) - c * tilt.vz) * dt; tilt.z += tilt.vz * dt;
+	let ox = 0, oz = 0;
+	if (shakeT >= 0) {
+		// สั่นซ้าย-ขวา 0.45 วินาที แอมพลิจูดลดลงเรื่อยๆ
+		const dur = 0.45, f = 11;
+		const a = (1 - shakeT / dur) * 0.35;
+		ox = Math.sin(shakeT * f * Math.PI * 2) * a;
+		oz = Math.cos(shakeT * f * 1.3 * Math.PI * 2) * a * 0.6;
+		shakeT += dt;
+		if (shakeT > dur) shakeT = -1;
+	}
+	// ถาดเป็นวัตถุตายตัว (fixed) ตลอดเวลาที่ไม่ได้ขยับ ซึ่งถูกกว่าแบบขยับได้ (kinematic) ราว 50 เท่าตอนหินนิ่ง
+	// สลับเป็นแบบขยับได้เฉพาะตอนเอียงหรือเขย่า แล้วกลับเป็นตายตัวเมื่อคืนตำแหน่งเดิม
+	const moving = shakeT >= 0 || tiltDrag || Math.abs(tilt.x) + Math.abs(tilt.z) + Math.abs(tilt.vx) + Math.abs(tilt.vz) > 1e-4;
+	if (!moving) {
+		if (trayFixed) return;
+		tilt.x = tilt.z = tilt.vx = tilt.vz = 0;
+		trayBody.setBodyType(RAPIER.RigidBodyType.Fixed, true);
+		trayBody.setTranslation({ x: 0, y: 0, z: 0 }, true);
+		trayBody.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
+		trayFixed = true;
+		return;
+	}
+	if (trayFixed) { trayBody.setBodyType(RAPIER.RigidBodyType.KinematicPositionBased, true); trayFixed = false; }
+	q.setFromEuler(eul.set(tilt.x, 0, tilt.z));
+	trayBody.setNextKinematicRotation(q);
+	trayBody.setNextKinematicTranslation({ x: ox, y: 0, z: oz });
+}
+let trayFixed = true;
+
+function stepHeld() {
+	if (!held) return;
+	const p = held.body.translation();
+	let vx = (holdTarget.x - p.x) * P.holdStiffness, vy = (holdTarget.y - p.y) * P.holdStiffness, vz = (holdTarget.z - p.z) * P.holdStiffness;
+	const s = Math.hypot(vx, vy, vz);
+	if (s > P.holdMaxSpeed) { const k = P.holdMaxSpeed / s; vx *= k; vy *= k; vz *= k; }
+	held.body.setLinvel({ x: vx, y: vy, z: vz }, true);
+}
+
+// ---------- AO ----------
+// มืดลงเองตรงซอกที่แสงรอบตัวเข้าไม่ถึง ใต้หิน ระหว่างหินที่ชิดกัน และในร่อง
+// คำนวณเต็มความละเอียด ครึ่งเดียวขอบหินจะเป็นเม็ด และไม่ใช้ TRAA เพราะทำให้ขอบหินมีเม็ดสีตอนหินขยับ
+const post = new THREE.PostProcessing(renderer);
+const scenePass = pass(scene, camera, { samples: 4 }); // ลบรอยหยักขอบหิน
+scenePass.setMRT(mrt({ output, normal: normalView }));
+const aoPass = ao(scenePass.getTextureNode('depth'), scenePass.getTextureNode('normal'), camera);
+aoPass.resolutionScale = 1;
+aoPass.radius.value = AO.radius;
+aoPass.scale.value = AO.strength;
+aoPass.distanceExponent.value = AO.exponent;
+post.outputNode = aoPass.getTextureNode().mul(scenePass.getTextureNode('output'));
+const SETTLE_FRAMES = 2;
+let settle = SETTLE_FRAMES;
+
+// ---------- ลูป ----------
+let acc = 0, last = performance.now();
+const impact = new THREE.Vector3();
+function frame(now) {
+	acc += Math.min(0.1, (now - last) / 1000); last = now;
+	let n = 0;
+	while (acc >= P.step && n < P.maxSubsteps) {
+		stepTray(P.step);
+		stepHeld();
+		// จำความเร็วก่อนก้าว เพราะหลังก้าวหินที่ชนแล้วหยุดจะเหลือความเร็วเกือบศูนย์
+		for (const b of beads) { const v = b.body.linvel(); b.pre.set(v.x, v.y, v.z); }
+		world.step(events);
+		events.drainCollisionEvents((h1, h2, started) => {
+			if (!started) return;
+			const a = beadByHandle.get(h1), b = beadByHandle.get(h2);
+			if (!a && !b) return;
+			const speed = a && b ? impact.subVectors(a.pre, b.pre).length() : (a || b).pre.length();
+			click(speed, !!(a && b));
+		});
+		acc -= P.step; n++;
+	}
+	if (n === P.maxSubsteps) acc = 0;
+
+	let changed = needsRender || !trayFixed || held;
+	needsRender = false;
+	const t = trayBody.translation(), r = trayBody.rotation();
+	tray.position.set(t.x, t.y, t.z); tray.quaternion.set(r.x, r.y, r.z, r.w);
+	trayShadow.position.x = 0.5 + t.x; trayShadow.position.z = 0.7 + t.z; // เงาฟุ้งตามถาดตอนเขย่า
+	for (const b of beads) {
+		if (b.body.isSleeping()) continue;
+		changed = true;
+		if (b.body.translation().y < -30) { placeHome(b); continue; } // หล่นจากโต๊ะ กลับที่เดิม
+		syncBead(b);
+	}
+	controls.update();
+	// วาดใหม่เฉพาะเมื่อมีอะไรเปลี่ยน หินนิ่งหมดและกล้องไม่ขยับก็ไม่ต้องวาดซ้ำ ประหยัดแบตมือถือ
+	if (changed) settle = SETTLE_FRAMES;
+	if (settle > 0) { settle--; post.render(); }
+	requestAnimationFrame(frame);
+}
+let needsRender = true;
+controls.addEventListener('change', () => { needsRender = true; });
+requestAnimationFrame(frame);
+
+addEventListener('resize', () => {
+	camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+	renderer.setSize(innerWidth, innerHeight);
+	needsRender = true;
+});
+</script>
+</body>
+</html>
